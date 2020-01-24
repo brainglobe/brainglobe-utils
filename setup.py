@@ -5,7 +5,7 @@ requirements = ["pandas"]
 
 setup(
     name="imlib",
-    version="0.0.1a",
+    version="0.0.1b",
     description="General image processing functions",
     install_requires=requirements,
     extras_require={
