@@ -65,5 +65,3 @@ def test_get_sorted_file_paths():
 
 def test_check_path_in_dir():
     assert system.check_path_in_dir(jabberwocky, data_dir / "general")
-
-
