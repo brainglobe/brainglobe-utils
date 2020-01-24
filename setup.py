@@ -1,11 +1,11 @@
 from setuptools import setup, find_namespace_packages
 
-requirements = ["pandas"]
+requirements = ["natsort", "pandas"]
 
 
 setup(
     name="imlib",
-    version="0.0.1b",
+    version="0.0.1",
     description="General image processing functions",
     install_requires=requirements,
     extras_require={
