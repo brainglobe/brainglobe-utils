@@ -17,7 +17,6 @@ before_install:
 - hash -r
 - conda config --set always_yes yes --set changeps1 no
 - conda info -a
-- black ./ -l 79
 install:
 - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
 - source activate test-environment
@@ -26,7 +25,7 @@ install:
 after_success:
 - coveralls
 script:
-- travis_wait 40 bash travis/run_tests.sh
+- travis_wait 10 bash travis/run_tests.sh
 notifications:
   email:
     recipients:
