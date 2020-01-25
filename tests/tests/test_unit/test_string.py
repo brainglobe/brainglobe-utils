@@ -40,4 +40,7 @@ jabberwocky_list = [
 
 def test_get_string_lines():
     assert string.get_text_lines(jabberwocky) == jabberwocky_list
-    assert string.get_text_lines(jabberwocky, return_lines=8) == jabberwocky_list[8]
+    assert (
+        string.get_text_lines(jabberwocky, return_lines=8)
+        == jabberwocky_list[8]
+    )
