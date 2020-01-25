@@ -17,7 +17,7 @@ before_install:
 - hash -r
 - conda config --set always_yes yes --set changeps1 no
 - conda info -a
-- black ./ -l 79 --check
+- black ./ -l 79
 install:
 - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
 - source activate test-environment
