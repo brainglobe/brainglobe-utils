@@ -31,12 +31,19 @@ cubes = [
 sorted_cubes_dir = [os.path.join(str(cubes_dir), cube) for cube in cubes]
 
 
-def test_ensure_directory_exists():
-    home = os.path.expanduser("~")
-    exist_dir = os.path.join(home, ".test_dir")
+def test_ensure_directory_exists(tmpdir):
+
+    # string
+    exist_dir = os.path.join(tmpdir, "test_dir")
     system.ensure_directory_exists(exist_dir)
     assert os.path.exists(exist_dir)
     os.rmdir(exist_dir)
+
+    # pathlib
+    exist_dir_pathlib = Path(tmpdir) / "test_dir2"
+    system.ensure_directory_exists(exist_dir_pathlib)
+    assert exist_dir_pathlib.exists()
+    exist_dir_pathlib.rmdir()
 
 
 def test_get_sorted_file_paths():
@@ -65,3 +72,15 @@ def test_get_sorted_file_paths():
 
 def test_check_path_in_dir():
     assert system.check_path_in_dir(jabberwocky, data_dir / "general")
+
+
+def test_get_num_processes():
+    assert len(os.sched_getaffinity(0)) == system.get_num_processes(
+        min_free_cpu_cores=0
+    )
+
+
+def test_max_processes():
+    max_proc = 5
+    correct_n = min(len(os.sched_getaffinity(0)), max_proc)
+    assert correct_n == system.get_num_processes(n_max_processes=max_proc)
