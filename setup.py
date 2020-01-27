@@ -7,6 +7,7 @@ requirements = [
     "slurmio",
     "configobj",
     "micrometa",
+    "tqdm",
 ]
 
 
