@@ -8,8 +8,12 @@ from xml.dom import minidom
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element as EtElement
 
-from imlib.cells.cells import (Cell, UntypedCell, pos_from_file_name,
-                               MissingCellsError)
+from imlib.cells.cells import (
+    Cell,
+    UntypedCell,
+    pos_from_file_name,
+    MissingCellsError,
+)
 from imlib.system import replace_extension
 
 

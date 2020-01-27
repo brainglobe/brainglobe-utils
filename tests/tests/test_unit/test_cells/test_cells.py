@@ -93,4 +93,3 @@ def test_group_cells_by_z():
         len(cells_groups[plane]) for plane in z_planes_test
     ]
     assert cell_numbers_in_groups_validate == cell_numbers_in_groups_test
-
