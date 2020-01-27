@@ -1,6 +1,13 @@
 from setuptools import setup, find_namespace_packages
 
-requirements = ["natsort", "pandas", "psutil", "slurmio", "configobj"]
+requirements = [
+    "natsort",
+    "pandas",
+    "psutil",
+    "slurmio",
+    "configobj",
+    "micrometa",
+]
 
 
 setup(
