@@ -293,3 +293,22 @@ def safe_execute_command(cmd, log_file_path=None, error_file_path=None):
 
 class SafeExecuteCommandError(Exception):
     pass
+
+
+def delete_temp(directory, paths, prefix="tmp__"):
+    """
+    Removes all temp files (properties of an object starting with "tmp__")
+    :param directory: Directory to delete tmp files from
+    :param paths: Paths object with temp paths.
+    :param prefix: String that temporary files (to be deleted) begin with.
+    """
+    for path_name, path in paths.__dict__.items():
+        if path_name.startswith(prefix):
+            if check_path_in_dir(path, directory):
+                try:
+                    os.remove(path)
+                except FileNotFoundError:
+                    logging.debug(
+                        f"File: {path} not found, not deleting. "
+                        f"Proceeding anyway."
+                    )

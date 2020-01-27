@@ -1,6 +1,5 @@
 import pytest
 import os
-import random
 
 from pathlib import Path
 from random import shuffle
@@ -100,3 +99,24 @@ def test_max_processes():
     assert correct_n == system.get_num_processes(
         n_max_processes=max_proc, min_free_cpu_cores=0
     )
+
+
+class Paths:
+    def __init__(self, directory):
+        self.one = directory / "one.aaa"
+        self.two = directory / "two.bbb"
+        self.tmp__three = directory / "three.ccc"
+        self.tmp__four = directory / "four.ddd"
+
+
+def test_delete_tmp(tmpdir):
+    tmpdir = Path(tmpdir)
+    paths = Paths(tmpdir)
+    for attr, path in paths.__dict__.items():
+        path.touch()
+        print(path)
+    assert len([child for child in tmpdir.iterdir()]) == 4
+    system.delete_temp(tmpdir, paths)
+    assert len([child for child in tmpdir.iterdir()]) == 2
+
+    system.delete_temp(tmpdir, paths)
