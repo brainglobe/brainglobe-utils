@@ -5,7 +5,7 @@ requirements = ["natsort", "pandas", "psutil", "slurmio"]
 
 setup(
     name="imlib",
-    version="0.0.3",
+    version="0.0.4",
     description="General image processing functions",
     install_requires=requirements,
     extras_require={
