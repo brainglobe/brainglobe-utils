@@ -11,7 +11,7 @@ from natsort import natsorted
 from pathlib import Path, PosixPath
 from tempfile import gettempdir
 
-from imlib.string import get_text_lines
+from imlib.general.string import get_text_lines
 
 
 def replace_extension(file, new_extension, check_leading_period=True):

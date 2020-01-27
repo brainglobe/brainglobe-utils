@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from imlib import string
+from imlib.general import string
 
 
 data_dir = Path("tests", "data")

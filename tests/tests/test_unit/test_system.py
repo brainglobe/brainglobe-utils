@@ -4,8 +4,8 @@ import os
 from pathlib import Path
 from random import shuffle
 
-from imlib import system
-from imlib.string import get_text_lines
+from imlib.general import system
+from imlib.general.string import get_text_lines
 
 
 data_dir = Path("tests", "data")
