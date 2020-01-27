@@ -85,4 +85,3 @@ def test_max_processes():
     max_proc = 5
     correct_n = min(len(os.sched_getaffinity(0)), max_proc)
     assert correct_n == system.get_num_processes(n_max_processes=max_proc)
-
