@@ -5,6 +5,7 @@ import psutil
 import platform
 import shutil
 import subprocess
+from tqdm import tqdm
 
 from slurmio import slurmio
 from natsort import natsorted
@@ -312,3 +313,17 @@ def delete_temp(directory, paths, prefix="tmp__"):
                         f"File: {path} not found, not deleting. "
                         f"Proceeding anyway."
                     )
+
+
+def delete_directory_contents(directory, progress=False):
+    """
+    Removes all contents of a directory
+    :param directory: Directory with files to be removed
+    """
+    files = os.listdir(directory)
+    if progress:
+        for f in tqdm(files):
+            os.remove(os.path.join(directory, f))
+    else:
+        for f in files:
+            os.remove(os.path.join(directory, f))
