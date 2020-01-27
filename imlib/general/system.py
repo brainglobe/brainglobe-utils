@@ -5,13 +5,14 @@ import psutil
 import platform
 import shutil
 import subprocess
+from tqdm import tqdm
 
 from slurmio import slurmio
 from natsort import natsorted
 from pathlib import Path, PosixPath
 from tempfile import gettempdir
 
-from imlib.string import get_text_lines
+from imlib.general.string import get_text_lines
 
 
 def replace_extension(file, new_extension, check_leading_period=True):
@@ -293,3 +294,36 @@ def safe_execute_command(cmd, log_file_path=None, error_file_path=None):
 
 class SafeExecuteCommandError(Exception):
     pass
+
+
+def delete_temp(directory, paths, prefix="tmp__"):
+    """
+    Removes all temp files (properties of an object starting with "tmp__")
+    :param directory: Directory to delete tmp files from
+    :param paths: Paths object with temp paths.
+    :param prefix: String that temporary files (to be deleted) begin with.
+    """
+    for path_name, path in paths.__dict__.items():
+        if path_name.startswith(prefix):
+            if check_path_in_dir(path, directory):
+                try:
+                    os.remove(path)
+                except FileNotFoundError:
+                    logging.debug(
+                        f"File: {path} not found, not deleting. "
+                        f"Proceeding anyway."
+                    )
+
+
+def delete_directory_contents(directory, progress=False):
+    """
+    Removes all contents of a directory
+    :param directory: Directory with files to be removed
+    """
+    files = os.listdir(directory)
+    if progress:
+        for f in tqdm(files):
+            os.remove(os.path.join(directory, f))
+    else:
+        for f in files:
+            os.remove(os.path.join(directory, f))

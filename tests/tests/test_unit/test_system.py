@@ -5,8 +5,8 @@ import random
 from pathlib import Path
 from random import shuffle
 
-from imlib import system
-from imlib.string import get_text_lines
+from imlib.general import system
+from imlib.general.string import get_text_lines
 
 
 data_dir = Path("tests", "data")
@@ -100,3 +100,43 @@ def test_max_processes():
     assert correct_n == system.get_num_processes(
         n_max_processes=max_proc, min_free_cpu_cores=0
     )
+
+
+class Paths:
+    def __init__(self, directory):
+        self.one = directory / "one.aaa"
+        self.two = directory / "two.bbb"
+        self.tmp__three = directory / "three.ccc"
+        self.tmp__four = directory / "four.ddd"
+
+
+def test_delete_tmp(tmpdir):
+    tmpdir = Path(tmpdir)
+    paths = Paths(tmpdir)
+    for attr, path in paths.__dict__.items():
+        path.touch()
+        print(path)
+    assert len([child for child in tmpdir.iterdir()]) == 4
+    system.delete_temp(tmpdir, paths)
+    assert len([child for child in tmpdir.iterdir()]) == 2
+
+    system.delete_temp(tmpdir, paths)
+
+
+def write_n_random_files(n, dir, min_size=32, max_size=2048):
+    sizes = random.sample(range(min_size, max_size), n)
+    for size in sizes:
+        with open(os.path.join(dir, str(size)), "wb") as fout:
+            fout.write(os.urandom(size))
+
+
+def test_delete_directory_contents(tmpdir):
+    delete_dir = os.path.join(str(tmpdir), "delete_dir")
+    os.mkdir(delete_dir)
+    write_n_random_files(10, delete_dir)
+
+    # check the directory isn't empty first
+    assert not os.listdir(delete_dir) == []
+
+    system.delete_directory_contents(delete_dir, progress=True)
+    assert os.listdir(delete_dir) == []

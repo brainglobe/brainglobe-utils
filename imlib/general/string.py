@@ -1,6 +1,6 @@
 from natsort import natsorted
 
-from imlib import list
+from imlib.general import list
 
 
 def get_text_lines(

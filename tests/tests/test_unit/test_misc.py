@@ -3,7 +3,7 @@ import pytest
 from random import randint
 from argparse import ArgumentTypeError
 
-from imlib import misc
+from imlib.general import misc
 
 
 def test_check_positive_float():

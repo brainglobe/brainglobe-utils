@@ -14,7 +14,7 @@ from imlib.cells.cells import (
     pos_from_file_name,
     MissingCellsError,
 )
-from imlib.system import replace_extension
+from imlib.general.system import replace_extension
 
 
 def get_cells(cells_file_path, cells_only=False, cell_type=None):
