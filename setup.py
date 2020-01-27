@@ -5,7 +5,7 @@ requirements = ["natsort", "pandas", "psutil", "slurmio"]
 
 setup(
     name="imlib",
-    version="0.0.2",
+    version="0.0.3",
     description="General image processing functions",
     install_requires=requirements,
     extras_require={
@@ -26,7 +26,7 @@ setup(
     packages=find_namespace_packages(exclude=("docs", "tests*")),
     include_package_data=True,
     url="https://github.com/adamltyson/imlib",
-    author="Adam Tyson",
+    author="Adam Tyson, Charly Rousseau",
     author_email="adam.tyson@ucl.ac.uk",
     classifiers=[
         "Development Status :: 3 - Alpha",

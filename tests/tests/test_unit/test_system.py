@@ -32,6 +32,19 @@ cubes = [
 sorted_cubes_dir = [os.path.join(str(cubes_dir), cube) for cube in cubes]
 
 
+def test_replace_extension():
+    test_file = "test_file.sh"
+    test_ext = "txt"
+    test_ext_w_dot = ".txt"
+    validate_file = "test_file.txt"
+    assert validate_file == system.replace_extension(test_file, test_ext)
+    assert validate_file == system.replace_extension(test_file, test_ext_w_dot)
+
+
+def test_remove_leading_character():
+    assert ".ext" == system.remove_leading_character("..ext", ".")
+
+
 def test_ensure_directory_exists(tmpdir):
 
     # string

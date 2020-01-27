@@ -14,6 +14,34 @@ from tempfile import gettempdir
 from imlib.string import get_text_lines
 
 
+def replace_extension(file, new_extension, check_leading_period=True):
+    """
+    Replaces the file extension of a given file
+    :param str file: Input file with file extension to replace
+    :param str new_extension: New file extension
+    :param bool check_leading_period: If True, any leading period of the
+    new extension is removed, preventing "file..txt"
+    :return str: File with new file extension
+    """
+    if check_leading_period:
+        new_extension = remove_leading_character(new_extension, ".")
+    return os.path.splitext(file)[0] + "." + new_extension
+
+
+def remove_leading_character(string, character):
+    """
+    If "string" starts with "character", strip that leading character away.
+    Only removes the first instance
+    :param string:
+    :param character:
+    :return: String without the specified, leading character
+    """
+    if string.startswith(character):
+        return string[1:]
+    else:
+        return string
+
+
 def ensure_directory_exists(directory):
     """
     If a directory doesn't exist, make it. Works for pathlib objects, and
