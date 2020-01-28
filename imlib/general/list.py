@@ -5,3 +5,8 @@ def remove_empty_string(str_list):
     :return: List of strings without the empty strings
     """
     return list(filter(None, str_list))
+
+
+def unique_elements_lists(list_in):
+    """ return the unique elements in a list"""
+    return list(dict.fromkeys(list_in))
