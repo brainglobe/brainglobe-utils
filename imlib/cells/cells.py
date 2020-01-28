@@ -1,7 +1,6 @@
 import os
 import re
 import math
-import logging
 
 from functools import total_ordering
 from collections import defaultdict
@@ -10,8 +9,6 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element as EtElement
 
 import logging
-
-import imlib.IO.cells as cell_io
 
 
 @total_ordering
