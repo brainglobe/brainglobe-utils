@@ -9,6 +9,10 @@ from collections import defaultdict
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element as EtElement
 
+import logging
+
+import imlib.IO.cells as cell_io
+
 
 @total_ordering
 class Cell(object):
