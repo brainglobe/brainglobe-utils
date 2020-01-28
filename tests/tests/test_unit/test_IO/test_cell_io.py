@@ -8,6 +8,7 @@ from imlib.cells.cells import Cell
 
 data_dir = os.path.join("tests", "data")
 xml_path = os.path.join(data_dir, "cells", "cells.xml")
+yml_path = os.path.join(data_dir, "cells", "cells.yml")
 cubes_dir = os.path.join(data_dir, "cube_extract", "cubes")
 roi_sorter_output_dir = os.path.join(data_dir, "IO", "roi_sorter_output")
 
@@ -299,6 +300,10 @@ def test_get_cells():
     cells = cell_io.get_cells(xml_path)
     assert len(cells) == 65
     assert Cell([2536, 523, 1286], 1) == cells[64]
+
+    cells = cell_io.get_cells(yml_path)
+    assert len(cells) == 250
+    assert Cell([9170, 2537, 311], 1) == cells[194]
 
     cells = cell_io.get_cells(cubes_dir)
     assert len(cells) == 4
