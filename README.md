@@ -1,5 +1,5 @@
 [![Python Version](https://img.shields.io/pypi/pyversions/imlib.svg)](https://python.org)
-[![PyPI](https://img.shields.io/pypi/v/imlib.svg)](https://pypi.org/project/cellfinder)
+[![PyPI](https://img.shields.io/pypi/v/imlib.svg)](https://pypi.org/project/imlib)
 [![Wheel](https://img.shields.io/pypi/wheel/imlib.svg)](https://pypi.org/project/imlib)
 [![Development Status](https://img.shields.io/pypi/status/imlib.svg)](https://github.com/adamltyson/imlib)
 [![Travis](https://img.shields.io/travis/com/adamltyson/imlib?label=Travis%20CI)](
