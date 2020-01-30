@@ -8,6 +8,7 @@ requirements = [
     "configobj",
     "micrometa",
     "tqdm",
+    "PyYAML",
 ]
 
 

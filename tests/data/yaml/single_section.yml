@@ -1,0 +1,9 @@
+data:
+- {a: "/some_path",
+   b: "Eeyore",
+   d: a_single_dog,
+   e: 2}
+- {a: /another/path,
+   z: 1,
+   2: 2}
+
