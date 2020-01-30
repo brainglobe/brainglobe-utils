@@ -1,6 +1,23 @@
 import argparse
 
 
+def is_even(num):
+    """
+    Returns True if a number is even
+    :param num:
+    :return:
+    """
+    if num == 0:
+        raise NotImplementedError(
+            "Input number is 0. Evenness of 0 is not defined by this "
+            "function."
+        )
+    if num % 2:
+        return False
+    else:
+        return True
+
+
 def check_positive_float(value, none_allowed=True):
     """
     Used in argparse to enforce positive floats
