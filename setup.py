@@ -15,7 +15,7 @@ requirements = [
 
 setup(
     name="imlib",
-    version="0.0.11",
+    version="0.0.12",
     description="General image processing functions",
     install_requires=requirements,
     extras_require={
