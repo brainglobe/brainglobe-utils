@@ -13,26 +13,9 @@ structures_csv = data_dir / "structures" / "structures.csv"
 
 brain_structure_100 = BrainStructure(
     "378",
-    "754",
     "Supplemental somatosensory area",
-    "SSs",
-    "",
-    "1",
-    "3",
-    "8690",
     "453",
-    "7",
-    "1",
-    "100",
     "/997/8/567/688/695/315/453/378/",
-    "188064",
-    "",
-    "",
-    "f",
-    "101",
-    "713142416",
-    "734881840",
-    "Supplemental somatosensory area",
 )
 
 structure_id_100 = "/997/8/343/313/348/165/100/"
@@ -72,7 +55,7 @@ def test_structure_not_found_error():
 def test_get_structure_by_id():
     structures_tree_list = structures_tree.get_structures_tree(structures_csv)
     structure = structures_tree.get_struct_by_id(structures_tree_list, "378")
-    assert structure.safe_name == "Supplemental somatosensory area"
+    assert structure.name == "Supplemental somatosensory area"
 
     with pytest.raises(structures_tree.StructureNotFoundError):
         structures_tree.get_struct_by_id(structures_tree_list, "1000000")
@@ -81,6 +64,5 @@ def test_get_structure_by_id():
 def test_get_structures_tree_and_brain():
     structures_tree_list = structures_tree.get_structures_tree(structures_csv)
     assert len(structures_tree_list) == 1299
-    assert brain_structure_100.acronym == structures_tree_list[100].acronym
-    assert brain_structure_100.safe_name == structures_tree_list[100].safe_name
+    assert brain_structure_100.name == structures_tree_list[100].name
     assert brain_structure_100.id == structures_tree_list[100].id
