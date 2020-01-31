@@ -9,7 +9,7 @@ requirements = [
     "micrometa",
     "tqdm",
     "PyYAML",
-    "anytree"
+    "anytree",
 ]
 
 

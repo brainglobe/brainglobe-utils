@@ -1,6 +1,33 @@
-import csv
-import pandas as pd
 from imlib.anatomy.structures.structure import BrainStructure
+from imlib.IO.structures import load_structures
+
+
+class CellCountMissingCellsException(Exception):
+    pass
+
+
+class UnknownAtlasValue(Exception):
+    pass
+
+
+def atlas_value_to_structure_id(atlas_value, structures_reference_df):
+    line = structures_reference_df[
+        structures_reference_df["id"] == atlas_value
+    ]
+    if len(line) == 0:
+        raise UnknownAtlasValue(atlas_value)
+    structure_id = line["structure_id_path"].values[0]
+    return structure_id
+
+
+def atlas_value_to_name(atlas_value, structures_reference_df):
+    line = structures_reference_df[
+        structures_reference_df["id"] == atlas_value
+    ]
+    if len(line) == 0:
+        raise UnknownAtlasValue(atlas_value)
+    name = line["name"]
+    return str(name.values[0])
 
 
 class StructureNotFoundError(Exception):
@@ -9,21 +36,6 @@ class StructureNotFoundError(Exception):
 
     def __str__(self):
         return "Missing structure with id {}".format(self._id)
-
-
-def load_structures(structures_file_path):
-    with open(structures_file_path, "r") as structures_file:
-        structures_reader = csv.reader(
-            structures_file, delimiter=",", quotechar='"'
-        )
-        structures = list(structures_reader)
-        header = structures[0]
-        structures = structures[1:]
-        return header, structures
-
-
-def load_structures_as_df(structures_file_path):
-    return pd.read_csv(structures_file_path, sep=",", header=0, quotechar='"')
 
 
 def get_struct_by_id(structures, _id):
@@ -44,10 +56,3 @@ def get_structures_tree(structures_file_path):
             )
         structures.append(struct)
     return structures
-
-
-def print_tree(structures_tree, root_node_idx=0):
-    from anytree import RenderTree, AsciiStyle
-
-    root_node = structures_tree[root_node_idx]
-    print(RenderTree(root_node, style=AsciiStyle()))
