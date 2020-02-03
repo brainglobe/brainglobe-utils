@@ -1,4 +1,4 @@
-[![Python Version](https://img.shields.io/pypi/pyversions/imlib.svg)](https://python.org)
+[![Python Version](https://img.shields.io/pypi/pyversions/imlib.svg)](https://pypi.org/project/imlib)
 [![PyPI](https://img.shields.io/pypi/v/imlib.svg)](https://pypi.org/project/imlib)
 [![Wheel](https://img.shields.io/pypi/wheel/imlib.svg)](https://pypi.org/project/imlib)
 [![Development Status](https://img.shields.io/pypi/status/imlib.svg)](https://github.com/adamltyson/imlib)
