@@ -1,6 +1,5 @@
 from pathlib import Path
 from pandas import Index
-from numpy import nan
 
 from imlib.IO.structures import load_structures_as_df, load_structures
 
