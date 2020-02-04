@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def reorient_image(image, invert_axes=None, orientation="saggital"):
     """
     Reorients the image to the coordinate space of the atlas
