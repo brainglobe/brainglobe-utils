@@ -1,7 +1,3 @@
-from imlib.anatomy.structures.structure import BrainStructure
-from imlib.IO.structures import load_structures
-
-
 class CellCountMissingCellsException(Exception):
     pass
 
@@ -28,31 +24,3 @@ def atlas_value_to_name(atlas_value, structures_reference_df):
         raise UnknownAtlasValue(atlas_value)
     name = line["name"]
     return str(name.values[0])
-
-
-class StructureNotFoundError(Exception):
-    def __init__(self, _id):
-        self._id = _id
-
-    def __str__(self):
-        return "Missing structure with id {}".format(self._id)
-
-
-def get_struct_by_id(structures, _id):
-    for struct in structures:
-        if struct.id == _id:
-            return struct
-    raise StructureNotFoundError(_id)
-
-
-def get_structures_tree(structures_file_path):
-    header, structures_data = load_structures(structures_file_path)
-    structures = []
-    for struct_data in structures_data:
-        struct = BrainStructure(*struct_data)
-        if structures:
-            struct.parent = get_struct_by_id(
-                structures, struct._parent_structure_id
-            )
-        structures.append(struct)
-    return structures
