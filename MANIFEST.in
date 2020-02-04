@@ -1,2 +1,1 @@
-include amap/*.conf
-recursive-include amap/bin/nifty_reg reg_* *.dll
+recursive-include imlib/bin/nifty_reg reg_* *.dll
