@@ -9,6 +9,7 @@ requirements = [
     "micrometa",
     "tqdm",
     "PyYAML",
+    "scipy",
 ]
 
 
