@@ -10,6 +10,7 @@ requirements = [
     "tqdm",
     "PyYAML",
     "scipy",
+    "scikit-image",
 ]
 
 
