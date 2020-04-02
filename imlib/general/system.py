@@ -233,6 +233,21 @@ def get_free_ram():
     return psutil.virtual_memory().available
 
 
+def sanitize_num_processes(num_processes, min_processes, parallel=False):
+    """
+    Returns False to prevent parallel processing in case more processes have
+    been requested than can be used.
+    :param num_processes: How many processes have been requested
+    :param min_processes: Minimum number of cores to keep free
+    :param parallel: If parallel is requested
+    :return bool: True if num_processes is sensible
+    """
+    if parallel:
+        if num_processes < min_processes:
+            parallel = False
+    return parallel
+
+
 def safe_execute_command(cmd, log_file_path=None, error_file_path=None):
     """
     Executes a command in the terminal, making sure that the output can
@@ -327,3 +342,19 @@ def delete_directory_contents(directory, progress=False):
     else:
         for f in files:
             os.remove(os.path.join(directory, f))
+
+
+def filename_from_path(path, remove_extension=False):
+    """
+    Takes a filepath and returns only the filename, optionally removes the
+    file extension
+    :param path: Filepath
+    :param remove_extension: If True, remove the file extension too.
+    Default: False
+    :return: filename
+    """
+
+    filename = os.path.basename(path)
+    if remove_extension:
+        filename = os.path.splitext(filename)[0]
+    return filename
