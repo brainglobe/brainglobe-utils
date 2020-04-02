@@ -19,3 +19,21 @@ def sanitise_df(df):
     """
     df = df.replace(np.inf, np.nan)
     return df
+
+
+def move_column_first(df, column_name):
+    """
+    Moves a given dataframe column (given by name) to the first position
+    :param df: Dataframe
+    :param str column_name: Column name
+    :return: Dataframe with new first column
+    """
+
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("df must be a dataframe!")
+    if not isinstance(column_name, str):
+        raise ValueError("column_name must be a string!")
+    col = df[column_name]
+    df.drop(labels=[column_name], axis=1, inplace=True)
+    df.insert(0, column_name, col)
+    return df
