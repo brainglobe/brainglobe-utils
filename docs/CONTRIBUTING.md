@@ -28,7 +28,7 @@ clean commit history.
 
 
 #### Formatting
-`neuro` uses [Black](https://github.com/python/black) o ensure a consistent 
+`movement` uses [Black](https://github.com/python/black) o ensure a consistent 
 code style. Please run `black ./ -l 79 --target-version py37` before making 
 any commits. To prevent any errors, it is easier to add a formatting check 
 as a [pre-commit hook](https://www.atlassian.com/git/tutorials/git-hooks). 
@@ -49,5 +49,5 @@ before pushing changes.
 
 #### Releases
 Travis will automatically release any tagged commit on the master branch. 
-Hence to release a new version of imlib, use either GitHub, or the git 
+Hence to release a new version of `imlib`, use either GitHub, or the git 
 CLI to tag the relevant commit and push to master.

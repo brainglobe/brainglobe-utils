@@ -1,6 +1,25 @@
 import numpy as np
 
 
+def weight_array(array, weights):
+    """
+    For a given 1D array, and a matching weights array of equal size, append
+    the array with the appropriate values when the corresponding weights value
+     is >1. I.e. for a an array (1, 5, 3, 10) and a weight array (1 2 3 1),
+     return (1 5 3 10 5 3 3)
+    :param array: Array of values
+    :param weights: Corresponding weighting of those values.
+    :return: Weighted array, with additional values appended
+    """
+    array = np.array(array)
+    original_array = np.copy(array)
+    weights = np.array(weights)
+    max_weight = max(weights)
+    for weight in range(2, int(max_weight) + 1):
+        array = np.append(array, original_array[weights == weight])
+    return array
+
+
 def sanitise_array(array, extreme_multiplier=None, exclude_zeros=False):
     """
     Remove nans and other extreme values, including those introduced by

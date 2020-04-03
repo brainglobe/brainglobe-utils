@@ -1,6 +1,18 @@
 import operator
 
 
+def check_none(*args):
+    """
+    Checks if any of the arguments are None
+    :param args: A list of objects of any time
+    :return: True if any of the arguments are None
+    """
+    if any(arg is None for arg in args):
+        return True
+    else:
+        return False
+
+
 def convert_string_to_operation(string_operation, inclusive=True):
     """
     Converts a string (e.g. "higher") to an operation (e.g. operator.ge)
