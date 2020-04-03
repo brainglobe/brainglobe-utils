@@ -28,7 +28,7 @@ clean commit history.
 
 
 #### Formatting
-`movement` uses [Black](https://github.com/python/black) o ensure a consistent 
+`movement` uses [Black](https://github.com/python/black) to ensure a consistent 
 code style. Please run `black ./ -l 79 --target-version py37` before making 
 any commits. To prevent any errors, it is easier to add a formatting check 
 as a [pre-commit hook](https://www.atlassian.com/git/tutorials/git-hooks). 
