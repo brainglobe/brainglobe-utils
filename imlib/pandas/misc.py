@@ -37,3 +37,15 @@ def move_column_first(df, column_name):
     df.drop(labels=[column_name], axis=1, inplace=True)
     df.insert(0, column_name, col)
     return df
+
+
+def regex_remove_df_columns(df, search_string_list):
+    """
+    Remove columns in a dataframe based on a list of search strings
+    :param df: Pandas dataframe
+    :param search_string_list: A list of regex strings to search for.
+    Columns matching these will be removed
+    """
+    for search_string in search_string_list:
+        df = df.drop(df.filter(regex=search_string).columns, axis=1)
+    return df
