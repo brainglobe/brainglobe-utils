@@ -1,6 +1,16 @@
 import numpy as np
 
 
+def midpoints_of_series(series):
+    """
+    Given a series of N values, return a N-1 length array of the midpoints
+    between these points
+
+    :param series: 1D np.array of values
+    """
+    return np.ediff1d(series) / 2 + series[:-1]
+
+
 def weight_array(array, weights):
     """
     For a given 1D array, and a matching weights array of equal size, append
