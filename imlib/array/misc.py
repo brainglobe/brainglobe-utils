@@ -1,6 +1,21 @@
 import numpy as np
 
 
+def split_array_half(array):
+    """
+    Splits an array like object in half, into two arrays.
+    If of an odd length, the first half will be larger by 1.
+
+    :param array: array like object to be split in half
+    :return: Two arrays (first_half and second_half)
+    """
+    midpoint = len(array) // 2
+    first_half = array[:midpoint]
+    second_half = array[midpoint:]
+    assert len(first_half) + len(second_half) == len(array)
+    return first_half, second_half
+
+
 def midpoints_of_series(series):
     """
     Given a series of N values, return a N-1 length array of the midpoints
