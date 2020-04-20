@@ -1,5 +1,11 @@
 import random
+from vtkplotter.colors import colors as vtkplotter_colors
+
 from imlib.plotting.seaborn import get_seaborn_hex
+
+
+def get_random_vtkplotter_color():
+    return random.choice(list(vtkplotter_colors.keys()))
 
 
 def get_random_colors(number_of_colors):
