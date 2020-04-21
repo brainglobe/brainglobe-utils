@@ -11,12 +11,13 @@ requirements = [
     "PyYAML",
     "scipy",
     "scikit-image",
+    "seaborn",
 ]
 
 
 setup(
     name="imlib",
-    version="0.0.18",
+    version="0.0.19",
     description="General data processing functions",
     install_requires=requirements,
     extras_require={
