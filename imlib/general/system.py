@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from slurmio import slurmio
 from natsort import natsorted
-from pathlib import Path, PosixPath
+from pathlib import Path
 from tempfile import gettempdir
 
 from imlib.general.string import get_text_lines
@@ -52,7 +52,7 @@ def ensure_directory_exists(directory):
     if isinstance(directory, str):
         if not os.path.exists(directory):
             os.makedirs(directory)
-    elif isinstance(directory, PosixPath):
+    elif isinstance(directory, Path):
         directory.mkdir(exist_ok=True)
 
 
