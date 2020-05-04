@@ -1,0 +1,3 @@
+#### macOS
+Follow the instructions provided [here](https://github.com/KCL-BMEIS/niftyreg/wiki/install) for compiling the binaries on a macOS. After the configuration of the project is done, before running the `make` command,  opened the CMakeCache.txt file that is created in the build folder, and add this line in the file: CMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=NO.
+Then, keep following the instructions. The binaries created in install_folder should be movable without depending on dyld files around.
