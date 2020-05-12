@@ -89,14 +89,12 @@ def test_check_path_in_dir():
 
 
 def test_get_num_processes():
-    assert len(os.sched_getaffinity(0)) == system.get_num_processes(
-        min_free_cpu_cores=0
-    )
+    assert os.cpu_count() == system.get_num_processes(min_free_cpu_cores=0)
 
 
 def test_max_processes():
     max_proc = 5
-    correct_n = min(len(os.sched_getaffinity(0)), max_proc)
+    correct_n = min(os.cpu_count(), max_proc)
     assert correct_n == system.get_num_processes(
         n_max_processes=max_proc, min_free_cpu_cores=0
     )

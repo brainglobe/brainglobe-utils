@@ -9,7 +9,7 @@ def get_text_lines(
     rstrip=True,
     sort=False,
     remove_empty_lines=True,
-    encoding=None,
+    encoding="utf8",
 ):
     """
     Return only the nth line of a text file
