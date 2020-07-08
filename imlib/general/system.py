@@ -112,6 +112,7 @@ def get_num_processes(
     fraction_free_ram=0.1,
     n_max_processes=None,
     max_ram_usage=None,
+    enforce_single_cpu=True,
 ):
     """
     Determine how many CPU cores to use, based on a minimum number of cpu cores
@@ -127,6 +128,7 @@ def get_num_processes(
     :param int n_max_processes: Maximum number of processes
     :param float max_ram_usage: Maximum amount of RAM (in bytes)
     to use (allthough available may be lower)
+    :param enforce_single_cpu: Ensure that >=1 cpu cores are chosen
     :return: Number of processes to
     """
     logging.debug("Determining the maximum number of CPU cores to use")
@@ -162,6 +164,11 @@ def get_num_processes(
                 f" on other considerations."
             )
         n_processes = min(n_processes, n_max_processes)
+
+    if enforce_single_cpu:
+        if n_processes < 1:
+            logging.debug("Forcing number of processes to be 1")
+            n_processes = 1
 
     logging.debug(f"Setting number of processes to: {n_processes}")
     return int(n_processes)
