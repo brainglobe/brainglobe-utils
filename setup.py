@@ -16,7 +16,7 @@ requirements = [
 
 setup(
     name="imio",
-    version="0.0.1a",
+    version="0.0.1",
     description="Loading and saving of image data.",
     install_requires=requirements,
     extras_require={"dev": ["black", "pytest-cov", "pytest", "coverage",]},
