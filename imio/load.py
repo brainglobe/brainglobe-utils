@@ -227,8 +227,8 @@ def load_from_folder(
     :param bool anti_aliasing: Whether to apply a Gaussian filter to smooth
         the image prior to down-scaling. It is crucial to filter when
         down-sampling the image to avoid aliasing artifacts.
-    :param str file_extension: will have to be present in the file names for them\
-        to be considered part of the sample
+    :param str file_extension: will have to be present in the file names for
+        them to be considered part of the sample
     :param bool load_parallel: Use multiprocessing to speedup image loading
     :param int n_free_cpus: Number of cpu cores to leave free.
     :return: The loaded and scaled brain

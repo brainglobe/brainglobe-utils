@@ -3,7 +3,6 @@ import os
 import glob
 import psutil
 
-import numpy as np
 from scipy.ndimage import zoom
 
 from natsort import natsorted

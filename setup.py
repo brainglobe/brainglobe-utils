@@ -20,7 +20,15 @@ setup(
     description="Loading and saving of image data.",
     install_requires=requirements,
     extras_require={
-        "dev": ["black", "pytest-cov", "pytest", "coverage", "bump2version"]
+        "dev": [
+            "black",
+            "pytest-cov",
+            "pytest",
+            "coverage",
+            "bump2version",
+            "pre-commit",
+            "flake8",
+        ]
     },
     python_requires=">=3.6",
     packages=find_packages(),
