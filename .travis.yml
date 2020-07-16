@@ -3,8 +3,8 @@ after_success:
   - coveralls
 
 stages:
-  - test
   - lint
+  - test
   - name: deploy
     if:
       tag IS present AND repo = adamltyson/imio
