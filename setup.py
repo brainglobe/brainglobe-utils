@@ -19,7 +19,9 @@ setup(
     version="0.0.2",
     description="Loading and saving of image data.",
     install_requires=requirements,
-    extras_require={"dev": ["black", "pytest-cov", "pytest", "coverage",]},
+    extras_require={
+        "dev": ["black", "pytest-cov", "pytest", "coverage", "bump2version"]
+    },
     python_requires=">=3.6",
     packages=find_packages(),
     include_package_data=True,
