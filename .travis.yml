@@ -4,6 +4,7 @@ after_success:
 
 stages:
   - test
+  - lint
   - name: deploy
     if:
       tag IS present AND repo = adamltyson/imio
@@ -11,6 +12,15 @@ stages:
 
 jobs:
   include:
+    - stage: lint
+      name: "Lint"
+      language: python
+      os: linux
+      env: MINICONDA_URL=http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+      dist: bionic
+      python: 3.7
+      before_install: source travis/install_unix.sh
+      script: bash travis/lint.sh
     - stage: test
       name: "Ubuntu Bionic python 3.6"
       language: python
