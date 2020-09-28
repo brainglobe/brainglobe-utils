@@ -27,6 +27,18 @@ def test_get_cell_location_array():
     cell_array = get_cell_location_array(
         xml_path, cell_position_scaling=[0.101, 10.1, 101], integer=False
     )
-    assert isclose(cell_array[0, 0], 68.579, abs_tol=0.01,)
-    assert isclose(cell_array[0, 1], 808, abs_tol=0.01,)
-    assert isclose(cell_array[0, 2], 66660, abs_tol=0.01,)
+    assert isclose(
+        cell_array[0, 0],
+        68.579,
+        abs_tol=0.01,
+    )
+    assert isclose(
+        cell_array[0, 1],
+        808,
+        abs_tol=0.01,
+    )
+    assert isclose(
+        cell_array[0, 2],
+        66660,
+        abs_tol=0.01,
+    )

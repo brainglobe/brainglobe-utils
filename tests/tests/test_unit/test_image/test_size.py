@@ -1,7 +1,13 @@
 import numpy as np
 from imlib.image import size
 
-img = np.array([[0, 0, 1, 1, 0], [0, 10, 100, 10, 0], [0, 1, 10, 1, 0],])
+img = np.array(
+    [
+        [0, 0, 1, 1, 0],
+        [0, 10, 100, 10, 0],
+        [0, 1, 10, 1, 0],
+    ]
+)
 
 resized_test = np.array(
     [
