@@ -441,7 +441,7 @@ def load_from_paths_sequence(
                 ),
                 dtype=img.dtype,
             )
-        if x_scaling_factor != 1 and y_scaling_factor != 1:
+        if x_scaling_factor != 1 or y_scaling_factor != 1:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 img = transform.rescale(
