@@ -16,10 +16,10 @@ def reorient_image(image, invert_axes=None, orientation="saggital"):
         for axis in list(invert_axes):
             image = np.flip(image, axis=axis)
 
-    if orientation is not "saggital":
-        if orientation is "coronal":
+    if orientation != "saggital":
+        if orientation == "coronal":
             transposition = (2, 1, 0)
-        elif orientation is "horizontal":
+        elif orientation == "horizontal":
             transposition = (1, 2, 0)
 
         image = np.transpose(image, transposition)

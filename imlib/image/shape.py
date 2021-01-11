@@ -9,11 +9,11 @@ def convert_shape_dict_to_array_shape(shape_dict, type="numpy"):
     """
 
     shape = []
-    if type is "numpy":
+    if type == "numpy":
         shape.append(int(shape_dict["y"]))
         shape.append(int(shape_dict["x"]))
 
-    elif type is "fiji":
+    elif type == "fiji":
         shape.append(int(shape_dict["x"]))
         shape.append(int(shape_dict["y"]))
     else:

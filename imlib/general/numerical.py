@@ -82,7 +82,7 @@ def round_updown_to_x(num_in, x, direction="up"):
     :param direction: Round up or down. Default: 'up'
     :return: Rounded number
     """
-    if direction is "down":
+    if direction == "down":
         num_out = int(num_in) - int(num_in) % int(x)
     else:
         num_out = num_in + (x - num_in) % int(x)

@@ -13,10 +13,6 @@ validate_2d_img = np.array(
 
 
 def test_scale_to_16_bits():
-    assert (validate_2d_img == scale.scale_to_16_bits(test_2d_img)).all()
-
-
-def test_scale_to_16_bits():
     validate_2d_img_uint16 = validate_2d_img.astype(np.uint16, copy=False)
     assert (
         validate_2d_img_uint16

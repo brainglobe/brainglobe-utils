@@ -12,7 +12,7 @@ requirements = [
     "scipy",
     "scikit-image",
     "seaborn",
-    "vtkplotter",
+    "vedo",
 ]
 
 
@@ -23,15 +23,13 @@ setup(
     install_requires=requirements,
     extras_require={
         "dev": [
-            "sphinx",
-            "recommonmark",
-            "sphinx_rtd_theme",
-            "pydoc-markdown",
             "black",
             "pytest-cov",
             "pytest",
-            "gitpython",
             "coverage",
+            "bump2version",
+            "pre-commit",
+            "flake8",
         ]
     },
     python_requires=">=3.7",
@@ -45,7 +43,6 @@ setup(
         "Operating System :: POSIX :: Linux",
         "Operating System :: Microsoft :: Windows :: Windows 10",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Intended Audience :: Developers",
