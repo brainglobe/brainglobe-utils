@@ -12,7 +12,6 @@ requirements = [
     "scipy",
     "scikit-image",
     "seaborn",
-    "vedo",
 ]
 
 
@@ -30,7 +29,10 @@ setup(
             "bump2version",
             "pre-commit",
             "flake8",
-        ]
+        ],
+        "vedo": [
+            "vedo",
+        ],
     },
     python_requires=">=3.7",
     packages=find_namespace_packages(exclude=("docs", "tests*")),
