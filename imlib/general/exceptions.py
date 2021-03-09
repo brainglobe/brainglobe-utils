@@ -14,18 +14,6 @@ class CommandLineInputError(Exception):
         return str(self.message)
 
 
-class RegistrationError(Exception):
-    pass
-
-
-class SegmentationError(RegistrationError):
-    pass
-
-
-class TransformationError(RegistrationError):
-    pass
-
-
 class ArgumentError(Exception):
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
