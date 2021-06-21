@@ -8,7 +8,7 @@ def remove_empty_string(str_list):
 
 
 def unique_elements_lists(list_in):
-    """ return the unique elements in a list"""
+    """return the unique elements in a list"""
     return list(dict.fromkeys(list_in))
 
 
