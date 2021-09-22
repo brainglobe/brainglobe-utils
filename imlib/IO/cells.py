@@ -1,3 +1,10 @@
+"""
+Cell position I/O
+
+Based on https://github.com/SainsburyWellcomeCentre/niftynet_cell_count by
+Christian Niedworok (https://github.com/cniedwor).
+"""
+
 import logging
 import os
 import yaml

@@ -1,3 +1,7 @@
+"""
+Based on https://github.com/SainsburyWellcomeCentre/niftynet_cell_count by
+Christian Niedworok (https://github.com/cniedwor).
+"""
 import os
 import re
 import math

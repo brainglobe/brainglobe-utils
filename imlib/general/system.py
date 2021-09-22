@@ -260,6 +260,9 @@ def safe_execute_command(cmd, log_file_path=None, error_file_path=None):
     Executes a command in the terminal, making sure that the output can
     be logged even if execution fails during the call.
 
+    From https://github.com/SainsburyWellcomeCentre/amap_python by
+    Charly Rousseau (https://github.com/crousseau).
+
     :param cmd:
     :param log_file_path:
     :param error_file_path:
