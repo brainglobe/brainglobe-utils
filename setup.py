@@ -34,7 +34,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     url="https://github.com/brainglobe/imio",
-    author="Adam Tyson, Charly Rousseau",
+    author="Charly Rousseau, Adam Tyson",
     author_email="code@adamltyson.com",
     classifiers=[
         "Development Status :: 3 - Alpha",
