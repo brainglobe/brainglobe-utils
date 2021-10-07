@@ -16,8 +16,7 @@ Loading and saving of image data.
 ### About
 The aim of imio is to be a lightweight image loading library for the file types
  supported by [cellfinder](https://github.com/brainglobe/cellfinder), and
- [brainreg](https://github.com/brainglobe/brainreg). It is an update to 
- [brainio](https://github.com/adamltyson/brainio).
+ [brainreg](https://github.com/brainglobe/brainreg).
 
 #### Supports loading of:
 * Tiff stack `+`
