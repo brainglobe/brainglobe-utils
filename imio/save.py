@@ -59,7 +59,7 @@ def to_tiffs(img_volume, path_prefix, path_suffix="", pad_width=4):
     :return:
     """
     z_size = img_volume.shape[-1]
-    if z_size > 10 ** pad_width:
+    if z_size > 10**pad_width:
         raise ValueError(
             "Not enough padding digits {} for value"
             " {}".format(pad_width, z_size)
