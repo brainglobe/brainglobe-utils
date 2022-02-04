@@ -1,5 +1,5 @@
 __author__ = "Adam Tyson, Charly Rousseau"
-__version__ = "0.1.0"
+__version__ = "0.2.0-rc0"
 
 from imio.load import *
 from imio.save import *
