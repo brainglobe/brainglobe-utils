@@ -31,7 +31,7 @@ setup(
         ]
     },
     python_requires=">=3.7",
-    packages=find_packages(),
+    packages=find_packages(exclude=("tests", "tests.*")),
     include_package_data=True,
     url="https://github.com/brainglobe/imio",
     author="Charly Rousseau, Adam Tyson",
