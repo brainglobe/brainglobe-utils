@@ -8,12 +8,12 @@ import numpy as np
 
 from skimage import transform
 from tqdm import tqdm
-from natsort import natsorted
 from concurrent.futures import ProcessPoolExecutor
+from natsort import natsorted
 
 from imlib.general.system import get_sorted_file_paths, get_num_processes
 
-from .utils import scale_z, check_mem
+from .utils import check_mem, scale_z
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -170,7 +170,7 @@ def load_img_stack(
         stack = np.array(downsampled_stack)
 
     if stack.ndim == 3:
-        stack = np.rollaxis(stack, 0, 3)
+        # stack = np.rollaxis(stack, 0, 3)
         if z_scaling_factor != 1:
             logging.debug("Downsampling stack in Z")
             stack = scale_z(stack, z_scaling_factor)
@@ -191,7 +191,7 @@ def load_nii(src_path, as_array=False, as_numpy=False):
     src_path = str(src_path)
     nii_img = nib.load(src_path)
     if as_array:
-        image = nii_img.get_data()
+        image = nii_img.get_fdata()
         if as_numpy:
             image = np.array(image)
 
@@ -202,9 +202,9 @@ def load_nii(src_path, as_array=False, as_numpy=False):
 
 def load_from_folder(
     src_folder,
-    x_scaling_factor,
-    y_scaling_factor,
-    z_scaling_factor,
+    x_scaling_factor=1,
+    y_scaling_factor=1,
+    z_scaling_factor=1,
     anti_aliasing=True,
     file_extension="",
     load_parallel=False,
@@ -249,9 +249,9 @@ def load_from_folder(
 
 def load_img_sequence(
     img_sequence_file_path,
-    x_scaling_factor,
-    y_scaling_factor,
-    z_scaling_factor,
+    x_scaling_factor=1,
+    y_scaling_factor=1,
+    z_scaling_factor=1,
     anti_aliasing=True,
     load_parallel=False,
     sort=False,
@@ -299,9 +299,9 @@ def load_img_sequence(
 
 def load_image_series(
     paths,
-    x_scaling_factor,
-    y_scaling_factor,
-    z_scaling_factor,
+    x_scaling_factor=1,
+    y_scaling_factor=1,
+    z_scaling_factor=1,
     anti_aliasing=True,
     load_parallel=False,
     n_free_cpus=2,
@@ -341,6 +341,8 @@ def load_image_series(
             y_scaling_factor,
             anti_aliasing=anti_aliasing,
         )
+
+    img = np.moveaxis(img, 2, 0)  # back to z first
     if z_scaling_factor != 1:
         img = scale_z(img, z_scaling_factor)
 
@@ -385,8 +387,11 @@ def threaded_load_from_sequence(
             break
         else:
             end_idx = start_idx + n_paths_per_subsequence
-            end_idx = end_idx if end_idx < len(paths_sequence) else -1
-            sub_paths = paths_sequence[start_idx:end_idx]
+
+            if end_idx <= len(paths_sequence):
+                sub_paths = paths_sequence[start_idx:end_idx]
+            else:
+                sub_paths = paths_sequence[start_idx:]
 
         process = pool.submit(
             load_from_paths_sequence,
@@ -453,55 +458,3 @@ def load_from_paths_sequence(
                 )
         volume[:, :, i] = img
     return volume
-
-
-def generate_paths_sequence_file(
-    input_folder,
-    output_file_path,
-    sort=True,
-    prefix=None,
-    suffix=None,
-    match_string=None,
-):
-    input_folder = str(input_folder)
-    paths = []
-    for root, dirs, files in os.walk(input_folder):
-        for filename in files:
-            if prefix is not None and not filename.startswith(prefix):
-                continue
-            if suffix is not None and not filename.endswith(suffix):
-                continue
-            if match_string is not None and match_string not in filename:
-                continue
-            paths.append(os.path.join(root, filename))
-
-    if sort:
-        paths = natsorted(paths)
-
-    with open(output_file_path, "w") as out_file:
-        out_file.writelines(paths)
-
-
-def get_size_image_from_file_paths(file_path, file_extension="tif"):
-    """
-    Returns the size of an image (which is a list of 2D files), without loading
-    the whole image
-    :param str file_path: File containing file_paths in a text file,
-    or as a list.
-    :param str file_extension: Optional file extension (if a directory
-     is passed)
-    :return: Dict of image sizes
-    """
-    file_path = str(file_path)
-
-    img_paths = get_sorted_file_paths(file_path, file_extension=file_extension)
-    z_shape = len(img_paths)
-
-    logging.debug(
-        "Loading file: {} to check raw image size" "".format(img_paths[0])
-    )
-    image_0 = load_any(img_paths[0])
-    y_shape, x_shape = image_0.shape
-
-    image_shape = {"x": x_shape, "y": y_shape, "z": z_shape}
-    return image_shape
