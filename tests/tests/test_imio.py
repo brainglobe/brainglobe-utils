@@ -22,7 +22,7 @@ def start_array(layer):
 def test_tiff_io(tmpdir, layer):
     folder = str(tmpdir)
     dest_path = os.path.join(folder, "layer.tiff")
-    tifffile.imsave(dest_path, layer)
+    tifffile.imwrite(dest_path, layer)
     reloaded = tifffile.imread(dest_path)
     assert (reloaded == layer).all()
 

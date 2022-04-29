@@ -43,7 +43,7 @@ def to_tiff(img_volume, dest_path):
     :param dest_path: Where to save the tiff stack
     """
     dest_path = str(dest_path)
-    tifffile.imsave(dest_path, img_volume)
+    tifffile.imwrite(dest_path, img_volume)
 
 
 def to_tiffs(img_volume, path_prefix, path_suffix="", extension=".tif"):
