@@ -16,7 +16,7 @@ requirements = [
 
 setup(
     name="imio",
-    version="0.2.1",
+    version="0.2.2-rc0",
     description="Loading and saving of image data.",
     install_requires=requirements,
     extras_require={
