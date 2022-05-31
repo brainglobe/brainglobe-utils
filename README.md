@@ -38,3 +38,6 @@ available RAM
 ```bash
 pip install imio
 ```
+
+## Contributing
+Contributions to imio are more than welcome. Please see the [contributing guide](https://github.com/brainglobe/.github/blob/main/CONTRIBUTING.md).
