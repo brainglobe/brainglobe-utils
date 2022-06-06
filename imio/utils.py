@@ -1,8 +1,8 @@
 import logging
-import psutil
 
-from scipy.ndimage import zoom
+import psutil
 from imlib.general.system import get_sorted_file_paths
+from scipy.ndimage import zoom
 
 import imio
 

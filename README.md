@@ -26,13 +26,13 @@ The aim of imio is to be a lightweight image loading library for the file types
 
 `*` Supports loading in parallel for speed
 
-`+` Suports scaling on loading. E.g. downsampling to load images bigger than the 
+`+` Suports scaling on loading. E.g. downsampling to load images bigger than the
 available RAM
 
 #### Supports saving of:
 * Tiff stack
 * Tiff series
-* nifti 
+* nifti
 
 ### To install
 ```bash

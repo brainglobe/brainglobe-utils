@@ -1,9 +1,8 @@
-import tifffile
 import warnings
+
 import nrrd
-
 import numpy as np
-
+import tifffile
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")

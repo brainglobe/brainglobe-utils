@@ -1,8 +1,7 @@
 import os
-import pytest
 
 import numpy as np
-
+import pytest
 from tifffile import tifffile
 
 from imio import load, save, utils

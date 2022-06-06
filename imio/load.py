@@ -1,17 +1,16 @@
-import os
-import math
-import nrrd
 import logging
-import tifffile
+import math
+import os
 import warnings
-import numpy as np
+from concurrent.futures import ProcessPoolExecutor
 
+import nrrd
+import numpy as np
+import tifffile
+from imlib.general.system import get_num_processes, get_sorted_file_paths
+from natsort import natsorted
 from skimage import transform
 from tqdm import tqdm
-from concurrent.futures import ProcessPoolExecutor
-from natsort import natsorted
-
-from imlib.general.system import get_sorted_file_paths, get_num_processes
 
 from .utils import check_mem, scale_z
 
