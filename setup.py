@@ -22,7 +22,7 @@ requirements = [
 
 setup(
     name="imio",
-    version="0.2.4-rc0",
+    version="0.2.4",
     description="Loading and saving of image data.",
     long_description=long_description,
     long_description_content_type="text/markdown",
