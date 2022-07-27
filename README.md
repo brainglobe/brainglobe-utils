@@ -5,8 +5,7 @@
 [![Development Status](https://img.shields.io/pypi/status/imio.svg)](https://github.com/brainglobe/imio)
 [![Tests](https://img.shields.io/github/workflow/status/brainglobe/imio/tests)](
     https://github.com/brainglobe/imio/actions)
-[![Coverage Status](https://coveralls.io/repos/github/brainglobe/imio/badge.svg?branch=master)](https://coveralls.io/github/brainglobe/imio?branch=master)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+[![codecov](https://codecov.io/gh/brainglobe/imio/branch/master/graph/badge.svg?token=M1BXRDJ9V4)](https://codecov.io/gh/brainglobe/imio)[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
 [![Contributions](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)](https://github.com/brainglobe/imio)
 
 
