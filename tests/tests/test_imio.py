@@ -9,7 +9,7 @@ from imio import load, save, utils
 
 @pytest.fixture()
 def layer():
-    return np.tile(np.array([1, 2, 3, 4]), (4, 1))
+    return np.tile(np.array([1, 2, 3, 4], dtype=np.int32), (4, 1))
 
 
 @pytest.fixture()
