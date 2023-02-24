@@ -1,3 +1,63 @@
+[project]
+name = "imio"
+description = "Loading and saving of image data."
+readme = "README.md"
+authors = [
+    {name = "Charly Rousseau, Adam Tyson", email = "code@adamltyson.com"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "imlib",
+    "natsort",
+    "nibabel",
+    "nibabel >= 2.1.0",
+    "numpy",
+    "psutil",
+    "pynrrd",
+    "scikit-image",
+    "slurmio >= 0.0.5",
+    "tifffile",
+    "tqdm",
+]
+dynamic = ['version']
+
+[project.urls]
+Homepage = "https://github.com/brainglobe/imio"
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+]
+
+[build-system]
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "setuptools_scm[toml]>=6.2",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["imio*"]
+
+[tool.setuptools_scm]
 [tool.black]
 target-version = ['py38', 'py39', 'py310']
 skip-string-normalization = false
