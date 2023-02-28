@@ -58,6 +58,24 @@ include-package-data = true
 include = ["imio*"]
 
 [tool.setuptools_scm]
+
+[tool.pytest.ini_options]
+addopts = "--cov=imio"
+filterwarnings = [
+    "error",
+    # Emitted by scikit-image on import, see https://github.com/scikit-image/scikit-image/issues/6663
+    # This filter should be removed when scikit-image 0.20 is released
+    "ignore:`np.bool8` is a deprecated alias for `np.bool_`",
+    # Emitted by nptyping, see https://github.com/ramonhagenaars/nptyping/issues/102
+    # for upstream issue
+    "ignore:`np.object0` is a deprecated alias for ``np.object0`",
+    "ignore:`np.int0` is a deprecated alias for `np.intp`",
+    "ignore:`np.uint0` is a deprecated alias for `np.uintp`",
+    "ignore:`np.void0` is a deprecated alias for `np.void`",
+    "ignore:`np.bytes0` is a deprecated alias for `np.bytes_`",
+    "ignore:`np.str0` is a deprecated alias for `np.str_`"
+]
+
 [tool.black]
 target-version = ['py38', 'py39', 'py310']
 skip-string-normalization = false
