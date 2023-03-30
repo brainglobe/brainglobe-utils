@@ -18,6 +18,8 @@
       ]
     }
   ],
+  "commit": false,
+  "contributorsSortAlphabetically": true,
   "contributorsPerLine": 7,
   "skipCi": false,
   "repoType": "github",
