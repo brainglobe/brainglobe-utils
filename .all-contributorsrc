@@ -7,6 +7,17 @@
   "commitConvention": "angular",
   "contributors": [
     {
+      "login": "adamltyson",
+      "name": "Adam Tyson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13147259?v=4",
+      "profile": "http://adamltyson.com",
+      "contributions": [
+        "code",
+        "infra",
+        "maintenance",
+        "test",
+      ]
+    }
       "login": "dstansby",
       "name": "David Stansby",
       "avatar_url": "https://avatars.githubusercontent.com/u/6197628?v=4",
@@ -48,6 +59,7 @@
       ]
     }
   ],
+
   "commit": false,
   "contributorsSortAlphabetically": true,
   "contributorsPerLine": 7,
