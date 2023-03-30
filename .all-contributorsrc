@@ -7,6 +7,18 @@
   "commitConvention": "angular",
   "contributors": [
     {
+      "login": "dstansby",
+      "name": "David Stansby",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6197628?v=4",
+      "profile": "https://www.davidstansby.com",
+      "contributions": [
+        "test",
+        "code",
+        "maintenance",
+        "review",
+        "infra"
+      ]
+    }
       "login": "JulesScholler",
       "name": "Jules Scholler",
       "avatar_url": "https://avatars.githubusercontent.com/u/23705332?v=4",
