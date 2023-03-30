@@ -7,6 +7,15 @@
   "commitConvention": "angular",
   "contributors": [
     {
+      "login": "JulesScholler",
+      "name": "Jules Scholler",
+      "avatar_url": "https://avatars.githubusercontent.com/u/23705332?v=4",
+      "profile": "https://www.jscholler.com/",
+       "contributions": [
+       "code"
+      ]
+    },
+  {
       "login": "jaimergp",
       "name": "jaimergp",
       "avatar_url": "https://avatars.githubusercontent.com/u/2559438?v=4",
@@ -14,8 +23,8 @@
       "contributions": [
         "code"
       ]
-    }
-  ],
+    },
+ {
       "login": "crousseau",
       "name": "Charly Rousseau",
       "avatar_url": "https://avatars.githubusercontent.com/u/13150960?v=4",

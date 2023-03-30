@@ -48,6 +48,7 @@ Contributions to imio are more than welcome. Please see the [contributing guide]
 <table>
   <tbody>
     <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.jscholler.com/"><img src="https://avatars.githubusercontent.com/u/23705332?v=4?s=100" width="100px;" alt="Jules Scholler"/><br /><sub><b>Jules Scholler</b></sub></a><br /><a href="https://github.com/brainglobe/imio/commits?author=JulesScholler" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jaimergp"><img src="https://avatars.githubusercontent.com/u/2559438?v=4?s=100" width="100px;" alt="jaimergp"/><br /><sub><b>jaimergp</b></sub></a><br /><a href="https://github.com/brainglobe/imio/commits?author=jaimergp" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/crousseau"><img src="https://avatars.githubusercontent.com/u/13150960?v=4?s=100" width="100px;" alt="Charly Rousseau"/><br /><sub><b>Charly Rousseau</b></sub></a><br /><a href="https://github.com/brainglobe/imio/commits?author=crousseau" title="Code">💻</a> <a href="#ideas-crousseau" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/brainglobe/imio/commits?author=crousseau" title="Tests">⚠️</a></td>
     </tr>
