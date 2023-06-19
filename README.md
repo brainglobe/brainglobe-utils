@@ -37,7 +37,7 @@ pip install imio
 ```
 
 ## Contributing
-Contributions to imio are more than welcome. Please see the [contributing guide](https://github.com/brainglobe/.github/blob/main/CONTRIBUTING.md).
+Contributions to imio are more than welcome. Please see the [developers guide](https://brainglobe.info/developers/index.html).
 
 ## Contributors
 
