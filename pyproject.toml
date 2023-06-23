@@ -68,7 +68,7 @@ build-backend = "setuptools.build_meta"
 include-package-data = true
 
 [tool.setuptools.packages.find]
-include = ["swc_slack*"]
+include = ["brainglobe_utils*"]
 exclude = ["tests", "docs*"]
 
 
