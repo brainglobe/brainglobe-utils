@@ -1,16 +1,16 @@
-import os
 import glob
 import logging
-import psutil
+import os
 import platform
 import shutil
 import subprocess
-from tqdm import tqdm
-
-from slurmio import slurmio
-from natsort import natsorted
 from pathlib import Path
 from tempfile import gettempdir
+
+import psutil
+from natsort import natsorted
+from slurmio import slurmio
+from tqdm import tqdm
 
 from imlib.general.string import get_text_lines
 

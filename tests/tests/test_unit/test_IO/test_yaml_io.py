@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from imlib.IO import yaml
 
 data_dir = Path("tests", "data")

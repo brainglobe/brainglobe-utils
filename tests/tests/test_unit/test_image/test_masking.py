@@ -2,7 +2,6 @@ import numpy as np
 
 import imlib.image.masking as masking
 
-
 raw_image = np.array(
     [
         [1, 1, 3, 3, 1, 1],

@@ -2,19 +2,17 @@
 Based on https://github.com/SainsburyWellcomeCentre/niftynet_cell_count by
 Christian Niedworok (https://github.com/cniedwor).
 """
+import logging
+import math
 import os
 import re
-import math
-from typing import Union, Dict, List, Tuple, Any, Optional
-
-from functools import total_ordering
 from collections import defaultdict
-
-import numpy.typing as npt
+from functools import total_ordering
+from typing import Any, Dict, List, Optional, Tuple, Union
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element as EtElement
 
-import logging
+import numpy.typing as npt
 
 
 @total_ordering

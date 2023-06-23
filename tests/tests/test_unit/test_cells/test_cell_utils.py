@@ -1,6 +1,7 @@
 import os
-import numpy as np
 from math import isclose
+
+import numpy as np
 
 from imlib.cells.utils import get_cell_location_array
 
