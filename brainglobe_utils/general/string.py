@@ -1,6 +1,6 @@
 from natsort import natsorted
 
-from imlib.general import list
+from brainglobe_utils.general import list
 
 
 def get_text_lines(

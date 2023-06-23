@@ -3,8 +3,8 @@ import os
 import pytest
 from natsort import natsorted
 
-from imlib.cells.cells import Cell
-from imlib.IO import cells as cell_io
+from brainglobe_utils.cells.cells import Cell
+from brainglobe_utils.IO import cells as cell_io
 
 data_dir = os.path.join("tests", "data")
 xml_path = os.path.join(data_dir, "cells", "cells.xml")

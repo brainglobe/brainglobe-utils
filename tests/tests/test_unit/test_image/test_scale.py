@@ -1,6 +1,6 @@
 import numpy as np
 
-from imlib.image import scale
+from brainglobe_utils.image import scale
 
 test_2d_img = np.array([[1, 2, 10, 100], [5, 25, 300, 1000], [1, 0, 0, 125]])
 validate_2d_img = np.array(

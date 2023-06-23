@@ -3,7 +3,7 @@ from math import isclose
 
 import numpy as np
 
-from imlib.cells.utils import get_cell_location_array
+from brainglobe_utils.cells.utils import get_cell_location_array
 
 data_dir = os.path.join("tests", "data")
 xml_path = os.path.join(data_dir, "cells", "cells_two_types.xml")

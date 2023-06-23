@@ -2,8 +2,8 @@ import os
 
 from natsort import natsorted
 
-from imlib.cells import cells
-from imlib.IO.cells import get_cells
+from brainglobe_utils.cells import cells
+from brainglobe_utils.IO.cells import get_cells
 
 data_dir = os.path.join("tests", "data")
 cubes_dir = os.path.join(data_dir, "cube_extract", "cubes")

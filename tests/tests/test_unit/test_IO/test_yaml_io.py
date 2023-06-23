@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from imlib.IO import yaml
+from brainglobe_utils.IO import yaml
 
 data_dir = Path("tests", "data")
 yaml_file = data_dir / "yaml" / "single_section.yml"

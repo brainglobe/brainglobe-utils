@@ -1,6 +1,6 @@
 import numpy as np
 
-import imlib.image.masking as masking
+import brainglobe_utils.image.masking as masking
 
 raw_image = np.array(
     [

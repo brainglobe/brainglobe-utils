@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from imlib.general import string
+from brainglobe_utils.general import string
 
 data_dir = Path("tests", "data")
 jabberwocky = data_dir / "general" / "jabberwocky.txt"

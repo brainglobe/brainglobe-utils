@@ -15,13 +15,13 @@ from xml.etree.ElementTree import Element as EtElement
 import pandas as pd
 import yaml
 
-from imlib.cells.cells import (
+from brainglobe_utils.cells.cells import (
     Cell,
     MissingCellsError,
     UntypedCell,
     pos_from_file_name,
 )
-from imlib.general.system import replace_extension
+from brainglobe_utils.general.system import replace_extension
 
 
 def get_cells(

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from imlib.pandas import misc as pandas_misc
+from brainglobe_utils.pandas import misc as pandas_misc
 
 columns = ["name", "number"]
 data_with_nan = [["one", np.nan], ["two", 15], ["three", np.nan]]

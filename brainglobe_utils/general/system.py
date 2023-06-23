@@ -12,7 +12,7 @@ from natsort import natsorted
 from slurmio import slurmio
 from tqdm import tqdm
 
-from imlib.general.string import get_text_lines
+from brainglobe_utils.general.string import get_text_lines
 
 
 def replace_extension(file, new_extension, check_leading_period=True):

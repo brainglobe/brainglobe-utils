@@ -4,7 +4,7 @@ from random import randint
 
 import pytest
 
-from imlib.general import numerical
+from brainglobe_utils.general import numerical
 
 
 def test_is_even():

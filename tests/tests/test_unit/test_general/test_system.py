@@ -5,8 +5,8 @@ from random import shuffle
 
 import pytest
 
-from imlib.general import system
-from imlib.general.string import get_text_lines
+from brainglobe_utils.general import system
+from brainglobe_utils.general.string import get_text_lines
 
 data_dir = Path("tests", "data")
 cubes_dir = data_dir / "cubes"

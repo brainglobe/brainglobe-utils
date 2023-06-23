@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from imlib.array import misc
+from brainglobe_utils.array import misc
 
 
 def test_midpoints_of_series():

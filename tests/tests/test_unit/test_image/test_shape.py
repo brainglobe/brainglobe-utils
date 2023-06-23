@@ -1,6 +1,6 @@
 import pytest
 
-from imlib.image.shape import convert_shape_dict_to_array_shape
+from brainglobe_utils.image.shape import convert_shape_dict_to_array_shape
 
 
 def test_convert_shape_dict_to_array_shape():

@@ -3,8 +3,8 @@ from typing import Any, Tuple, Union
 
 import numpy.typing as npt
 
-import imlib.IO.cells as cell_io
-from imlib.cells.cells import Cell
+import brainglobe_utils.IO.cells as cell_io
+from brainglobe_utils.cells.cells import Cell
 
 
 def get_cell_location_array(

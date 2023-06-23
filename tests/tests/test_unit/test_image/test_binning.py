@@ -1,6 +1,6 @@
 import numpy as np
 
-from imlib.image import binning
+from brainglobe_utils.image import binning
 
 
 def test_get_bins():

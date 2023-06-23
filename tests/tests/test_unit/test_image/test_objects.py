@@ -1,7 +1,7 @@
 import numpy as np
 from skimage.measure import label
 
-from imlib.image import objects
+from brainglobe_utils.image import objects
 
 many_objects = np.array(
     [

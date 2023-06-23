@@ -1,6 +1,6 @@
 import numpy as np
 
-from imlib.image import size
+from brainglobe_utils.image import size
 
 img = np.array(
     [

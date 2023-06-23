@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from imlib.pandas import query as pandas_query
+from brainglobe_utils.pandas import query as pandas_query
 
 
 def test_column_as_array():
