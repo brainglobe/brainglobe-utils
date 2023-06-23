@@ -14,3 +14,11 @@ exclude = '''
   | dist
 )/
 '''
+
+[tool.mypy]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["imlib.cells.*"]
+ignore_errors = false
+strict = true

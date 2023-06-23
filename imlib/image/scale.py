@@ -10,7 +10,7 @@ def scale_to_16_bits(img):
     :rtype: np.array
     """
     normalised = img / img.max()
-    return normalised * (2 ** 16 - 1)
+    return normalised * (2**16 - 1)
 
 
 def scale_and_convert_to_16_bits(img):

@@ -46,7 +46,6 @@ def test_remove_leading_character():
 
 
 def test_ensure_directory_exists(tmpdir):
-
     # string
     exist_dir = os.path.join(tmpdir, "test_dir")
     system.ensure_directory_exists(exist_dir)

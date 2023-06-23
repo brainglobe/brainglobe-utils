@@ -29,51 +29,45 @@ def test_opposite_angle():
 
 
 def test_radial_bins():
-    assert (
-        np.array(
-            [
-                0,
-                25,
-                50,
-                75,
-                100,
-                125,
-                150,
-                175,
-                200,
-                225,
-                250,
-                275,
-                300,
-                325,
-                350,
-                375,
-            ]
-        )
-        == pytest.approx(misc.radial_bins(25))
-    )
-    assert (
-        np.array(
-            [
-                0,
-                25,
-                50,
-                75,
-                100,
-                125,
-                150,
-                175,
-                200,
-                225,
-                250,
-                275,
-                300,
-                325,
-                350,
-            ]
-        )
-        == pytest.approx(misc.radial_bins(25, remove_greater_than_360=True))
-    )
+    assert np.array(
+        [
+            0,
+            25,
+            50,
+            75,
+            100,
+            125,
+            150,
+            175,
+            200,
+            225,
+            250,
+            275,
+            300,
+            325,
+            350,
+            375,
+        ]
+    ) == pytest.approx(misc.radial_bins(25))
+    assert np.array(
+        [
+            0,
+            25,
+            50,
+            75,
+            100,
+            125,
+            150,
+            175,
+            200,
+            225,
+            250,
+            275,
+            300,
+            325,
+            350,
+        ]
+    ) == pytest.approx(misc.radial_bins(25, remove_greater_than_360=True))
 
     assert np.array([0, 3.45575192, 6.91150384]) == pytest.approx(
         misc.radial_bins(1.1 * np.pi, degrees=False)

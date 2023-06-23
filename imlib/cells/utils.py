@@ -1,16 +1,21 @@
 import logging
+from typing import Union, Tuple, Any
+
+import numpy.typing as npt
 
 import imlib.IO.cells as cell_io
 from imlib.cells.cells import Cell
 
 
 def get_cell_location_array(
-    cell_file,
-    cell_position_scaling=[None, None, None],
-    cells_only=False,
-    type_str="type",
-    integer=True,
-):
+    cell_file: str,
+    cell_position_scaling: Union[
+        Tuple[None, None, None], Tuple[float, float, float]
+    ] = (None, None, None),
+    cells_only: bool = False,
+    type_str: str = "type",
+    integer: bool = True,
+) -> npt.NDArray[Any]:
     """
     Loads a cell file, and converts to an array, with 3 columns of x,y,z
     positions
@@ -29,7 +34,7 @@ def get_cell_location_array(
     logging.debug("Loading cells")
     cells = cell_io.get_cells(cell_file)
 
-    if cell_position_scaling != [None, None, None]:
+    if cell_position_scaling != (None, None, None):
         for cell in cells:
             cell.transform(
                 x_scale=cell_position_scaling[0],
@@ -50,4 +55,4 @@ def get_cell_location_array(
 
     logging.debug("Tidying up dataframe to convert to array")
     cells.drop(type_str, axis=1, inplace=True)
-    return cells.to_numpy()
+    return cells.to_numpy()  # type: ignore[no-any-return]

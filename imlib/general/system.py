@@ -226,10 +226,10 @@ def disk_free_gb(file_path):
     if platform.system() == "Windows":
         drive, _ = os.path.splitdrive(file_path)
         total, used, free = shutil.disk_usage(drive)
-        return free / 1024 ** 3
+        return free / 1024**3
     else:
         stats = os.statvfs(file_path)
-        return (stats.f_frsize * stats.f_bavail) / 1024 ** 3
+        return (stats.f_frsize * stats.f_bavail) / 1024**3
 
 
 def get_free_ram():

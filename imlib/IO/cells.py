@@ -8,6 +8,7 @@ Christian Niedworok (https://github.com/cniedwor).
 import logging
 import os
 import yaml
+from typing import List, Optional
 
 import pandas as pd
 
@@ -24,7 +25,11 @@ from imlib.cells.cells import (
 from imlib.general.system import replace_extension
 
 
-def get_cells(cells_file_path, cells_only=False, cell_type=None):
+def get_cells(
+    cells_file_path: str,
+    cells_only: bool = False,
+    cell_type: Optional[int] = None,
+):
     # TODO: implement csv read
     if cells_file_path.endswith(".xml"):
         return get_cells_xml(cells_file_path, cells_only=cells_only)
@@ -136,7 +141,7 @@ def cells_xml_to_df(xml_file_path):
     return cells_to_dataframe(cells)
 
 
-def cells_to_dataframe(cells):
+def cells_to_dataframe(cells: List[Cell]) -> pd.DataFrame:
     return pd.DataFrame([c.to_dict() for c in cells])
 
 
