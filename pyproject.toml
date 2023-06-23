@@ -12,12 +12,10 @@ dependencies = [
     "psutil",
     "slurmio",
     "configobj",
-    "micrometa",
     "tqdm",
     "PyYAML",
     "scipy",
     "scikit-image",
-    "seaborn",
 ]
 
 license = {text = "MIT"}
@@ -51,6 +49,11 @@ dev = [
   "pre-commit",
   "ruff",
   "setuptools_scm",
+]
+
+slumrmio = [
+  "slurmio",
+
 ]
 
 [build-system]
