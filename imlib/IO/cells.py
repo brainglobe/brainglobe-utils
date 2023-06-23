@@ -7,20 +7,19 @@ Christian Niedworok (https://github.com/cniedwor).
 
 import logging
 import os
-import yaml
 from typing import List, Optional
-
-import pandas as pd
-
 from xml.dom import minidom
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element as EtElement
 
+import pandas as pd
+import yaml
+
 from imlib.cells.cells import (
     Cell,
+    MissingCellsError,
     UntypedCell,
     pos_from_file_name,
-    MissingCellsError,
 )
 from imlib.general.system import replace_extension
 

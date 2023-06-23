@@ -1,19 +1,107 @@
+[project]
+name = "brainglobe-utils"
+authors = [{name = "Adam Tyson", email= "code@adamltyson.com"}]
+description = "Shared general purpose tools for the BrainGlobe project"
+readme = "README.md"
+requires-python = ">=3.8.0"
+dynamic = ["version"]
+
+dependencies = [
+    "natsort",
+    "pandas",
+    "psutil",
+    "slurmio",
+    "configobj",
+    "micrometa",
+    "tqdm",
+    "PyYAML",
+    "scipy",
+    "scikit-image",
+    "seaborn",
+]
+
+license = {text = "MIT"}
+
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: BSD License",
+]
+
+[project.urls]
+homepage = "https://brainglobe.info"
+bug_tracker = "https://github.com/brainglobe/brainglobe-utils/issues"
+source_code = "https://github.com/brainglobe/brainglobe-utils"
+user_support = "https://github.com/brainglobe/brainglobe-utils/issues"
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "coverage",
+  "tox",
+  "black",
+  "mypy",
+  "pre-commit",
+  "ruff",
+  "setuptools_scm",
+]
+
+[build-system]
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "setuptools_scm[toml]>=6.2",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["swc_slack*"]
+exclude = ["tests", "docs*"]
+
+
+[tool.pytest.ini_options]
+addopts = "--cov=brainglobe_utils"
+
 [tool.black]
+target-version = ['py38', 'py39', 'py310']
+skip-string-normalization = false
 line-length = 79
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+
+[tool.setuptools_scm]
+
+[tool.check-manifest]
+ignore = [
+  ".yaml",
+  "tox.ini",
+  "tests/",
+  "tests/test_unit/",
+  "tests/test_integration/",
+  "docs/",
+  "docs/source/",
+]
+
+
+[tool.ruff]
+line-length = 79
+exclude = ["__init__.py","build",".eggs"]
+select = ["I", "E", "F"]
+fix = true
+
+[tool.cibuildwheel]
+build = "cp38-* cp39-* cp310-*"
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64"]
 
 [tool.mypy]
 ignore_errors = true

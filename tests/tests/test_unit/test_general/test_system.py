@@ -1,13 +1,12 @@
-import pytest
 import os
 import random
-
 from pathlib import Path
 from random import shuffle
 
+import pytest
+
 from imlib.general import system
 from imlib.general.string import get_text_lines
-
 
 data_dir = Path("tests", "data")
 cubes_dir = data_dir / "cubes"

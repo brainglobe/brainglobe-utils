@@ -1,8 +1,8 @@
-import pytest
 import random
-
-from random import randint
 from argparse import ArgumentTypeError
+from random import randint
+
+import pytest
 
 from imlib.general import numerical
 

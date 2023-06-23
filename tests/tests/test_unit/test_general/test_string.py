@@ -2,7 +2,6 @@ from pathlib import Path
 
 from imlib.general import string
 
-
 data_dir = Path("tests", "data")
 jabberwocky = data_dir / "general" / "jabberwocky.txt"
 
