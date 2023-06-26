@@ -18,7 +18,7 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "imlib",
+    "brainglobe-utils[slurmio]",
     "natsort",
     "nibabel",
     "nibabel >= 2.1.0",
@@ -26,7 +26,6 @@ dependencies = [
     "psutil",
     "pynrrd",
     "scikit-image",
-    "slurmio >= 0.0.5",
     "tifffile",
     "tqdm",
 ]
