@@ -8,7 +8,7 @@ import os
 import re
 from collections import defaultdict
 from functools import total_ordering
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, DefaultDict, Dict, List, Optional, Tuple, Union
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element as EtElement
 
@@ -356,7 +356,7 @@ def transform_cell_positions(
     return transformed_cells_no_none
 
 
-def group_cells_by_z(cells: List[Cell]) -> defaultdict[float, List[Cell]]:
+def group_cells_by_z(cells: List[Cell]) -> DefaultDict[float, List[Cell]]:
     """
     For a list of Cells return a dict of lists of cells, grouped by plane.
 
