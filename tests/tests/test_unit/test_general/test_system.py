@@ -2,6 +2,7 @@ import os
 import random
 from pathlib import Path
 from random import shuffle
+from unittest.mock import patch
 
 import pytest
 
@@ -87,7 +88,12 @@ def test_check_path_in_dir():
 
 
 def test_get_num_processes():
-    assert os.cpu_count() == system.get_num_processes(min_free_cpu_cores=0)
+    cpu_count = 10
+    with patch(
+        "brainglobe_utils.general.system.psutil.cpu_count",
+        return_value=cpu_count,
+    ):
+        assert system.get_num_processes(min_free_cpu_cores=0) == cpu_count
 
 
 def test_max_processes():
@@ -96,6 +102,33 @@ def test_max_processes():
     assert correct_n == system.get_num_processes(
         n_max_processes=max_proc, min_free_cpu_cores=0
     )
+
+
+def test_max_processes_windows_low():
+    cpu_count = 10
+    with patch(
+        "brainglobe_utils.general.system.platform.system",
+        return_value="Windows",
+    ):
+        with patch(
+            "brainglobe_utils.general.system.psutil.cpu_count",
+            return_value=cpu_count,
+        ):
+            assert system.limit_cpus_windows(cpu_count) == cpu_count
+
+
+def test_max_processes_windows_high():
+    cpu_count = 128
+    with patch(
+        "brainglobe_utils.general.system.platform.system",
+        return_value="Windows",
+    ):
+        with patch(
+            "brainglobe_utils.general.system.psutil.cpu_count",
+            return_value=cpu_count,
+        ):
+            # 61 is max on Windows
+            assert system.limit_cpus_windows(cpu_count) == 61
 
 
 class Paths:
