@@ -88,10 +88,14 @@ def test_check_path_in_dir():
 
 
 def test_get_num_processes():
-    assert os.cpu_count() == system.get_num_processes(min_free_cpu_cores=0)
+    cpu_count = 10
+    with patch(
+        "brainglobe_utils.general.system.psutil.cpu_count",
+        return_value=cpu_count,
+    ):
+        assert system.get_num_processes(min_free_cpu_cores=0) == cpu_count
 
 
-## orig
 def test_max_processes():
     max_proc = 5
     correct_n = min(os.cpu_count(), max_proc)
