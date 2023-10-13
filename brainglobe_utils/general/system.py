@@ -173,7 +173,8 @@ def get_num_processes(
 
 def limit_cpus_windows(n_max_processes):
     if platform.system() == "Windows":
-        n_max_processes = min(n_max_processes, MAX_PROCESSES_WINDOWS)
+        if n_max_processes is not None:
+            n_max_processes = min(n_max_processes, MAX_PROCESSES_WINDOWS)
     return n_max_processes
 
 
