@@ -152,8 +152,7 @@ def get_num_processes(
     else:
         n_processes = n_cpu_cores
 
-    if platform.system() == "Windows":
-        n_max_processes = min(n_max_processes, MAX_PROCESSES_WINDOWS)
+    n_max_processes = limit_cpus_windows(n_max_processes)
 
     if n_max_processes is not None:
         if n_max_processes < n_processes:
@@ -170,6 +169,12 @@ def get_num_processes(
 
     logging.debug(f"Setting number of processes to: {n_processes}")
     return int(n_processes)
+
+
+def limit_cpus_windows(n_max_processes):
+    if platform.system() == "Windows":
+        n_max_processes = min(n_max_processes, MAX_PROCESSES_WINDOWS)
+    return n_max_processes
 
 
 def get_cores_available():
