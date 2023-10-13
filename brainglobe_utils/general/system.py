@@ -14,6 +14,10 @@ from tqdm import tqdm
 
 from brainglobe_utils.general.string import get_text_lines
 
+# On Windows, max_workers must be less than or equal to 61
+# https://docs.python.org/3/library/concurrent.futures.html#processpoolexecutor
+MAX_PROCESSES_WINDOWS = 61
+
 
 def replace_extension(file, new_extension, check_leading_period=True):
     """
@@ -132,35 +136,29 @@ def get_num_processes(
     :return: Number of processes to
     """
     logging.debug("Determining the maximum number of CPU cores to use")
-    try:
-        os.environ["SLURM_JOB_ID"]
-        n_cpu_cores = (
-            slurmio.SlurmJobParameters().allocated_cores - min_free_cpu_cores
-        )
-    except KeyError:
-        n_cpu_cores = psutil.cpu_count() - min_free_cpu_cores
+
+    n_cpu_cores = get_cores_available()
+    n_cpu_cores = n_cpu_cores - min_free_cpu_cores
 
     logging.debug(f"Number of CPU cores available is: {n_cpu_cores}")
 
     if ram_needed_per_process is not None:
-        cores_w_sufficient_ram = how_many_cores_with_sufficient_ram(
+        n_processes = limit_cores_based_on_memory(
+            n_cpu_cores,
             ram_needed_per_process,
-            fraction_free_ram=fraction_free_ram,
-            max_ram_usage=max_ram_usage,
-        )
-        n_processes = min(n_cpu_cores, cores_w_sufficient_ram)
-        logging.debug(
-            f"Based on memory requirements, up to {cores_w_sufficient_ram} "
-            f"cores could be used. Therefore setting the number of "
-            f"processes to {n_processes}."
+            fraction_free_ram,
+            max_ram_usage,
         )
     else:
         n_processes = n_cpu_cores
 
+    if platform.system() == "Windows":
+        n_max_processes = min(n_max_processes, MAX_PROCESSES_WINDOWS)
+
     if n_max_processes is not None:
         if n_max_processes < n_processes:
             logging.debug(
-                f"Forcing the number of processes to {n_max_processes} based"
+                f"Limiting the number of processes to {n_max_processes} based"
                 f" on other considerations."
             )
         n_processes = min(n_processes, n_max_processes)
@@ -172,6 +170,33 @@ def get_num_processes(
 
     logging.debug(f"Setting number of processes to: {n_processes}")
     return int(n_processes)
+
+
+def get_cores_available():
+    try:
+        os.environ["SLURM_JOB_ID"]
+        n_cpu_cores = slurmio.SlurmJobParameters().allocated_cores
+    except KeyError:
+        n_cpu_cores = psutil.cpu_count()
+
+    return n_cpu_cores
+
+
+def limit_cores_based_on_memory(
+    n_cpu_cores, ram_needed_per_process, fraction_free_ram, max_ram_usage
+):
+    cores_w_sufficient_ram = how_many_cores_with_sufficient_ram(
+        ram_needed_per_process,
+        fraction_free_ram=fraction_free_ram,
+        max_ram_usage=max_ram_usage,
+    )
+    n_processes = min(n_cpu_cores, cores_w_sufficient_ram)
+    logging.debug(
+        f"Based on memory requirements, up to {cores_w_sufficient_ram} "
+        f"cores could be used. Therefore setting the number of "
+        f"processes to {n_processes}."
+    )
+    return n_processes
 
 
 def how_many_cores_with_sufficient_ram(
