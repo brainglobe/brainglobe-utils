@@ -14,6 +14,7 @@ dependencies = [
     "configobj",
     "tqdm",
     "PyYAML",
+    "pytest-qt",
     "scipy",
     "scikit-image",
 ]
@@ -37,6 +38,11 @@ source_code = "https://github.com/brainglobe/brainglobe-utils"
 user_support = "https://github.com/brainglobe/brainglobe-utils/issues"
 
 [project.optional-dependencies]
+napari = [
+  "napari>=0.4.18",
+  "qtpy",
+]
+
 dev = [
   "pytest",
   "pytest-cov",
@@ -47,6 +53,9 @@ dev = [
   "pre-commit",
   "ruff",
   "setuptools_scm",
+  "pytest-qt",
+  "qtpy",
+  "PyQt5",
 ]
 
 slumrmio = [
