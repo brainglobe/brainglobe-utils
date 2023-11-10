@@ -37,6 +37,11 @@ source_code = "https://github.com/brainglobe/brainglobe-utils"
 user_support = "https://github.com/brainglobe/brainglobe-utils/issues"
 
 [project.optional-dependencies]
+napari = [
+  "napari>=0.4.18",
+  "qtpy",
+]
+
 dev = [
   "pytest",
   "pytest-cov",
