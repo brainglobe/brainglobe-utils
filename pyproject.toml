@@ -55,6 +55,7 @@ dev = [
   "setuptools_scm",
   "pytest-qt",
   "qtpy",
+  "PyQt5",
 ]
 
 slumrmio = [
