@@ -10,8 +10,6 @@ def test_logo(qtbot):
 
     qtbot.addWidget(header)
 
-    # header.window().show()
-
     expected_strings_logo = [package_name, "brainglobe.png"]
     expected_strings_docs = [
         package_tagline,
