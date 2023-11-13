@@ -37,11 +37,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       # these libraries enable testing on Qt on linux
-      - uses: tlambert03/setup-qt-libs@v1
+      - uses: pyvista/setup-headless-display-action@v2
+        with:
+          qt: true
       # Run tests
       - uses: neuroinformatics-unit/actions/test@v2
         with:
-          use-xvfb: true
           python-version: ${{ matrix.python-version }}
 
   build_sdist_wheels:
