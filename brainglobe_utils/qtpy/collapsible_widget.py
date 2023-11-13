@@ -1,4 +1,4 @@
-from typing import List, overload
+from typing import List, overload, Optional, Union
 
 from qtpy.QtCore import Qt, Signal
 from qtpy.QtWidgets import QGroupBox, QVBoxLayout, QWidget
@@ -32,9 +32,9 @@ class CollapsibleWidget(QCollapsible):
     def __init__(
         self,
         title: str = "",
-        parent: QWidget | None = None,
-        expanded_icon: str | None = "▲",
-        collapsed_icon: str | None = "▼",
+        parent: Optional[QWidget] = None,
+        expanded_icon: Optional[str] = "▲",
+        collapsed_icon: Optional[str] = "▼",
     ):
         """
         Initializes a new CollapsibleWidget instance.
@@ -104,7 +104,7 @@ class CollapsibleWidgetContainer(QGroupBox):
     def add_widget(self, widget: CollapsibleWidget):
         ...
 
-    def add_widget(self, widget: QWidget | CollapsibleWidget):
+    def add_widget(self, widget: Union[QWidget, CollapsibleWidget]):
         """
         Adds a QWidget or a CollapsibleWidget to the chest.
 
@@ -127,7 +127,7 @@ class CollapsibleWidgetContainer(QGroupBox):
     def remove_widget(self, widget: CollapsibleWidget):
         ...
 
-    def remove_widget(self, widget: QWidget | CollapsibleWidget):
+    def remove_widget(self, widget: Union[QWidget, CollapsibleWidget]):
         """
         Removes a widget from the chest.
 

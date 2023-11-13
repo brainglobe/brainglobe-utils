@@ -14,10 +14,8 @@ dependencies = [
     "configobj",
     "tqdm",
     "PyYAML",
-    "pytest-qt",
     "scipy",
     "scikit-image",
-    "superqt",
 ]
 
 license = {text = "MIT"}
@@ -42,11 +40,14 @@ user_support = "https://github.com/brainglobe/brainglobe-utils/issues"
 napari = [
   "napari>=0.4.18",
   "qtpy",
+  "superqt"
 ]
 
 dev = [
+  "qtpy",
   "pytest",
   "pytest-cov",
+  "pytest-qt",
   "coverage",
   "tox",
   "black",
@@ -54,9 +55,8 @@ dev = [
   "pre-commit",
   "ruff",
   "setuptools_scm",
-  "pytest-qt",
-  "qtpy",
-  "PyQt5",
+  "pyqt5",
+  "superqt",
 ]
 
 slumrmio = [

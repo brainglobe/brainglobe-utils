@@ -32,6 +32,7 @@ jobs:
 
     steps:
       # Run tests
+      - uses: tiambert03/setup-qt-libs@v1
       - uses: neuroinformatics-unit/actions/test@v2
         with:
           python-version: ${{ matrix.python-version }}
