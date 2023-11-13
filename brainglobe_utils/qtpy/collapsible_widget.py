@@ -1,4 +1,4 @@
-from typing import List, overload, Optional, Union
+from typing import List, Optional, Union, overload
 
 from qtpy.QtCore import Qt, Signal
 from qtpy.QtWidgets import QGroupBox, QVBoxLayout, QWidget
