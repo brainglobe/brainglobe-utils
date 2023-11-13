@@ -34,7 +34,6 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
-          use-xvfb: true
           python-version: ${{ matrix.python-version }}
 
       # these libraries enable testing on Qt on linux
@@ -42,6 +41,7 @@ jobs:
       # Run tests
       - uses: neuroinformatics-unit/actions/test@v2
         with:
+          use-xvfb: true
           python-version: ${{ matrix.python-version }}
 
   build_sdist_wheels:
