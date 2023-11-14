@@ -1,4 +1,4 @@
-from typing import List, Optional, Union, overload
+from typing import List, Optional, Union
 
 from qtpy.QtCore import Qt, Signal
 from qtpy.QtWidgets import QGroupBox, QVBoxLayout, QWidget
@@ -86,14 +86,6 @@ class CollapsibleWidgetContainer(QGroupBox):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.collapsible_widgets: List[CollapsibleWidget] = []
 
-    @overload
-    def add_widget(self, widget: QWidget):
-        ...
-
-    @overload
-    def add_widget(self, widget: CollapsibleWidget):
-        ...
-
     def add_widget(self, widget: Union[QWidget, CollapsibleWidget]):
         """
         Adds a QWidget or a CollapsibleWidget to the chest.
@@ -108,14 +100,6 @@ class CollapsibleWidgetContainer(QGroupBox):
             widget.toggled_signal_with_self.connect(self._update_drawers)
 
         self.layout().addWidget(widget, 0, Qt.AlignTop)
-
-    @overload
-    def remove_widget(self, widget: QWidget):
-        ...
-
-    @overload
-    def remove_widget(self, widget: CollapsibleWidget):
-        ...
 
     def remove_widget(self, widget: Union[QWidget, CollapsibleWidget]):
         """
