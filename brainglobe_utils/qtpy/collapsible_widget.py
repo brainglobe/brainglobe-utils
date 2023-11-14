@@ -21,10 +21,6 @@ class CollapsibleWidget(QCollapsible):
         The title of the CollapsibleWidget.
     parent : QWidget or None, optional
         The parent widget.
-    expanded_icon : str or None, optional
-        The ASCII symbol for the expanded state.
-    collapsed_icon : str or None, optional
-        The ASCII symbol for the collapsed state.
     """
 
     toggled_signal_with_self = Signal(QCollapsible, bool)
@@ -33,8 +29,6 @@ class CollapsibleWidget(QCollapsible):
         self,
         title: str = "",
         parent: Optional[QWidget] = None,
-        expanded_icon: Optional[str] = "▲",
-        collapsed_icon: Optional[str] = "▼",
     ):
         """
         Initializes a new CollapsibleWidget instance.
@@ -45,12 +39,8 @@ class CollapsibleWidget(QCollapsible):
             The title of the CollapsibleWidget.
         parent : QWidget or None, optional
             The parent widget.
-        expanded_icon : str or None, optional
-            The icon for the expanded state.
-        collapsed_icon : str or None, optional
-            The icon for the collapsed state.
         """
-        super().__init__(title, parent, expanded_icon, collapsed_icon)
+        super().__init__(title, parent)
         self.currently_expanded = False
 
         self.toggled.connect(self._on_toggle)
