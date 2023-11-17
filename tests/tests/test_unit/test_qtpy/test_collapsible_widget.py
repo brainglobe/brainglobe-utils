@@ -8,6 +8,9 @@ from brainglobe_utils.qtpy.collapsible_widget import (
 
 WIDGET_TITLE = "Title"
 
+## TODO Add tests for different layouts
+## TODO Add tests for removing widgets not in the container
+
 
 @pytest.fixture(scope="class")
 def collapsible_widget() -> CollapsibleWidget:
@@ -22,6 +25,7 @@ def collapsible_widget_container() -> CollapsibleWidgetContainer:
 
 
 def test_collapsible_widget_empty(qtbot, collapsible_widget):
+    collapsible_widget = CollapsibleWidget(WIDGET_TITLE, collapsible=True)
     qtbot.addWidget(collapsible_widget)
 
     assert collapsible_widget.text() == WIDGET_TITLE

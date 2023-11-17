@@ -1,7 +1,7 @@
 from typing import List, Optional, Union
 
 from qtpy.QtCore import Qt, Signal
-from qtpy.QtWidgets import QGroupBox, QVBoxLayout, QWidget
+from qtpy.QtWidgets import QVBoxLayout, QWidget
 from superqt.collapsible import QCollapsible
 
 
@@ -59,7 +59,7 @@ class CollapsibleWidget(QCollapsible):
         self.toggled_signal_with_self.emit(self, state)
 
 
-class CollapsibleWidgetContainer(QGroupBox):
+class CollapsibleWidgetContainer(QWidget):
     """
     Container for multiple CollapsibleWidgets with the ability to add,
     remove, and synchronize their states.
@@ -86,20 +86,36 @@ class CollapsibleWidgetContainer(QGroupBox):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.collapsible_widgets: List[CollapsibleWidget] = []
 
-    def add_widget(self, widget: Union[QWidget, CollapsibleWidget]):
+    def add_widget(
+        self, widget: QWidget, collapsible: bool = True, widget_title: str = ""
+    ):
         """
         Adds a QWidget or a CollapsibleWidget to the chest.
 
         Parameters
         ----------
-        widget : QWidget or CollapsibleWidget
+        widget : QWidget
             The widget instance to be added.
+        collapsible : bool, optional
+            Whether the widget should be collapsible.
+        widget_title : str, optional
+            The title of the CollapsibleWidget.
         """
-        if isinstance(widget, CollapsibleWidget):
-            self.collapsible_widgets.append(widget)
-            widget.toggled_signal_with_self.connect(self._update_drawers)
+        # if isinstance(widget, CollapsibleWidget):
+        #     self.collapsible_widgets.append(widget)
+        #     widget.toggled_signal_with_self.connect(self._update_drawers)
 
-        self.layout().addWidget(widget, 0, Qt.AlignTop)
+        if collapsible:
+            collapsible_widget = CollapsibleWidget(widget_title, parent=self)
+            collapsible_widget.setContent(widget)
+            collapsible_widget.toggled_signal_with_self.connect(
+                self._update_drawers
+            )
+            collapsible_widget.collapse(False)
+            self.collapsible_widgets.append(collapsible_widget)
+            self.layout().addWidget(collapsible_widget, 0, Qt.AlignTop)
+        else:
+            self.layout().addWidget(widget, 0, Qt.AlignTop)
 
     def remove_widget(self, widget: Union[QWidget, CollapsibleWidget]):
         """
