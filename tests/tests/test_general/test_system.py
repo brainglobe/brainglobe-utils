@@ -1,4 +1,5 @@
 import os
+import platform
 import random
 from pathlib import Path
 from random import shuffle
@@ -254,6 +255,10 @@ def test_disk_free_gb_windows(mock_disk_usage):
         assert free_space == 500000 / 1024**3
 
 
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="os.statvfs not available on Windows",
+)
 def test_disk_free_gb_linux(mock_statvfs):
     with patch(
         "brainglobe_utils.general.system.platform.system", return_value="Linux"
@@ -264,6 +269,10 @@ def test_disk_free_gb_linux(mock_statvfs):
         assert free_space == (1024 * 1000) / 1024**3  # Free space in GB
 
 
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="os.statvfs not available on Windows",
+)
 def test_disk_free_gb_macos(mock_statvfs):
     with patch(
         "brainglobe_utils.general.system.platform.system",
