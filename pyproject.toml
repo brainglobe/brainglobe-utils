@@ -15,7 +15,7 @@ dependencies = [
     "tqdm",
     "PyYAML",
     "scipy",
-    "scikit-image",
+    "numpy",
 ]
 
 license = {text = "MIT"}
