@@ -1,4 +1,5 @@
 import pytest
+
 from brainglobe_utils.general.exceptions import CommandLineInputError
 
 
