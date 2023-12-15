@@ -10,7 +10,6 @@ dependencies = [
     "natsort",
     "pandas",
     "psutil",
-    "slurmio",
     "configobj",
     "tqdm",
     "PyYAML",
@@ -59,9 +58,9 @@ dev = [
   "superqt",
 ]
 
-slumrmio = [
+# For use with the SLURM job scheduler
+slurmio = [
   "slurmio",
-
 ]
 
 [build-system]
