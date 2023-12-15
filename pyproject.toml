@@ -56,6 +56,7 @@ dev = [
   "setuptools_scm",
   "pyqt5",
   "superqt",
+    "slurmio"
 ]
 
 # For use with the SLURM job scheduler
