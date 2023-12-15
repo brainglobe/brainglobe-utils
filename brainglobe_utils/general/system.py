@@ -352,25 +352,6 @@ class SafeExecuteCommandError(Exception):
     pass
 
 
-def delete_temp(directory, paths, prefix="tmp__"):
-    """
-    Removes all temp files (properties of an object starting with "tmp__")
-    :param directory: Directory to delete tmp files from
-    :param paths: Paths object with temp paths.
-    :param prefix: String that temporary files (to be deleted) begin with.
-    """
-    for path_name, path in paths.__dict__.items():
-        if path_name.startswith(prefix):
-            if check_path_in_dir(path, directory):
-                try:
-                    os.remove(path)
-                except FileNotFoundError:
-                    logging.debug(
-                        f"File: {path} not found, not deleting. "
-                        f"Proceeding anyway."
-                    )
-
-
 def delete_directory_contents(directory, progress=False):
     """
     Removes all contents of a directory
@@ -383,19 +364,3 @@ def delete_directory_contents(directory, progress=False):
     else:
         for f in files:
             os.remove(os.path.join(directory, f))
-
-
-def filename_from_path(path, remove_extension=False):
-    """
-    Takes a filepath and returns only the filename, optionally removes the
-    file extension
-    :param path: Filepath
-    :param remove_extension: If True, remove the file extension too.
-    Default: False
-    :return: filename
-    """
-
-    filename = os.path.basename(path)
-    if remove_extension:
-        filename = os.path.splitext(filename)[0]
-    return filename

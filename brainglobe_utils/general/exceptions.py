@@ -12,8 +12,3 @@ class CommandLineInputError(Exception):
 
     def __str__(self):
         return str(self.message)
-
-
-class ArgumentError(Exception):
-    def __init__(self, *args, **kwargs):
-        Exception.__init__(self, *args, **kwargs)

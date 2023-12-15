@@ -2,17 +2,14 @@
 Based on https://github.com/SainsburyWellcomeCentre/niftynet_cell_count by
 Christian Niedworok (https://github.com/cniedwor).
 """
-import logging
 import math
 import os
 import re
 from collections import defaultdict
 from functools import total_ordering
-from typing import Any, DefaultDict, Dict, List, Optional, Tuple, Union
+from typing import Any, DefaultDict, Dict, List, Tuple, Union
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element as EtElement
-
-import numpy.typing as npt
 
 
 @total_ordering
@@ -248,112 +245,6 @@ def pos_from_file_name(file_name: str) -> List[float]:
     y = re.findall(r"y\d+", file_name.lower())
     z = re.findall(r"z\d+", file_name.lower())
     return [int(p) for p in (x[-1][1:], y[-1][1:], z[-1][1:])]
-
-
-def transform(
-    cell: Cell,
-    deformation_field: npt.NDArray[Any],
-    field_scales: Tuple[float, float, float],
-    scales: Tuple[float, float, float],
-) -> Optional[Cell]:
-    """
-    Transforms cell position from one space, to another (defined by a
-    deformation field)
-    :param cell: Cells in original space
-    :param deformation_field: Deformation field
-    (shape (len(x), len(y), len(z), 3). For each spatial position, there is a
-    vector mapping onto a new coordinate space.
-    :param field_scales: Scaling of the deformation field values (in mm) into
-    voxel space (e.g. 100,100,100)
-    :param scales: Scale of cell x, y and z positions onto deformation
-    field (e.g. 0.2, 0.2, 0.5)
-    :return: Cell in the new space
-    """
-    scaled_x = int(round(cell.x * scales[0]))
-    scaled_y = int(round(cell.y * scales[1]))
-    scaled_z = int(round(cell.z * scales[2]))
-
-    try:
-        new_x = int(
-            round(
-                field_scales[0]
-                * deformation_field[scaled_x, scaled_y, scaled_z, 0, 0]
-            )
-        )
-        new_y = int(
-            round(
-                field_scales[1]
-                * deformation_field[scaled_x, scaled_y, scaled_z, 0, 1]
-            )
-        )
-        new_z = int(
-            round(
-                field_scales[2]
-                * deformation_field[scaled_x, scaled_y, scaled_z, 0, 2]
-            )
-        )
-
-        # if any new coordinates are negative
-        if any(position < 0 for position in [new_x, new_y, new_z]):
-            warn_outside_target_space(cell)
-
-        else:
-            cell.x = new_x
-            cell.y = new_y
-            cell.z = new_z
-        return cell
-
-    except IndexError:
-        warn_outside_target_space(cell)
-        return None
-
-
-def warn_outside_target_space(cell: Cell) -> None:
-    logging.warning(
-        "Position x:{}, y:{}, z{} is outside the target "
-        "coordinate space, skipping. If this happens for many "
-        "cells, something may be up.".format(cell.x, cell.y, cell.z)
-    )
-
-
-def transform_cell_positions(
-    cells: List[Cell],
-    deformation_field: npt.NDArray[Any],
-    field_scales: Tuple[float, float, float] = (100, 100, 100),
-    scales: Tuple[float, float, float] = (1, 1, 1),
-) -> List[Cell]:
-    """
-    Transforms cell positions from one space, to another (defined by a
-    deformation field)
-    :param cells: List of cells in original space
-    :param deformation_field: Deformation field
-    (shape (len(x), len(y), len(z), 3). For each spatial position, there is a
-    vector mapping onto a new coordinate space.
-    :param field_scales: Scaling of the deformation field values (in mm) into
-    voxel space (e.g. 100,100,100)
-    :param scales: Scale of cell x, y and z positions onto deformation
-    field (e.g. 0.2, 0.2, 0.5)
-    :return: list of cells in the new space
-    """
-    # TODO: parallelise (maybe not needed, very quick anyway)
-    # TODO: clarify this transformation, and the existing transformed_x
-    # property of the cells used for other things (e.g. summaries)
-    transformed_cells = [
-        transform(cell, deformation_field, field_scales, scales)
-        for cell in cells
-    ]
-
-    # Remove None's from list (where cell couldn't be transformed)
-    transformed_cells_no_none = [
-        cell for cell in transformed_cells if cell is not None
-    ]
-    cells_not_transformed = len(cells) - len(transformed_cells_no_none)
-    logging.warning(
-        "{} cells were not transformed to standard space".format(
-            cells_not_transformed
-        )
-    )
-    return transformed_cells_no_none
 
 
 def group_cells_by_z(cells: List[Cell]) -> DefaultDict[float, List[Cell]]:

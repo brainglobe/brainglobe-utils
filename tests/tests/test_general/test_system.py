@@ -139,19 +139,6 @@ class Paths:
         self.tmp__four = directory / "four.ddd"
 
 
-def test_delete_tmp(tmpdir):
-    tmpdir = Path(tmpdir)
-    paths = Paths(tmpdir)
-    for attr, path in paths.__dict__.items():
-        path.touch()
-        print(path)
-    assert len([child for child in tmpdir.iterdir()]) == 4
-    system.delete_temp(tmpdir, paths)
-    assert len([child for child in tmpdir.iterdir()]) == 2
-
-    system.delete_temp(tmpdir, paths)
-
-
 def write_n_random_files(n, dir, min_size=32, max_size=2048):
     sizes = random.sample(range(min_size, max_size), n)
     for size in sizes:
