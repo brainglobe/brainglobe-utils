@@ -218,8 +218,8 @@ def how_many_cores_with_sufficient_ram(
     this to ensure that the number of processes isn't too high.
     :param float fraction_free_ram: Fraction of the ram to ensure stays free
     regardless of the current program.
-    :param float max_ram_usage: Maximum amount of RAM (in bytes)
-    to use (allthough available may be lower)
+    :param float max_ram_usage: The Maximum amount of RAM (in bytes)
+    to use (although available may be lower)
     :return: How many CPU cores could be theoretically used based on
     the amount of free RAM
     """
@@ -269,21 +269,6 @@ def get_free_ram():
     :return: Available RAM in bytes
     """
     return psutil.virtual_memory().available
-
-
-def sanitize_num_processes(num_processes, min_processes, parallel=False):
-    """
-    Returns False to prevent parallel processing in case more processes have
-    been requested than can be used.
-    :param num_processes: How many processes have been requested
-    :param min_processes: Minimum number of cores to keep free
-    :param parallel: If parallel is requested
-    :return bool: True if num_processes is sensible
-    """
-    if parallel:
-        if num_processes < min_processes:
-            parallel = False
-    return parallel
 
 
 def safe_execute_command(cmd, log_file_path=None, error_file_path=None):

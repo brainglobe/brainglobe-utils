@@ -29,11 +29,9 @@ def get_cells(
     cells_only: bool = False,
     cell_type: Optional[int] = None,
 ):
-    # TODO: implement csv read
     if cells_file_path.endswith(".xml"):
         return get_cells_xml(cells_file_path, cells_only=cells_only)
     elif cells_file_path.endswith(".yml"):
-        # Not general
         return get_cells_yml(cells_file_path, ignore_type=True)
     elif os.path.isdir(cells_file_path):
         try:

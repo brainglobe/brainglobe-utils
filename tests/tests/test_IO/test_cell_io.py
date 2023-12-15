@@ -1,5 +1,6 @@
 import os
 
+import pandas as pd
 import pytest
 from natsort import natsorted
 
@@ -317,15 +318,27 @@ def test_get_cells():
         assert cell_io.get_cells("misc_format.abc")
 
 
-def test_cells_to_xml(tmpdir):
+def test_cells_to_xml(tmp_path):
     cells = cell_io.get_cells(xml_path)
-    tmp_cells_out_path = os.path.join(str(tmpdir), "cells.xml")
+    tmp_cells_out_path = tmp_path / "cells.xml"
     cell_io.cells_to_xml(cells, tmp_cells_out_path)
-    assert cells == cell_io.get_cells(tmp_cells_out_path)
+    assert cells == cell_io.get_cells(str(tmp_cells_out_path))
 
 
 def test_cells_xml_to_dataframe():
     cells_df = cell_io.cells_xml_to_df(xml_path)
+    assert len(cells_df) == 65
+    assert cells_df.type.tolist() == type_vals
+    assert cells_df.x.tolist() == x_vals
+    assert cells_df.y.tolist() == y_vals
+    assert cells_df.z.tolist() == z_vals
+
+
+def test_cells_to_csv(tmp_path):
+    cells = cell_io.get_cells(xml_path)
+    tmp_cells_out_path = tmp_path / "cells.csv"
+    cell_io.cells_to_csv(cells, tmp_cells_out_path)
+    cells_df = pd.read_csv(tmp_cells_out_path)
     assert len(cells_df) == 65
     assert cells_df.type.tolist() == type_vals
     assert cells_df.x.tolist() == x_vals

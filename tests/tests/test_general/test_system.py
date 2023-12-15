@@ -2,7 +2,7 @@ import os
 import random
 from pathlib import Path
 from random import shuffle
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -30,6 +30,23 @@ cubes = [
 ]
 
 sorted_cubes_dir = [os.path.join(str(cubes_dir), cube) for cube in cubes]
+
+
+@pytest.fixture
+def mock_disk_usage():
+    """Fixture to mock shutil.disk_usage."""
+    return Mock(
+        return_value=(1000000, 500000, 500000)
+    )  # total, used, free space in bytes
+
+
+@pytest.fixture
+def mock_statvfs():
+    """Fixture to mock os.statvfs."""
+    mock_stats = Mock()
+    mock_stats.f_frsize = 1024  # Fragment size
+    mock_stats.f_bavail = 1000  # Free blocks
+    return mock_stats
 
 
 def test_replace_extension():
@@ -118,25 +135,157 @@ def test_max_processes_windows_low():
 
 
 def test_max_processes_windows_high():
-    cpu_count = 128
+    mock_cpu_count = 128
     with patch(
         "brainglobe_utils.general.system.platform.system",
         return_value="Windows",
     ):
         with patch(
             "brainglobe_utils.general.system.psutil.cpu_count",
-            return_value=cpu_count,
+            return_value=mock_cpu_count,
         ):
             # 61 is max on Windows
-            assert system.limit_cpus_windows(cpu_count) == 61
+            assert system.limit_cpus_windows(mock_cpu_count) == 61
 
 
-class Paths:
-    def __init__(self, directory):
-        self.one = directory / "one.aaa"
-        self.two = directory / "two.bbb"
-        self.tmp__three = directory / "three.ccc"
-        self.tmp__four = directory / "four.ddd"
+@pytest.mark.parametrize("cores_available", [1, 100, 1000])
+def test_cores_available_in_slurm_environment(cores_available):
+    mock_slurm_parameters = Mock()
+    mock_slurm_parameters.allocated_cores = cores_available
+
+    with patch.dict(
+        "brainglobe_utils.general.system.os.environ", {"SLURM_JOB_ID": "1"}
+    ), patch(
+        "brainglobe_utils.general.system.slurmio.SlurmJobParameters",
+        return_value=mock_slurm_parameters,
+    ):
+        assert system.get_cores_available() == cores_available
+
+
+@pytest.mark.parametrize("cores_available", [1, 100, 1000])
+def test_cores_available(cores_available):
+    with patch(
+        "brainglobe_utils.general.system.psutil.cpu_count",
+        return_value=cores_available,
+    ):
+        assert system.get_cores_available() == cores_available
+
+
+@pytest.mark.parametrize(
+    "ram_needed_per_cpu, fraction_free_ram, max_ram_usage, "
+    "free_system_ram, expected_cores",
+    [
+        (
+            1024**3,
+            0.1,
+            None,
+            16 * 1024**3,
+            14,
+        ),  # 1 GB per core, 0.1 fraction free, no max ram,
+        # 16GB free on the system, expect 14
+        (
+            2 * 1024**3,
+            0.5,
+            None,
+            256 * 1024**3,
+            64,
+        ),  # 1 GB per core, 0.5 fraction free, no max ram,
+        # 256GB free on the system, expect 64
+        (
+            1024**3,
+            0.5,
+            10 * 1024**3,
+            256 * 1024**3,
+            5,
+        ),  # 1 GB per core, 0.5 fraction free, 10Gb max ram,
+        # 256GB free on the system, expect 5
+    ],
+)
+def test_how_many_cores_with_sufficient_ram(
+    ram_needed_per_cpu,
+    fraction_free_ram,
+    max_ram_usage,
+    free_system_ram,
+    expected_cores,
+):
+    with patch(
+        "brainglobe_utils.general.system.get_free_ram",
+        return_value=free_system_ram,
+    ):
+        assert (
+            system.how_many_cores_with_sufficient_ram(
+                ram_needed_per_cpu,
+                fraction_free_ram,
+                max_ram_usage=max_ram_usage,
+            )
+            == expected_cores
+        )
+
+
+def test_how_many_cores_with_sufficient_ram_in_slurm_environment():
+    ram_needed_per_cpu = 1024**3  # 1 GB
+    free_system_ram = 16 * 1024**3  # 16 GB
+
+    mock_slurm_parameters = Mock()
+    mock_slurm_parameters.allocated_memory = free_system_ram
+
+    with patch.dict(
+        "brainglobe_utils.general.system.os.environ", {"SLURM_JOB_ID": "1"}
+    ), patch(
+        "brainglobe_utils.general.system.slurmio.SlurmJobParameters",
+        return_value=mock_slurm_parameters,
+    ):
+        assert (
+            system.how_many_cores_with_sufficient_ram(ram_needed_per_cpu) == 14
+        )  # (0.9 * 16) GB / 1 GB per core
+
+
+def test_disk_free_gb_windows(mock_disk_usage):
+    with patch(
+        "brainglobe_utils.general.system.platform.system",
+        return_value="Windows",
+    ), patch(
+        "brainglobe_utils.general.system.os.path.splitdrive",
+        return_value=("C:\\", ""),
+    ), patch(
+        "brainglobe_utils.general.system.shutil.disk_usage", mock_disk_usage
+    ):
+        free_space = system.disk_free_gb("C:\\path\\to\\file")
+        assert free_space == 500000 / 1024**3
+
+
+def test_disk_free_gb_linux(mock_statvfs):
+    with patch(
+        "brainglobe_utils.general.system.platform.system", return_value="Linux"
+    ), patch(
+        "brainglobe_utils.general.system.os.statvfs", return_value=mock_statvfs
+    ):
+        free_space = system.disk_free_gb("/path/to/file")
+        assert free_space == (1024 * 1000) / 1024**3  # Free space in GB
+
+
+def test_disk_free_gb_macos(mock_statvfs):
+    with patch(
+        "brainglobe_utils.general.system.platform.system",
+        return_value="Darwin",
+    ), patch(
+        "brainglobe_utils.general.system.os.statvfs", return_value=mock_statvfs
+    ):
+        free_space = system.disk_free_gb("/path/to/file")
+        assert free_space == (1024 * 1000) / 1024**3  # Free space in GB
+
+
+def test_get_free_ram():
+    mock_free_ram = 1000000001
+
+    mock_virtual_memory = Mock()
+    mock_virtual_memory.available = mock_free_ram
+
+    with patch(
+        "brainglobe_utils.general.system.psutil.virtual_memory",
+        return_value=mock_virtual_memory,
+    ):
+        assert system.get_free_ram() == mock_free_ram
 
 
 def write_n_random_files(n, dir, min_size=32, max_size=2048):
@@ -146,8 +295,8 @@ def write_n_random_files(n, dir, min_size=32, max_size=2048):
             fout.write(os.urandom(size))
 
 
-def test_delete_directory_contents(tmpdir):
-    delete_dir = os.path.join(str(tmpdir), "delete_dir")
+def test_delete_directory_contents_with_progress(tmp_path):
+    delete_dir = tmp_path / "delete_dir"
     os.mkdir(delete_dir)
     write_n_random_files(10, delete_dir)
 
@@ -155,4 +304,16 @@ def test_delete_directory_contents(tmpdir):
     assert not os.listdir(delete_dir) == []
 
     system.delete_directory_contents(delete_dir, progress=True)
+    assert os.listdir(delete_dir) == []
+
+
+def test_delete_directory_contents(tmp_path):
+    delete_dir = tmp_path / "delete_dir"
+    os.mkdir(delete_dir)
+    write_n_random_files(10, delete_dir)
+
+    # check the directory isn't empty first
+    assert not os.listdir(delete_dir) == []
+
+    system.delete_directory_contents(delete_dir, progress=False)
     assert os.listdir(delete_dir) == []
