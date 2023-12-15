@@ -211,14 +211,6 @@ def pretty_xml(elem, indentation_str="  "):
     return md_parsed.toprettyxml(indent=indentation_str, encoding="UTF-8")
 
 
-# TRANSCODE
-def transform_xml_file(xml_file_path, output_file_path, transform_params):
-    cells = get_cells(xml_file_path)  # TODO: check if cells_only
-    for cell in cells:
-        cell.transform(*transform_params)
-    cells_to_xml(cells, output_file_path)
-
-
 def find_relevant_tiffs(tiffs, cell_def):
     cells = [UntypedCell(tiff) for tiff in tiffs]
     if os.path.isdir(cell_def):

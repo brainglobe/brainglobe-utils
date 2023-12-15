@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import pytest
 
 from brainglobe_utils.pandas import misc as pandas_misc
 
@@ -20,18 +19,6 @@ def test_initialise_df():
 def test_sanitise_df():
     sanitised_df = pandas_misc.sanitise_df(df_with_inf)
     assert sanitised_df.equals(df_with_nan)
-
-
-def test_move_column_first():
-    column_first = pandas_misc.move_column_first(df_with_nan, "number")
-    assert column_first.columns[0] == columns[1]
-    assert column_first[columns[1]][1] == 15
-
-    with pytest.raises(ValueError):
-        pandas_misc.move_column_first(data_with_nan, "number")
-
-    with pytest.raises(ValueError):
-        pandas_misc.move_column_first(df_with_nan, columns)
 
 
 def test_safe_pandas_concat() -> None:
