@@ -15,6 +15,7 @@ dependencies = [
     "PyYAML",
     "scipy",
     "numpy",
+    "slurmio"
 ]
 
 license = {text = "MIT"}
@@ -56,14 +57,9 @@ dev = [
   "setuptools_scm",
   "pyqt5",
   "superqt",
-  "slurmio",
   "scikit-image"
 ]
 
-# For use with the SLURM job scheduler
-slurmio = [
-  "slurmio",
-]
 
 [build-system]
 requires = [
