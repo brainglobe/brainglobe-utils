@@ -1,4 +1,4 @@
-import importlib.resources as pkg_resources
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -6,8 +6,10 @@ from tifffile import imread
 
 from brainglobe_utils.image.heatmap import heatmap_from_points, rescale_array
 
+data_dir = Path("tests", "data")
+heatmap_validate_path = data_dir / "image" / "heatmap.tif"
+
 points = np.array([[5, 5, 5], [10, 10, 10], [15, 15, 15]])
-heatmap_validate_path = pkg_resources.path("tests.data.image", "heatmap.tif")
 
 
 @pytest.fixture
