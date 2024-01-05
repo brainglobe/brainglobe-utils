@@ -15,7 +15,9 @@ dependencies = [
     "PyYAML",
     "scipy",
     "numpy",
-    "slurmio"
+    "slurmio",
+    "tifffile",
+    "imio"
 ]
 
 license = {text = "MIT"}
