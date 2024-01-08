@@ -15,9 +15,6 @@ from brainglobe_utils.qtpy.collapsible_widget import (
 
 WIDGET_TITLE = "Title"
 
-## TODO Add tests for different layouts
-## TODO Add tests for removing widgets not in the container
-
 
 @pytest.fixture(scope="class")
 def generic_widget() -> QWidget:
