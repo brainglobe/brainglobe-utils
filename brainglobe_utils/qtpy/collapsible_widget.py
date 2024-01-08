@@ -100,7 +100,7 @@ class CollapsibleWidgetContainer(QWidget):
         collapsible : bool, optional
             Whether the widget should be collapsible.
         widget_title : str, optional
-            The title of the CollapsibleWidget.
+            The title of the widget.
         """
         if collapsible:
             collapsible_widget = CollapsibleWidget(widget_title, parent=self)
