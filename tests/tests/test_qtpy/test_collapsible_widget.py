@@ -115,7 +115,7 @@ def test_collapsible_widget_container_add_collapsible_widget(
     generic_widget.layout().addWidget(QPushButton("test"))
 
     collapsible_widget_container.add_widget(
-        generic_widget, widget_title=WIDGET_TITLE
+        generic_widget, collapsible=True, widget_title=WIDGET_TITLE
     )
 
     # Check that the widget was added and is a CollapsibleWidget
@@ -203,7 +203,7 @@ def test_collapsible_widget_container_add_remove_diff_widgets(
     other_widget = QLabel("test")
 
     collapsible_widget_container.add_widget(
-        generic_widget, widget_title=WIDGET_TITLE
+        generic_widget, collapsible=True, widget_title=WIDGET_TITLE
     )
     collapsible_widget_container.add_widget(other_widget, collapsible=False)
 
@@ -258,7 +258,9 @@ def test_collapsible_widget_container_update_drawers(
                 collapsible_widget_container.layout().itemAt(i).widget()
             )
         elif len(collapsible_widgets) < num_collapsible_widgets:
-            collapsible_widget_container.add_widget(QLabel("test"))
+            collapsible_widget_container.add_widget(
+                QLabel("test"), collapsible=True
+            )
             collapsible_widgets.append(
                 collapsible_widget_container.layout().itemAt(i).widget()
             )
