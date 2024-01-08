@@ -1,6 +1,8 @@
-import numpy as np
-from typing import Union
 from pathlib import Path
+from typing import Union
+
+import numpy as np
+
 
 def export_points_to_brainrender(
     points: np.ndarray,
