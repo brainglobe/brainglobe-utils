@@ -1,5 +1,12 @@
 import pytest
-from qtpy.QtWidgets import QLabel, QPushButton
+from qtpy.QtWidgets import (
+    QFormLayout,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from brainglobe_utils.qtpy.collapsible_widget import (
     CollapsibleWidget,
@@ -7,6 +14,12 @@ from brainglobe_utils.qtpy.collapsible_widget import (
 )
 
 WIDGET_TITLE = "Title"
+
+
+@pytest.fixture(scope="class")
+def generic_widget() -> QWidget:
+    widget = QWidget()
+    return widget
 
 
 @pytest.fixture(scope="class")
@@ -86,61 +99,115 @@ def test_collapsible_widget_container(qtbot, collapsible_widget_container):
     assert len(collapsible_widget_container.collapsible_widgets) == 0
 
 
+@pytest.mark.parametrize(
+    "layout", [QVBoxLayout(), QHBoxLayout(), QFormLayout()]
+)
 def test_collapsible_widget_container_add_collapsible_widget(
-    qtbot, collapsible_widget_container, collapsible_widget
+    qtbot, collapsible_widget_container, generic_widget, layout
 ):
     qtbot.addWidget(collapsible_widget_container)
 
-    collapsible_widget_container.add_widget(collapsible_widget)
+    generic_widget.setLayout(layout)
+    generic_widget.layout().addWidget(QLabel("test"))
+    generic_widget.layout().addWidget(QPushButton("test"))
 
+    collapsible_widget_container.add_widget(
+        generic_widget, collapsible=True, widget_title=WIDGET_TITLE
+    )
+
+    # Check that the widget was added and is a CollapsibleWidget
     assert collapsible_widget_container.layout().count() == 1
+    assert isinstance(
+        collapsible_widget_container.layout().itemAt(0).widget(),
+        CollapsibleWidget,
+    )
+    # Check that the widget is collapsed and contains the generic widget
     assert (
-        collapsible_widget_container.collapsible_widgets[0]
-        == collapsible_widget
+        collapsible_widget_container.collapsible_widgets[0].content()
+        is generic_widget
+    )
+    assert (
+        collapsible_widget_container.layout().itemAt(0).widget().text()
+        == WIDGET_TITLE
+    )
+    assert (
+        not collapsible_widget_container.layout()
+        .itemAt(0)
+        .widget()
+        .isExpanded()
     )
     assert len(collapsible_widget_container.collapsible_widgets) == 1
 
 
-def test_collapsible_widget_container_add_other_widget(
-    qtbot, collapsible_widget_container
+@pytest.mark.parametrize("widget_type", [QLabel, QPushButton])
+def test_collapsible_widget_container_add_not_collapsible_widget(
+    qtbot, collapsible_widget_container, widget_type
 ):
     qtbot.addWidget(collapsible_widget_container)
 
-    collapsible_widget_container.add_widget(QLabel("test"))
+    collapsible_widget_container.add_widget(
+        widget_type(WIDGET_TITLE), collapsible=False
+    )
 
     assert collapsible_widget_container.layout().count() == 1
+    assert isinstance(
+        collapsible_widget_container.layout().itemAt(0).widget(), widget_type
+    )
     assert len(collapsible_widget_container.collapsible_widgets) == 0
 
 
+@pytest.mark.parametrize(
+    "layout, collapsible",
+    [
+        (QVBoxLayout(), True),
+        (QHBoxLayout(), True),
+        (QFormLayout(), True),
+        (QVBoxLayout(), False),
+        (QHBoxLayout(), False),
+        (QFormLayout(), False),
+    ],
+)
 def test_collapsible_widget_container_add_remove_widgets(
-    qtbot, collapsible_widget, collapsible_widget_container
+    qtbot, collapsible_widget_container, generic_widget, layout, collapsible
 ):
     qtbot.addWidget(collapsible_widget_container)
 
-    collapsible_widget_container.add_widget(collapsible_widget)
+    generic_widget.setLayout(layout)
+    generic_widget.layout().addWidget(QLabel("test"))
+    generic_widget.layout().addWidget(QPushButton("test"))
+
+    collapsible_widget_container.add_widget(
+        generic_widget, collapsible=collapsible, widget_title=WIDGET_TITLE
+    )
 
     assert collapsible_widget_container.layout().count() == 1
-    assert len(collapsible_widget_container.collapsible_widgets) == 1
+    # Convert collapsible to int (False -> 0, True -> 1)
+    # to check if collapsible_widgets is empty
+    assert len(collapsible_widget_container.collapsible_widgets) == int(
+        collapsible
+    )
 
-    collapsible_widget_container.remove_widget(collapsible_widget)
+    collapsible_widget_container.remove_widget(generic_widget)
 
     assert collapsible_widget_container.layout().count() == 0
     assert len(collapsible_widget_container.collapsible_widgets) == 0
 
 
 def test_collapsible_widget_container_add_remove_diff_widgets(
-    qtbot, collapsible_widget, collapsible_widget_container
+    qtbot, generic_widget, collapsible_widget_container
 ):
     qtbot.addWidget(collapsible_widget_container)
     other_widget = QLabel("test")
 
-    collapsible_widget_container.add_widget(collapsible_widget)
-    collapsible_widget_container.add_widget(other_widget)
+    collapsible_widget_container.add_widget(
+        generic_widget, collapsible=True, widget_title=WIDGET_TITLE
+    )
+    collapsible_widget_container.add_widget(other_widget, collapsible=False)
 
     assert collapsible_widget_container.layout().count() == 2
     assert len(collapsible_widget_container.collapsible_widgets) == 1
 
-    collapsible_widget_container.remove_widget(collapsible_widget)
+    collapsible_widget_container.remove_widget(generic_widget)
 
     assert collapsible_widget_container.layout().count() == 1
     assert len(collapsible_widget_container.collapsible_widgets) == 0
@@ -149,6 +216,13 @@ def test_collapsible_widget_container_add_remove_diff_widgets(
 
     assert collapsible_widget_container.layout().count() == 0
     assert len(collapsible_widget_container.collapsible_widgets) == 0
+
+
+def test_collapsible_widget_container_remove_widget_not_found(
+    qtbot, generic_widget, collapsible_widget_container
+):
+    with pytest.raises(ValueError):
+        collapsible_widget_container.remove_widget(generic_widget)
 
 
 @pytest.mark.parametrize(
@@ -180,28 +254,27 @@ def test_collapsible_widget_container_update_drawers(
     # Add collapsible widgets and other widgets to the container alternating
     # until the correct number of each type of widget has been added
     for i in range(num_collapsible_widgets + num_other_widgets):
-        if i % 2 == 0:
-            if len(collapsible_widgets) == num_collapsible_widgets:
-                non_collapsible_widgets.append(QLabel("test"))
-                collapsible_widget_container.add_widget(
-                    non_collapsible_widgets[-1]
-                )
-            else:
-                collapsible_widgets.append(CollapsibleWidget(WIDGET_TITLE))
-                collapsible_widget_container.add_widget(
-                    collapsible_widgets[-1]
-                )
+        if i % 2 == 0 and len(non_collapsible_widgets) < num_other_widgets:
+            collapsible_widget_container.add_widget(
+                QLabel("test"), collapsible=False
+            )
+            non_collapsible_widgets.append(
+                collapsible_widget_container.layout().itemAt(i).widget()
+            )
+        elif len(collapsible_widgets) < num_collapsible_widgets:
+            collapsible_widget_container.add_widget(
+                QLabel("test"), collapsible=True
+            )
+            collapsible_widgets.append(
+                collapsible_widget_container.layout().itemAt(i).widget()
+            )
         else:
-            if len(non_collapsible_widgets) == num_other_widgets:
-                collapsible_widgets.append(CollapsibleWidget(WIDGET_TITLE))
-                collapsible_widget_container.add_widget(
-                    collapsible_widgets[-1]
-                )
-            else:
-                non_collapsible_widgets.append(QLabel("test"))
-                collapsible_widget_container.add_widget(
-                    non_collapsible_widgets[-1]
-                )
+            collapsible_widget_container.add_widget(
+                QLabel("test"), collapsible=False
+            )
+            non_collapsible_widgets.append(
+                collapsible_widget_container.layout().itemAt(i).widget()
+            )
 
     for _ in range(num_collapsible_widgets):
         collapsible_widgets[index_expanded]._toggle_btn.click()
