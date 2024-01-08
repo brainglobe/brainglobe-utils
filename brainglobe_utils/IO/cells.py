@@ -29,11 +29,9 @@ def get_cells(
     cells_only: bool = False,
     cell_type: Optional[int] = None,
 ):
-    # TODO: implement csv read
     if cells_file_path.endswith(".xml"):
         return get_cells_xml(cells_file_path, cells_only=cells_only)
     elif cells_file_path.endswith(".yml"):
-        # Not general
         return get_cells_yml(cells_file_path, ignore_type=True)
     elif os.path.isdir(cells_file_path):
         try:
@@ -209,14 +207,6 @@ def pretty_xml(elem, indentation_str="  "):
     ugly_xml = ElementTree.tostring(elem, "utf-8")
     md_parsed = minidom.parseString(ugly_xml)
     return md_parsed.toprettyxml(indent=indentation_str, encoding="UTF-8")
-
-
-# TRANSCODE
-def transform_xml_file(xml_file_path, output_file_path, transform_params):
-    cells = get_cells(xml_file_path)  # TODO: check if cells_only
-    for cell in cells:
-        cell.transform(*transform_params)
-    cells_to_xml(cells, output_file_path)
 
 
 def find_relevant_tiffs(tiffs, cell_def):

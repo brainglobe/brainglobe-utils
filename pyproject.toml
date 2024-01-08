@@ -10,12 +10,14 @@ dependencies = [
     "natsort",
     "pandas",
     "psutil",
-    "slurmio",
     "configobj",
     "tqdm",
     "PyYAML",
     "scipy",
-    "scikit-image",
+    "numpy",
+    "slurmio",
+    "tifffile",
+    "imio"
 ]
 
 license = {text = "MIT"}
@@ -57,12 +59,9 @@ dev = [
   "setuptools_scm",
   "pyqt5",
   "superqt",
+  "scikit-image"
 ]
 
-slumrmio = [
-  "slurmio",
-
-]
 
 [build-system]
 requires = [

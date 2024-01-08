@@ -11,5 +11,5 @@ def get_bins(image_size, bin_sizes):
     """
     bins = []
     for dim in range(0, len(image_size)):
-        bins.append(np.arange(0, image_size[dim], bin_sizes[dim]))
+        bins.append(np.arange(0, image_size[dim] + 1, bin_sizes[dim]))
     return bins
