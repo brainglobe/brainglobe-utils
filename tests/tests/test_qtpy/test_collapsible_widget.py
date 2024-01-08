@@ -221,6 +221,13 @@ def test_collapsible_widget_container_add_remove_diff_widgets(
     assert len(collapsible_widget_container.collapsible_widgets) == 0
 
 
+def test_collapsible_widget_container_remove_widget_not_found(
+    qtbot, generic_widget, collapsible_widget_container
+):
+    with pytest.raises(ValueError):
+        collapsible_widget_container.remove_widget(generic_widget)
+
+
 @pytest.mark.parametrize(
     "num_collapsible_widgets, num_other_widgets, index_expanded",
     [(2, 4, 1), (5, 1, 3), (10, 0, 9)],
