@@ -9,6 +9,7 @@ import pytest
 
 from brainglobe_utils.general import system
 from brainglobe_utils.general.string import get_text_lines
+from brainglobe_utils.general.exceptions import CommandLineInputError
 
 data_dir = Path("tests", "data")
 cubes_dir = data_dir / "cubes"
@@ -326,3 +327,31 @@ def test_delete_directory_contents(tmp_path):
 
     system.delete_directory_contents(delete_dir, progress=False)
     assert os.listdir(delete_dir) == []
+
+def write_file_single_size(directory, file_size):
+    with open(os.path.join(directory, str(file_size)), "wb") as fout:
+        fout.write(os.urandom(file_size))
+
+def test_check_path_exists(tmpdir):
+    num = 10
+    tmpdir = str(tmpdir)
+
+    assert system.check_path_exists(os.path.join(tmpdir))
+    no_exist_dir = os.path.join(tmpdir, "i_dont_exist")
+    with pytest.raises(FileNotFoundError):
+        assert system.check_path_exists(no_exist_dir)
+
+    write_file_single_size(tmpdir, num)
+    assert system.check_path_exists(os.path.join(tmpdir, str(num)))
+    with pytest.raises(FileNotFoundError):
+        assert system.check_path_exists(os.path.join(tmpdir, "20"))
+
+
+def test_catch_input_file_error(tmpdir):
+    tmpdir = str(tmpdir)
+    # check no error is raised:
+    system.catch_input_file_error(tmpdir)
+
+    no_exist_dir = os.path.join(tmpdir, "i_dont_exist")
+    with pytest.raises(CommandLineInputError):
+        system.catch_input_file_error(no_exist_dir)
