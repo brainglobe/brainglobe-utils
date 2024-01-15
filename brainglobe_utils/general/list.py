@@ -1,5 +1,6 @@
 from natsort import natsorted
 
+
 def remove_empty_string(str_list):
     """
     Removes any empty strings from a list of strings
@@ -12,6 +13,7 @@ def remove_empty_string(str_list):
 def unique_elements_lists(list_in):
     """return the unique elements in a list"""
     return list(dict.fromkeys(list_in))
+
 
 def check_unique_list(in_list, natural_sort=True):
     """

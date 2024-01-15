@@ -12,8 +12,8 @@ from natsort import natsorted
 from slurmio import slurmio
 from tqdm import tqdm
 
-from brainglobe_utils.general.string import get_text_lines
 from brainglobe_utils.general.exceptions import CommandLineInputError
+from brainglobe_utils.general.string import get_text_lines
 
 # On Windows, max_workers must be less than or equal to 61
 # https://docs.python.org/3/library/concurrent.futures.html#processpoolexecutor
@@ -350,6 +350,7 @@ def delete_directory_contents(directory, progress=False):
     else:
         for f in files:
             os.remove(os.path.join(directory, f))
+
 
 def check_path_exists(file):
     """

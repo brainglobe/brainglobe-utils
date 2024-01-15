@@ -8,8 +8,8 @@ from unittest.mock import Mock, patch
 import pytest
 
 from brainglobe_utils.general import system
-from brainglobe_utils.general.string import get_text_lines
 from brainglobe_utils.general.exceptions import CommandLineInputError
+from brainglobe_utils.general.string import get_text_lines
 
 data_dir = Path("tests", "data")
 cubes_dir = data_dir / "cubes"
@@ -328,9 +328,11 @@ def test_delete_directory_contents(tmp_path):
     system.delete_directory_contents(delete_dir, progress=False)
     assert os.listdir(delete_dir) == []
 
+
 def write_file_single_size(directory, file_size):
     with open(os.path.join(directory, str(file_size)), "wb") as fout:
         fout.write(os.urandom(file_size))
+
 
 def test_check_path_exists(tmpdir):
     num = 10
