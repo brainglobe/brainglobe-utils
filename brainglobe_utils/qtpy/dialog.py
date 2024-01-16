@@ -1,7 +1,7 @@
-from qtpy.QtWidgets import QMessageBox
+from qtpy.QtWidgets import QMessageBox, QWidget
 
 
-def display_warning(widget, title, message):
+def display_warning(widget: QWidget, title: str, message: str) -> bool:
     """
     Display a warning in a pop-up that can be accepted or dismissed
     """
