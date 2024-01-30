@@ -33,6 +33,9 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 
+[project.scripts]
+cite-brainglobe = "brainglobe.citation.cite:cli"
+
 [project.urls]
 homepage = "https://brainglobe.info"
 bug_tracker = "https://github.com/brainglobe/brainglobe-utils/issues"
