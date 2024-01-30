@@ -208,6 +208,15 @@ brainglobe_meta = Repository(
     ],
     cff_branch="add-citation-function",
 )
+brainglobe_utils = Repository(
+    "brainglobe-utils",
+    [
+        "brainglobe_utils",
+        "utils",
+        "brainglobe utils",
+        "brainglobe utilities",
+    ],
+)
 
 
 def all_citable_repositories() -> List[Repository]:
