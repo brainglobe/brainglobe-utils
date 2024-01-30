@@ -193,12 +193,16 @@ def supported_bibtex_entry_types() -> Dict[str, BibTexEntry]:
         Dict of classes derived from BibTexEntry that can handle entry
         types, indexed by the entry type they support.
     """
+    this_module = sys.modules[__name__]
+
     dict_of_formats: Dict[str, BibTexEntry] = {
-        obj.entry_type(): obj
-        for name, obj in inspect.getmembers(
-            sys.modules[__name__], inspect.isclass
+        cls.entry_type(): cls
+        for cls in (
+            getattr(this_module, name)
+            for name, _ in inspect.getmembers(this_module, inspect.isclass)
+            if name != "BibTexEntry" and name != "Format"
         )
-        if name != "BibTexEntry" and name != "Format"
+        if issubclass(cls, BibTexEntry)
     }
 
     return dict_of_formats
