@@ -1,6 +1,6 @@
 import pytest
 
-from brainglobe.citation.fetch import fetch_from_github
+from brainglobe_utils.citation.fetch import fetch_from_github
 
 
 def test_fetch() -> None:

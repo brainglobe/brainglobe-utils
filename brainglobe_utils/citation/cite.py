@@ -4,15 +4,15 @@ from pathlib import Path
 from typing import Literal
 from warnings import warn
 
-from brainglobe.citation.bibtex_fmt import (
+from brainglobe_utils.citation.bibtex_fmt import (
     BibTexEntry,
     supported_bibtex_entry_types,
 )
-from brainglobe.citation.repositories import (
+from brainglobe_utils.citation.repositories import (
     all_citable_repositories,
     unique_repositories_from_tools,
 )
-from brainglobe.citation.text_fmt import TextCitation
+from brainglobe_utils.citation.text_fmt import TextCitation
 
 FORMAT_TO_EXTENSION = {"bibtex": "tex", "text": "txt"}
 EXTENSION_TO_FORMAT = {

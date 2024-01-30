@@ -1,4 +1,4 @@
-from brainglobe.citation.format import Format
+from brainglobe_utils.citation.format import Format
 
 
 class TextCitation(Format):

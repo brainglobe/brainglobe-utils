@@ -34,7 +34,7 @@ classifiers = [
 ]
 
 [project.scripts]
-cite-brainglobe = "brainglobe.citation.cite:cli"
+cite-brainglobe = "brainglobe_utils.citation.cite:cli"
 
 [project.urls]
 homepage = "https://brainglobe.info"

@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Set
 
 import requests
 
-from brainglobe.citation.fetch import fetch_from_github, yaml_str_to_dict
+from brainglobe_utils.citation.fetch import fetch_from_github, yaml_str_to_dict
 
 
 @dataclass

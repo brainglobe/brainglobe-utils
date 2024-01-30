@@ -1,6 +1,6 @@
 import pytest
 
-from brainglobe.citation.repositories import (
+from brainglobe_utils.citation.repositories import (
     Repository,
     all_citable_repositories,
     unique_repositories_from_tools,

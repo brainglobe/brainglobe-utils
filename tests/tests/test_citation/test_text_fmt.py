@@ -1,4 +1,4 @@
-from brainglobe.citation.text_fmt import TextCitation
+from brainglobe_utils.citation.text_fmt import TextCitation
 
 
 def test_generate_ref_string() -> None:

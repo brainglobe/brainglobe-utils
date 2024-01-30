@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from brainglobe.citation.cite import cite
+from brainglobe_utils.citation.cite import cite
 
 
 @pytest.mark.parametrize(

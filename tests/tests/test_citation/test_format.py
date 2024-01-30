@@ -2,7 +2,7 @@ from typing import Dict, List, Union
 
 import pytest
 
-from brainglobe.citation.bibtex_fmt import Article
+from brainglobe_utils.citation.bibtex_fmt import Article
 
 
 class TestFormat:

@@ -2,7 +2,7 @@ from typing import List
 
 import pytest
 
-from brainglobe.citation.bibtex_fmt import (
+from brainglobe_utils.citation.bibtex_fmt import (
     Article,
     supported_bibtex_entry_types,
 )

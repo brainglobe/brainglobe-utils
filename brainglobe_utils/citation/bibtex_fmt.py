@@ -3,7 +3,7 @@ import sys
 from string import ascii_letters, digits
 from typing import Any, ClassVar, Dict
 
-from brainglobe.citation.format import Format
+from brainglobe_utils.citation.format import Format
 
 
 class BibTexEntry(Format):
