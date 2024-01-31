@@ -194,7 +194,6 @@ bg_atlasapi = Repository(
         "AtlasAPI",
         "Atlas API",
     ],
-    cff_branch="add-citation-file",
 )
 brainglobe_meta = Repository(
     "brainglobe-meta",
@@ -206,7 +205,6 @@ brainglobe_meta = Repository(
         "toolsuite",
         "tool suite",
     ],
-    cff_branch="add-citation-function",
 )
 brainglobe_utils = Repository(
     "brainglobe-utils",
