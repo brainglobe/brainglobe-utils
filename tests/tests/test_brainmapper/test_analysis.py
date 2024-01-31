@@ -1,6 +1,6 @@
-import filecmp
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from brainglobe_utils.brainmapper.analysis import (
@@ -37,9 +37,17 @@ def structures_with_points():
 
 
 def test_get_region_totals(tmp_path, points, structures_with_points):
-    """Regression test for count_points_per_brain_region for
+    """
+    Regression test for count_points_per_brain_region for
     pandas 1.5.3 -> 2.1.3+.
-    pd.Dataframe.append was deprecated and removed in this time."""
+    pd.DataFrame.append was deprecated and removed in this time.
+
+    2024-01-31: Newer versions of pandas are writing the
+    DataFrame rows in a different order. As such, filecmp is no longer
+    sufficient to check that we are still counting the number of cells
+    correctly - we will need to load the data back in and do a pandas
+    comparison.
+    """
     OUTPUT_DATA_LOC = (
         Path(__file__).parent.parent.parent / "data" / "brainmapper"
     )
@@ -54,4 +62,21 @@ def test_get_region_totals(tmp_path, points, structures_with_points):
         points, structures_with_points, volumes_path, output_path
     )
     assert output_path.exists()
-    assert filecmp.cmp(output_path, expected_output)
+
+    # Read data back in, and sort rows by the structures for comparison.
+    # NOTE: Column 'structure name' should exist, otherwise we've failed
+    # and the test will flag the error appropriately
+    expected_df = (
+        pd.read_csv(expected_output)
+        .sort_values("structure_name")
+        .reset_index(drop=True)
+    )
+    produced_df = (
+        pd.read_csv(output_path)
+        .sort_values("structure_name")
+        .reset_index(drop=True)
+    )
+    assert expected_df.equals(
+        produced_df
+    ), "Produced DataFrame no longer matches per-region "
+    "count from expected DataFrame"
