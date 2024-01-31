@@ -106,3 +106,28 @@ ignore_errors = true
 module = ["imlib.cells.*"]
 ignore_errors = false
 strict = true
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py{39,310,311}
+isolated_build = True
+
+[gh-actions]
+python =
+    3.9: py39
+    3.10: py310
+    3.11: py311
+
+[testenv]
+extras =
+    dev
+commands =
+    pytest -v --color=yes --cov=brainglobe_utils --cov-report=xml
+passenv =
+    CI
+    GITHUB_ACTIONS
+    DISPLAY
+    XAUTHORITY
+    PYVISTA_OFF_SCREEN
+"""
