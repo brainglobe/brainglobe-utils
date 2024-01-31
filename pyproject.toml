@@ -18,6 +18,7 @@ dependencies = [
   "slurmio",
   "tifffile",
   "imio",
+  "bg-atlasapi",
 ]
 
 license = { text = "MIT" }
