@@ -228,10 +228,11 @@ def cli() -> None:
 
         # List reference formats
         sys.stdout.write(
-            "Available citation formats (format, file extension):\n"
+            "Available citation formats "
+            "(supported file extension), format option:\n"
         )
-        sys.stdout.write("\t- BibTex (*.tex)\n")
-        sys.stdout.write("\t- Text (*.txt)\n")
+        sys.stdout.write("\t- BibTex (*.tex), --format bibtex\n")
+        sys.stdout.write("\t- Text (*.txt), --format text\n")
 
         # Terminate
         sys.exit(0)
