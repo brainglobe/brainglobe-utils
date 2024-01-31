@@ -1,36 +1,35 @@
 [project]
 name = "brainglobe-utils"
-authors = [{name = "Adam Tyson", email= "code@adamltyson.com"}]
+authors = [{ name = "Adam Tyson", email = "code@adamltyson.com" }]
 description = "Shared general purpose tools for the BrainGlobe project"
 readme = "README.md"
 requires-python = ">=3.9.0"
 dynamic = ["version"]
 
 dependencies = [
-    "natsort",
-    "pandas",
-    "psutil",
-    "configobj",
-    "tqdm",
-    "PyYAML",
-    "scipy",
-    "numpy",
-    "slurmio",
-    "tifffile",
-    "imio",
-    "bg-atlasapi",
+  "natsort",
+  "pandas",
+  "psutil",
+  "configobj",
+  "tqdm",
+  "PyYAML",
+  "scipy",
+  "numpy",
+  "slurmio",
+  "tifffile",
+  "imio",
 ]
 
-license = {text = "MIT"}
+license = { text = "MIT" }
 
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Operating System :: OS Independent",
+  "Development Status :: 2 - Pre-Alpha",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Operating System :: OS Independent",
 ]
 
 [project.urls]
@@ -40,11 +39,7 @@ source_code = "https://github.com/brainglobe/brainglobe-utils"
 user_support = "https://github.com/brainglobe/brainglobe-utils/issues"
 
 [project.optional-dependencies]
-napari = [
-  "napari>=0.4.18",
-  "qtpy",
-  "superqt"
-]
+napari = ["napari>=0.4.18", "qtpy", "superqt"]
 
 dev = [
   "qtpy",
@@ -60,16 +55,12 @@ dev = [
   "setuptools_scm",
   "pyqt5",
   "superqt",
-  "scikit-image"
+  "scikit-image",
 ]
 
 
 [build-system]
-requires = [
-    "setuptools>=45",
-    "wheel",
-    "setuptools_scm[toml]>=6.2",
-]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
@@ -104,7 +95,7 @@ ignore = [
 
 [tool.ruff]
 line-length = 79
-exclude = ["__init__.py","build",".eggs"]
+exclude = ["__init__.py", "build", ".eggs"]
 select = ["I", "E", "F"]
 fix = true
 

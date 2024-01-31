@@ -117,3 +117,4 @@ venv.bak/
 .idea/
 .vs/
 *.~lock.*
+.vscode/
