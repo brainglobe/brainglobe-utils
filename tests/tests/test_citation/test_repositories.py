@@ -16,6 +16,11 @@ def test_throw_on_bad_repo() -> None:
     ):
         Repository("dont-exist", ["a", "b", "c"])
 
+    with pytest.raises(
+        TypeError, match="Cannot convert input of type int to a set"
+    ):
+        Repository("BrainGlobe", 76)
+
 
 def test_repository_basics() -> None:
     """
@@ -91,3 +96,35 @@ def test_unique_repos() -> None:
         *[r.name for r in all_our_repositories]
     )
     assert all_our_repositories == our_fetchable_repositories
+
+
+def test_automatic_alias_generation() -> None:
+    """
+    Test that the aliases that are automatically generated
+    given the repository name are indeed added to the set of
+    known aliases.
+
+    - The -, _, and " " characters are all interchangeable
+    - The brainglobe prefix is dropped if present in a new alias.
+    """
+    # Create Repository, providing an alias distinct from the package name
+    meta_package = Repository("brainglobe-meta", "my_alias")
+
+    # "meta" alias should be available since brainglobe prefix is present
+    assert (
+        "meta" in meta_package.tool_aliases
+    ), "brainglobe prefix not dropped to make new alias."
+
+    # "brainglobe meta" and "brainglobe_meta" should also have been added
+    # as valid aliases
+    assert (
+        "brainglobe meta" in meta_package.tool_aliases
+        and "brainglobe_meta" in meta_package.tool_aliases
+    ), "Interchangeable characters in name are not replaced."
+
+    # The custom alias should also have seen automatic additions, replacing
+    # the underscore character
+    assert (
+        "my alias" in meta_package.tool_aliases
+        and "my-alias" in meta_package.tool_aliases
+    ), "Interchangeable characters in custom aliases are not replaced."

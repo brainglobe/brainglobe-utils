@@ -14,6 +14,20 @@ class Repository:
     Static class for representing GitHub repositories, in particular
     when needing to fetch CITATION information from them.
 
+    When providing the tool aliases, the tool name will be automatically
+    included.
+    Likewise, any variations aliases that contain hyphens, underscores, or
+    whitespace characters will be automatically given equivalent aliases
+    with these characters interchanged.
+    Finally, any 'brainglobe' prefixed packages will be given aliases without
+    this prefix.
+    For example, the name brainglobe-atlasapi would automatically generate
+    the following tool aliases:
+
+    - brainglobe atlasapi
+    - brainglobe_atlasapi
+    - atlasapi
+
     Parameters
     ----------
     See attributes.
@@ -22,8 +36,10 @@ class Repository:
     ----------
     name : str
         The name of the repository.
-    tool_aliases: List[str]
+    tool_aliases: Set[str]
         Names by which the tool the repository provides might be called.
+        A single string can be passed if only one alternative alias is to be
+        used.
     cff_branch: str, default = "main"
         Branch on which the citation file can be found.
     cff_loc: str, default = "CITATION.cff"
@@ -33,7 +49,7 @@ class Repository:
     """
 
     name: str
-    tool_aliases: List[str]
+    tool_aliases: Set[str]
     cff_branch: str = "main"
     cff_loc: str = "CITATION.cff"
     org: str = "brainglobe"
@@ -75,12 +91,35 @@ class Repository:
 
     def __post_init__(self) -> None:
         """
-        Validate the repository actually exists and is reachable,
-        before attempting to fetch content later.
+        Run the following post-init checks:
 
-        Also ensure that a tool can be referred to by its repository
-        name.
+        - self.tool_aliases is a set, or can be immediately cast to one.
+        - The repository actually exists and is reachable.
+
+        And ensure the following behaviour is adhered to:
+
+        - Tools always have an alias identical to their repository name.
+        - The underscore, hyphen, and space characters can be used
+        interchangeably when referring to tool aliases.
+        - A brainglobe-prefixed package automatically gets an alias without
+        the prefix present.
         """
+        # Cast tool_aliases to a set if provided as some other iterable
+        if not isinstance(self.tool_aliases, set) and not isinstance(
+            self.tool_aliases, str
+        ):
+            try:
+                self.tool_aliases = set(self.tool_aliases)
+            except TypeError as e:
+                raise TypeError(
+                    "Cannot convert input of type "
+                    f"{type(self.tool_aliases).__name__} to a set"
+                ) from e
+        elif isinstance(self.tool_aliases, str):
+            # Strings cast to sets via str -> list -> set, so account for this
+            self.tool_aliases = set([self.tool_aliases])
+
+        # Check repository actually exists
         ping_site = requests.get(self.url)
         if not ping_site.ok:
             if ping_site.status_code == 404:
@@ -94,9 +133,36 @@ class Repository:
                     f"Could not reach {self.url} successfully (non 404 status)"
                 )
 
+        # These characters are deemed interchangeable for the purposes of
+        # supplying and referring to aliases.
+        interchangeable = ["-", "_", " "]
+
         # Can always refer to yourself by repository name
         if self.name not in self.tool_aliases:
-            self.tool_aliases.append(self.name)
+            self.tool_aliases.add(self.name)
+
+        # If our name starts with the 'brainglobe' prefix, add another
+        # alias that drops this prefix.
+        for char in interchangeable:
+            if self.name.startswith(f"brainglobe{char}"):
+                self.tool_aliases.add(
+                    self.name.removeprefix(f"brainglobe{char}")
+                )
+
+        # Ensure that hyphens, dashes, and spaces are interchangeable
+        # when referring to tool aliases
+        # So we don't iterate over a growing set
+        original_tool_aliases = self.tool_aliases.copy()
+        # For each interchangeable character
+        for char in interchangeable:
+            replacements = [c for c in interchangeable if c is not char]
+            for alias in original_tool_aliases:
+                for replacement_char in replacements:
+                    proposed_equivalent_alias = alias.replace(
+                        char, replacement_char
+                    )
+                    self.tool_aliases.add(proposed_equivalent_alias)
+
         return
 
     def __str__(self) -> str:
@@ -188,8 +254,6 @@ def unique_repositories_from_tools(
 bg_atlasapi = Repository(
     "bg-atlasapi",
     [
-        "bg_atlasapi",
-        "BrainGlobe AtlasAPI",
         "BrainGlobe AtlasAPI",
         "AtlasAPI",
         "Atlas API",
@@ -199,21 +263,14 @@ brainglobe_meta = Repository(
     "brainglobe-meta",
     [
         "brainglobe",
-        "meta-package",
         "meta package",
-        "meta",
         "toolsuite",
         "tool suite",
     ],
 )
 brainglobe_utils = Repository(
     "brainglobe-utils",
-    [
-        "brainglobe_utils",
-        "utils",
-        "brainglobe utils",
-        "brainglobe utilities",
-    ],
+    "utilities",
 )
 
 
