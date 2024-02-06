@@ -1,6 +1,6 @@
 import inspect
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Set
 
 import requests
@@ -49,7 +49,7 @@ class Repository:
     """
 
     name: str
-    tool_aliases: Set[str]
+    tool_aliases: Set[str] = field(default_factory=lambda: set())
     cff_branch: str = "main"
     cff_loc: str = "CITATION.cff"
     org: str = "brainglobe"
@@ -259,6 +259,12 @@ bg_atlasapi = Repository(
         "Atlas API",
     ],
 )
+brainglobe_heatmap = Repository(
+    "brainglobe-heatmap",
+    [
+        "heat-map",
+    ],
+)
 brainglobe_meta = Repository(
     "brainglobe-meta",
     [
@@ -268,10 +274,55 @@ brainglobe_meta = Repository(
         "tool suite",
     ],
 )
+brainglobe_napari_io = Repository(
+    "brainglobe-napari-io",
+    [
+        "napari io",
+    ],
+)
+brainglobe_segmentation = Repository(
+    "brainglobe-segmentation",
+    [
+        "brainreg-segment",  # Legacy compatibility
+    ],
+)
+brainglobe_space = Repository(
+    "brainglobe-space",
+    [
+        "bg-space",  # Legacy compatibility
+    ],
+)
 brainglobe_utils = Repository(
     "brainglobe-utils",
     "utilities",
 )
+brainreg = Repository(
+    "brainreg",
+    [
+        "brainreg-napari",  # Legacy compatibility
+    ],
+)
+brainrender = Repository(
+    "brainrender",
+)
+brainrender_napari = Repository(
+    "brainrender-napari",
+)
+cellfinder = Repository(
+    "cellfinder",
+    [
+        "cellfinder-core",
+        "cellfinder-napari",
+    ],
+)
+# MORPHAPI currently broken at time of writing,
+# reinstate once fixed and CITATION.cff file added
+# morphapi = Repository(
+#     "morphapi",
+#     [
+#         "morph api",
+#     ],
+# )
 
 
 def all_citable_repositories() -> List[Repository]:
