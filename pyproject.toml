@@ -3,7 +3,7 @@ name = "imio"
 description = "Loading and saving of image data."
 readme = "README.md"
 authors = [
-    {name = "Charly Rousseau, Adam Tyson", email = "code@adamltyson.com"},
+    { name = "Charly Rousseau, Adam Tyson", email = "code@adamltyson.com" },
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -24,6 +24,7 @@ dependencies = [
     "nibabel >= 2.1.0",
     "numpy",
     "psutil",
+    "pyarrow",
     "pynrrd",
     "scikit-image",
     "tifffile",
@@ -35,19 +36,10 @@ dynamic = ['version']
 Homepage = "https://github.com/brainglobe/imio"
 
 [project.optional-dependencies]
-dev = [
-    "black",
-    "pre-commit",
-    "pytest",
-    "pytest-cov",
-]
+dev = ["black", "pre-commit", "pytest", "pytest-cov"]
 
 [build-system]
-requires = [
-    "setuptools>=45",
-    "wheel",
-    "setuptools_scm[toml]>=6.2",
-]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
@@ -72,7 +64,7 @@ filterwarnings = [
     "ignore:`np.uint0` is a deprecated alias for `np.uintp`",
     "ignore:`np.void0` is a deprecated alias for `np.void`",
     "ignore:`np.bytes0` is a deprecated alias for `np.bytes_`",
-    "ignore:`np.str0` is a deprecated alias for `np.str_`"
+    "ignore:`np.str0` is a deprecated alias for `np.str_`",
 ]
 
 [tool.black]
@@ -82,6 +74,26 @@ line-length = 79
 
 [tool.ruff]
 line-length = 79
-exclude = ["__init__.py","build",".eggs"]
+exclude = ["__init__.py", "build", ".eggs"]
 select = ["I", "E", "F"]
 fix = true
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py{38,39,310,311}
+
+[gh-actions]
+python =
+    3.8: py38
+    3.9: py39
+    3.10: py310
+    3.11: py311
+
+[testenv]
+extras =
+    dev
+commands =
+    pytest -v --color=yes --cov=imio --cov-report=xml
+
+"""
