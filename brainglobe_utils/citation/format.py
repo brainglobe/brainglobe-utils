@@ -78,7 +78,7 @@ class Format:
                     f"Did not receive value for required key: {required_field}"
                 )
         # Optional fields should be set to None so that checks against
-        # them produce nothing and evaluated to False
+        # them produce nothing and evaluate to False
         for optional_field in self.optional:
             if not hasattr(self, optional_field.replace("-", "_")):
                 setattr(self, optional_field.replace("-", "_"), None)
@@ -102,7 +102,7 @@ class Format:
         - orcid
         - affiliation
 
-        or which we only need the names.
+        of which we only need the names.
         """
         # A single author will be read in as a dictionary
         if isinstance(self.authors, dict):
