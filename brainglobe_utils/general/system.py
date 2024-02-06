@@ -294,9 +294,10 @@ def safe_execute_command(cmd, log_file_path=None, error_file_path=None):
             os.path.join(gettempdir(), "safe_execute_command.err")
         )
 
-    with open(log_file_path, "w") as log_file, open(
-        error_file_path, "w"
-    ) as error_file:
+    with (
+        open(log_file_path, "w") as log_file,
+        open(error_file_path, "w") as error_file,
+    ):
         try:
             subprocess.check_call(
                 cmd, stdout=log_file, stderr=error_file, shell=True
