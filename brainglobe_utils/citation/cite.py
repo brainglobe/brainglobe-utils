@@ -22,7 +22,7 @@ EXTENSION_TO_FORMAT = {
 
 def cite(
     *tools: str,
-    format: Literal["bibtex", "text"] = "bibtex",
+    format: Literal["bibtex", "text"] = "text",
     outfile: Path = None,
     cite_software: bool = False,
     newline_separations: int = 2,
@@ -259,7 +259,7 @@ def cli() -> None:
             raise RuntimeError(f"Output format {fmt} is not supported.")
         elif fmt is None:
             # Use default value as this argument was also not provided
-            fmt = "bibtex"
+            fmt = "text"
     else:
         # Output file provided - resolve path based on OS.
         output_file = Path(output_file)

@@ -51,7 +51,7 @@ class BibTexEntry(Format):
         """
         bad_characters = key.lower()
         for valid_character in ascii_letters + digits + "_-:":
-            bad_characters = bad_characters.replace(char, "")
+            bad_characters = bad_characters.replace(valid_character, "")
 
         if bad_characters:
             # Some characters in the string provided are not permitted,
