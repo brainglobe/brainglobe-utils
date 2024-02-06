@@ -1,0 +1,8 @@
+exclude .pre-commit-config.yaml
+
+include LICENSE
+include README.md
+
+graft brainglobe_utils
+
+prune tests
