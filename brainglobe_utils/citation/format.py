@@ -83,8 +83,6 @@ class Format:
             if not hasattr(self, optional_field.replace("-", "_")):
                 setattr(self, optional_field.replace("-", "_"), None)
 
-        # If we have an authors field, we will need to parse the
-        # dictionary input into the string that BibTex is expecting
         if hasattr(self, "authors"):
             self._prepare_authors_field()
 
