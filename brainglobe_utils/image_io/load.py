@@ -461,3 +461,28 @@ def load_from_paths_sequence(
                 )
         volume[:, :, i] = img
     return volume
+
+
+def get_size_image_from_file_paths(file_path, file_extension="tif"):
+    """
+    Returns the size of an image (which is a list of 2D files), without loading
+    the whole image
+    :param str file_path: File containing file_paths in a text file,
+    or as a list.
+    :param str file_extension: Optional file extension (if a directory
+     is passed)
+    :return: Dict of image sizes
+    """
+    file_path = str(file_path)
+
+    img_paths = get_sorted_file_paths(file_path, file_extension=file_extension)
+    z_shape = len(img_paths)
+
+    logging.debug(
+        "Loading file: {} to check raw image size" "".format(img_paths[0])
+    )
+    image_0 = load_any(img_paths[0])
+    y_shape, x_shape = image_0.shape
+
+    image_shape = {"x": x_shape, "y": y_shape, "z": z_shape}
+    return image_shape
