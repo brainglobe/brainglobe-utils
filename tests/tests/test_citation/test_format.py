@@ -51,9 +51,9 @@ class TestFormat:
             Article(information=pass_info)
 
         # Provide an invalid authors format
-        pass_info[
-            "authors"
-        ] = "sensible name that's not in the expected format"
+        pass_info["authors"] = (
+            "sensible name that's not in the expected format"
+        )
         with pytest.raises(
             TypeError,
             match="Expected authors to be either dict or list of dicts, "
