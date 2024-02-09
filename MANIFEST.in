@@ -1,5 +1,6 @@
 exclude .pre-commit-config.yaml
 
+include CITATION.cff
 include LICENSE
 include README.md
 
