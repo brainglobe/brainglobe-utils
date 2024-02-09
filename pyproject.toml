@@ -18,6 +18,7 @@ classifiers = [
 ]
 dependencies = [
     "bg-atlasapi",
+    "brainglobe-space",
     "configobj",
     "natsort",
     "nibabel >= 2.1.0",
@@ -101,8 +102,10 @@ line-length = 79
 [tool.ruff]
 line-length = 79
 exclude = ["__init__.py", "build", ".eggs"]
-select = ["I", "E", "F"]
 fix = true
+
+[tool.ruff.lint]
+select = ["I", "E", "F"]
 
 [tool.mypy]
 ignore_errors = true

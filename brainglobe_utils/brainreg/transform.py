@@ -2,12 +2,13 @@ import logging
 import os
 from typing import List, Optional, Tuple
 
-import bg_space as bgs
-import imio
+import brainglobe_space as bgs
 import numpy as np
 import pandas as pd
 import tifffile
 from bg_atlasapi import BrainGlobeAtlas
+
+from brainglobe_utils.image_io import get_size_image_from_file_paths
 
 
 def transform_points_from_downsampled_to_atlas_space(
@@ -91,7 +92,7 @@ def get_anatomical_space_from_image_planes(
     image_plane : np.ndarray
         A numpy-like array representing a single image plane from a 3D image.
     orientation : str
-        The orientation of the image following the bg-space
+        The orientation of the image following the brainglobe-space
         three-letter convention (e.g., 'asr', 'psl').
     voxel_sizes : List[float]
         A list of floats representing the voxel sizes (e.g., [5, 2, 2]).
@@ -103,7 +104,7 @@ def get_anatomical_space_from_image_planes(
 
     """
 
-    shape = tuple(imio.get_size_image_from_file_paths(image_plane).values())
+    shape = tuple(get_size_image_from_file_paths(image_plane).values())
 
     space = bgs.AnatomicalSpace(
         orientation,
@@ -132,7 +133,7 @@ def transform_points_from_raw_to_downsampled_space(
     source_image_plane : np.ndarray
         A numpy-like array representing a single image.
     orientation : str
-        The orientation of the image following the bg-space
+        The orientation of the image following the brainglobe-space
     three letter convention (e.g. 'asr', 'psl')
     voxel_sizes : List[float]
         A list of floats representing the voxel sizes (e.g. [5, 2, 2])
@@ -182,7 +183,7 @@ def transform_points_to_atlas_space(
     source_image_plane : np.ndarray
         A numpy-like array representing a single image.
     orientation : str
-        The orientation of the image following the bg-space
+        The orientation of the image following the brainglobe-space
     three letter convention (e.g. 'asr', 'psl')
     voxel_sizes : List[float]
         A list of floats representing the voxel sizes (e.g. [5, 2, 2])

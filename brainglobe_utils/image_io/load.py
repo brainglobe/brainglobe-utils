@@ -7,13 +7,14 @@ from concurrent.futures import ProcessPoolExecutor
 import nrrd
 import numpy as np
 import tifffile
+from natsort import natsorted
+from skimage import transform
+from tqdm import tqdm
+
 from brainglobe_utils.general.system import (
     get_num_processes,
     get_sorted_file_paths,
 )
-from natsort import natsorted
-from skimage import transform
-from tqdm import tqdm
 
 from .utils import check_mem, scale_z
 

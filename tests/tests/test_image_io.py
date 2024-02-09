@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from tifffile import tifffile
 
-from imio import load, save, utils
+from brainglobe_utils.image_io import load, save, utils
 
 
 @pytest.fixture()

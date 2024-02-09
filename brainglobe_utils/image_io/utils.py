@@ -1,13 +1,13 @@
 import logging
 
 import psutil
-from brainglobe_utils.general.system import get_sorted_file_paths
 from scipy.ndimage import zoom
 
-import imio
+from brainglobe_utils.general.system import get_sorted_file_paths
+from brainglobe_utils.image_io import load_any
 
 
-class ImioLoadException(Exception):
+class ImageIOLoadException(Exception):
     pass
 
 
@@ -26,7 +26,7 @@ def check_mem(img_byte_size, n_imgs):
     total_size = img_byte_size * n_imgs
     free_mem = psutil.virtual_memory().available
     if total_size >= free_mem:
-        raise ImioLoadException(
+        raise ImageIOLoadException(
             "Not enough memory on the system to complete loading operation"
             "Needed {}, only {} available.".format(total_size, free_mem)
         )
@@ -62,7 +62,7 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
     logging.debug(
         "Loading file: {} to check raw image size" "".format(img_paths[0])
     )
-    image_0 = imio.load_any(img_paths[0])
+    image_0 = load_any(img_paths[0])
     y_shape, x_shape = image_0.shape
 
     image_shape = {"x": x_shape, "y": y_shape, "z": z_shape}
