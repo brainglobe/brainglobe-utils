@@ -3,35 +3,39 @@ name = "brainglobe-utils"
 authors = [{ name = "Adam Tyson", email = "code@adamltyson.com" }]
 description = "Shared general purpose tools for the BrainGlobe project"
 readme = "README.md"
+license = { file = "LICENSE" }
 requires-python = ">=3.9.0"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "bg-atlasapi",
+    "brainglobe-space",
+    "configobj",
+    "natsort",
+    "nibabel >= 2.1.0",
+    "numpy",
+    "pandas",
+    "psutil",
+    "pyarrow",
+    "pynrrd",
+    "PyYAML",
+    "scikit-image",
+    "scipy",
+    "slurmio",
+    "tifffile",
+    "tqdm",
+]
 dynamic = ["version"]
 
-dependencies = [
-  "natsort",
-  "pandas",
-  "psutil",
-  "configobj",
-  "tqdm",
-  "PyYAML",
-  "scipy",
-  "numpy",
-  "slurmio",
-  "tifffile",
-  "imio",
-  "bg-atlasapi",
-]
-
-license = { text = "MIT" }
-
-classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Operating System :: OS Independent",
-]
 
 [project.urls]
 homepage = "https://brainglobe.info"
@@ -43,20 +47,20 @@ user_support = "https://github.com/brainglobe/brainglobe-utils/issues"
 napari = ["napari>=0.4.18", "qtpy", "superqt"]
 
 dev = [
-  "qtpy",
-  "pytest",
-  "pytest-cov",
-  "pytest-qt",
-  "coverage",
-  "tox",
-  "black",
-  "mypy",
-  "pre-commit",
-  "ruff",
-  "setuptools_scm",
-  "pyqt5",
-  "superqt",
-  "scikit-image",
+    "black",
+    "coverage",
+    "mypy",
+    "pre-commit",
+    "pyqt5",
+    "pytest-cov",
+    "pytest-qt",
+    "pytest",
+    "qtpy",
+    "ruff",
+    "scikit-image",
+    "setuptools_scm",
+    "superqt",
+    "tox",
 ]
 
 
@@ -71,9 +75,22 @@ include-package-data = true
 include = ["brainglobe_utils*"]
 exclude = ["tests", "docs*"]
 
-
 [tool.pytest.ini_options]
 addopts = "--cov=brainglobe_utils"
+filterwarnings = [
+    "error",
+    # Emitted by scikit-image on import, see https://github.com/scikit-image/scikit-image/issues/6663
+    # This filter should be removed when scikit-image 0.20 is released
+    "ignore:`np.bool8` is a deprecated alias for `np.bool_`",
+    # Emitted by nptyping, see https://github.com/ramonhagenaars/nptyping/issues/102
+    # for upstream issue
+    "ignore:`np.object0` is a deprecated alias for ``np.object0`",
+    "ignore:`np.int0` is a deprecated alias for `np.intp`",
+    "ignore:`np.uint0` is a deprecated alias for `np.uintp`",
+    "ignore:`np.void0` is a deprecated alias for `np.void`",
+    "ignore:`np.bytes0` is a deprecated alias for `np.bytes_`",
+    "ignore:`np.str0` is a deprecated alias for `np.str_`",
+]
 
 [tool.black]
 target-version = ['py39', 'py310', 'py311']
@@ -82,31 +99,21 @@ line-length = 79
 
 [tool.setuptools_scm]
 
-[tool.check-manifest]
-ignore = [
-  ".yaml",
-  "tox.ini",
-  "tests/",
-  "tests/test_unit/",
-  "tests/test_integration/",
-  "docs/",
-  "docs/source/",
-]
-
-
 [tool.ruff]
 line-length = 79
 exclude = ["__init__.py", "build", ".eggs"]
-select = ["I", "E", "F"]
 fix = true
+
+[tool.ruff.lint]
+select = ["I", "E", "F"]
 
 [tool.mypy]
 ignore_errors = true
 
-[[tool.mypy.overrides]]
-module = ["imlib.cells.*"]
-ignore_errors = false
-strict = true
+# [[tool.mypy.overrides]]
+# module = ["imlib.cells.*"]
+# ignore_errors = false
+# strict = true
 
 [tool.tox]
 legacy_tox_ini = """

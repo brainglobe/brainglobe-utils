@@ -3,14 +3,15 @@ name: tests
 on:
   push:
     branches:
-      - 'main'
+      - "main"
     tags:
-      - 'v*'
+      - "v**"
   pull_request:
   workflow_dispatch:
 
 jobs:
   linting:
+    name: Check Linting
     runs-on: ubuntu-latest
     steps:
       - uses: neuroinformatics-unit/actions/lint@v2
@@ -59,7 +60,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: neuroinformatics-unit/actions/build_sdist_wheels@v2
-
 
   upload_all:
     name: Publish build distributions
