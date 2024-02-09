@@ -155,11 +155,14 @@ def test_cores_available_in_slurm_environment(cores_available):
     mock_slurm_parameters = Mock()
     mock_slurm_parameters.allocated_cores = cores_available
 
-    with patch.dict(
-        "brainglobe_utils.general.system.os.environ", {"SLURM_JOB_ID": "1"}
-    ), patch(
-        "brainglobe_utils.general.system.slurmio.SlurmJobParameters",
-        return_value=mock_slurm_parameters,
+    with (
+        patch.dict(
+            "brainglobe_utils.general.system.os.environ", {"SLURM_JOB_ID": "1"}
+        ),
+        patch(
+            "brainglobe_utils.general.system.slurmio.SlurmJobParameters",
+            return_value=mock_slurm_parameters,
+        ),
     ):
         assert system.get_cores_available() == cores_available
 
@@ -231,11 +234,14 @@ def test_how_many_cores_with_sufficient_ram_in_slurm_environment():
     mock_slurm_parameters = Mock()
     mock_slurm_parameters.allocated_memory = free_system_ram
 
-    with patch.dict(
-        "brainglobe_utils.general.system.os.environ", {"SLURM_JOB_ID": "1"}
-    ), patch(
-        "brainglobe_utils.general.system.slurmio.SlurmJobParameters",
-        return_value=mock_slurm_parameters,
+    with (
+        patch.dict(
+            "brainglobe_utils.general.system.os.environ", {"SLURM_JOB_ID": "1"}
+        ),
+        patch(
+            "brainglobe_utils.general.system.slurmio.SlurmJobParameters",
+            return_value=mock_slurm_parameters,
+        ),
     ):
         assert (
             system.how_many_cores_with_sufficient_ram(ram_needed_per_cpu) == 14
@@ -243,14 +249,19 @@ def test_how_many_cores_with_sufficient_ram_in_slurm_environment():
 
 
 def test_disk_free_gb_windows(mock_disk_usage):
-    with patch(
-        "brainglobe_utils.general.system.platform.system",
-        return_value="Windows",
-    ), patch(
-        "brainglobe_utils.general.system.os.path.splitdrive",
-        return_value=("C:\\", ""),
-    ), patch(
-        "brainglobe_utils.general.system.shutil.disk_usage", mock_disk_usage
+    with (
+        patch(
+            "brainglobe_utils.general.system.platform.system",
+            return_value="Windows",
+        ),
+        patch(
+            "brainglobe_utils.general.system.os.path.splitdrive",
+            return_value=("C:\\", ""),
+        ),
+        patch(
+            "brainglobe_utils.general.system.shutil.disk_usage",
+            mock_disk_usage,
+        ),
     ):
         free_space = system.disk_free_gb("C:\\path\\to\\file")
         assert free_space == 500000 / 1024**3
@@ -261,10 +272,15 @@ def test_disk_free_gb_windows(mock_disk_usage):
     reason="os.statvfs not available on Windows",
 )
 def test_disk_free_gb_linux(mock_statvfs):
-    with patch(
-        "brainglobe_utils.general.system.platform.system", return_value="Linux"
-    ), patch(
-        "brainglobe_utils.general.system.os.statvfs", return_value=mock_statvfs
+    with (
+        patch(
+            "brainglobe_utils.general.system.platform.system",
+            return_value="Linux",
+        ),
+        patch(
+            "brainglobe_utils.general.system.os.statvfs",
+            return_value=mock_statvfs,
+        ),
     ):
         free_space = system.disk_free_gb("/path/to/file")
         assert free_space == (1024 * 1000) / 1024**3  # Free space in GB
@@ -275,11 +291,15 @@ def test_disk_free_gb_linux(mock_statvfs):
     reason="os.statvfs not available on Windows",
 )
 def test_disk_free_gb_macos(mock_statvfs):
-    with patch(
-        "brainglobe_utils.general.system.platform.system",
-        return_value="Darwin",
-    ), patch(
-        "brainglobe_utils.general.system.os.statvfs", return_value=mock_statvfs
+    with (
+        patch(
+            "brainglobe_utils.general.system.platform.system",
+            return_value="Darwin",
+        ),
+        patch(
+            "brainglobe_utils.general.system.os.statvfs",
+            return_value=mock_statvfs,
+        ),
     ):
         free_space = system.disk_free_gb("/path/to/file")
         assert free_space == (1024 * 1000) / 1024**3  # Free space in GB

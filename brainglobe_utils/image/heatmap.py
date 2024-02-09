@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Tuple, Union
 
-import imio
 import numpy as np
 from scipy.ndimage import zoom
 from skimage.filters import gaussian
@@ -10,6 +9,7 @@ from brainglobe_utils.general.system import ensure_directory_exists
 from brainglobe_utils.image.binning import get_bins
 from brainglobe_utils.image.masking import mask_image_threshold
 from brainglobe_utils.image.scale import scale_and_convert_to_16_bits
+from brainglobe_utils.image_io import to_tiff
 
 
 def rescale_array(source_array, target_array, order=1):
@@ -104,6 +104,6 @@ def heatmap_from_points(
 
     if output_filename is not None:
         ensure_directory_exists(Path(output_filename).parent)
-        imio.to_tiff(heatmap_array, output_filename)
+        to_tiff(heatmap_array, output_filename)
 
     return heatmap_array
