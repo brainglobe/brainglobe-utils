@@ -28,4 +28,7 @@ repos:
         hooks:
         -   id: mypy
             args: [--config-file, pyproject.toml]
-            additional_dependencies: [numpy]
+            additional_dependencies:
+              - numpy
+              - types-setuptools
+              - types-requests
