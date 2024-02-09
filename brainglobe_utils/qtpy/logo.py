@@ -29,7 +29,7 @@ def _logo_widget(package_name: str, parent: QWidget = None):
     <h1>
     <img src="{brainglobe_logo}"width="100">
     <p>{package_name}</p>
-    <\h1>
+    </h1>
     """  # noqa W605
 
     return QLabel(_logo_html, parent=None)
