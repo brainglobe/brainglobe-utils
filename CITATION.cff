@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+title: brainglobe-utils
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Brainglobe
+    family-names: Developers
+    email: hello@brainglobe.info
+repository-code: 'https://github.com/brainglobe/brainglobe-utils'
+url: 'https://brainglobe.info/'
+abstract: Shared general purpose tools for the BrainGlobe project.
+license: BSD-3-Clause
+year: 2024
+month: 01

@@ -37,6 +37,9 @@ dependencies = [
 dynamic = ["version"]
 
 
+[project.scripts]
+cite-brainglobe = "brainglobe_utils.citation.cite:cli"
+
 [project.urls]
 homepage = "https://brainglobe.info"
 bug_tracker = "https://github.com/brainglobe/brainglobe-utils/issues"
