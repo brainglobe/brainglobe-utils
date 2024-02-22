@@ -57,6 +57,7 @@ dev = [
     "pyqt5",
     "pytest-cov",
     "pytest-qt",
+    "pytest-mock",
     "pytest",
     "qtpy",
     "ruff",
