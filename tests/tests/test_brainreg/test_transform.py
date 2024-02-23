@@ -11,10 +11,12 @@ from brainglobe_utils.brainreg.transform import (
 def test_transform_points_from_downsampled_to_atlas_space(mocker):
     """
     Test case for transforming points from downsampled space to atlas space.
-    This is a basic test case that covers a deformation field that maps everything to [1, 1, 1].
+    This is a basic test case that covers a deformation field that maps
+    everything to [1, 1, 1].
 
     Args:
-        mocker: The mocker object used to patch the reading of deformation field tiffs.
+        mocker: The mocker object used to patch the reading of deformation
+                field tiffs.
 
     Returns:
         None
@@ -48,11 +50,14 @@ def test_transform_points_from_downsampled_to_atlas_space_out_of_bounds(
     mocker,
 ):
     """
-    Test case for transforming points from downsampled space to atlas space when points are out of bounds.
-    Points are out of bounds when they cause an index error on the deformation field.
+    Test case for transforming points from downsampled space to atlas space
+    when points are out of bounds.
+    Points are out of bounds when they cause an index error on the deformation
+    field.
 
     Args:
-        mocker: The mocker object to patch the reading of deformation field tiffs
+        mocker: The mocker object to patch the reading of deformation
+                field tiffs
 
     Returns:
         None
