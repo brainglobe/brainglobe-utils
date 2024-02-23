@@ -23,16 +23,16 @@ def test_citation_combinations(
 
     both_together = cite(
         "brainglobe-meta",
-        "bg-atlasapi",
+        "brainglobe-atlasapi",
         format=format,
         newline_separations=newline_separations,
     )
     bg_meta = cite("brainglobe-meta", format=format)
-    bg_atlasapi = cite("bg-atlasapi", format=format)
+    brainglobe_atlasapi = cite("brainglobe-atlasapi", format=format)
 
     # Fetching both citations together should mean the text from the
     # individual citations is included
-    assert bg_meta in both_together and bg_atlasapi in both_together, (
+    assert bg_meta in both_together and brainglobe_atlasapi in both_together, (
         "Fetching multiple tools at once"
         "does not generate all requested citations."
     )
@@ -40,7 +40,7 @@ def test_citation_combinations(
     # should leave only newline and whitespace characters
     leftover_text = (
         both_together.replace(bg_meta, "")
-        .replace(bg_atlasapi, "")
+        .replace(brainglobe_atlasapi, "")
         .replace(" ", "")
         .replace("\n", "")
     )

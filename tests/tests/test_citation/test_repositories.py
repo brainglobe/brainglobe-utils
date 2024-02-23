@@ -31,14 +31,14 @@ def test_repository_basics() -> None:
     - The less-than comparison (by repo name)
     """
     BrainGlobe = Repository("BrainGlobe", [])
-    bg_atlasapi = Repository("bg-atlasapi", [])
+    brainglobe_atlasapi = Repository("brainglobe-atlasapi", [])
 
     # URL construction
     assert BrainGlobe.url == "https://github.com/brainglobe/BrainGlobe"
 
     # Equality comparison
     assert (
-        BrainGlobe != bg_atlasapi
+        BrainGlobe != brainglobe_atlasapi
     ), "Different repositories are deemed equal!"
     assert (
         BrainGlobe == BrainGlobe
@@ -46,7 +46,7 @@ def test_repository_basics() -> None:
 
     # Less-than and ordering (alphabetical by Python)
     assert (
-        BrainGlobe < bg_atlasapi
+        BrainGlobe < brainglobe_atlasapi
     ), "Repository comparison does not assert alphabetical order by name"
 
 
@@ -77,7 +77,9 @@ def test_unique_repos() -> None:
     assert (
         len(
             unique_repositories_from_tools(
-                "bg-atlasapi", "bg_atlasapi", report_duplicates=True
+                "brainglobe-atlasapi",
+                "brainglobe_atlasapi",
+                report_duplicates=True,
             )
         )
         == 1

@@ -9,7 +9,7 @@ from typing import List, Set, Union
 
 import numpy as np
 import pandas as pd
-from bg_atlasapi import BrainGlobeAtlas
+from brainglobe_atlasapi import BrainGlobeAtlas
 
 from brainglobe_utils.general.system import ensure_directory_exists
 from brainglobe_utils.pandas.misc import safe_pandas_concat, sanitise_df
