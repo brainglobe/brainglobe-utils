@@ -6,7 +6,7 @@ import brainglobe_space as bgs
 import numpy as np
 import pandas as pd
 import tifffile
-from bg_atlasapi import BrainGlobeAtlas
+from brainglobe_atlasapi import BrainGlobeAtlas
 
 from brainglobe_utils.image_io import get_size_image_from_file_paths
 

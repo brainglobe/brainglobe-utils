@@ -251,8 +251,8 @@ def unique_repositories_from_tools(
 
 # Static instances for each of our repositories
 # that we provide citation information for.
-bg_atlasapi = Repository(
-    "bg-atlasapi",
+brainglobe_atlasapi = Repository(
+    "brainglobe-atlasapi",
     [
         "BrainGlobe AtlasAPI",
         "AtlasAPI",
