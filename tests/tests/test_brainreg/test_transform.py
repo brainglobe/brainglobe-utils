@@ -2,7 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from bg_atlasapi import BrainGlobeAtlas
+from brainglobe_atlasapi import BrainGlobeAtlas
 
 from brainglobe_utils.brainreg.transform import (
     transform_points_from_downsampled_to_atlas_space,
