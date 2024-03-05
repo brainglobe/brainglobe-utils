@@ -27,8 +27,8 @@ def to_nii(img, dest_path, scale=None, affine_transform=None):
         A tuple of floats to indicate the 'zooms' of the nifty image.
 
     affine_transform : np.ndarray, optional
-        A 4x4 matrix indicating the transform to save in the metadata of the image.
-        Required only if not nibabel input.
+        A 4x4 matrix indicating the transform to save in the metadata of the
+        image. Required only if not nibabel input.
     """
     dest_path = str(dest_path)
     if affine_transform is None:

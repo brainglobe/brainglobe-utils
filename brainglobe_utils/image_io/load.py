@@ -44,31 +44,36 @@ def load_any(
     Parameters
     ----------
     src_path : str
-        Can be the path of a nifty file, tiff file, tiff files folder, or text file
-        containing a list of paths.
+        Can be the path of a nifty file, tiff file, tiff files folder, or text
+        file containing a list of paths.
 
     x_scaling_factor : float
-        The scaling of the brain along the x dimension (applied on loading before return).
+        The scaling of the brain along the x dimension (applied on loading
+        before return).
 
     y_scaling_factor : float
-        The scaling of the brain along the y dimension (applied on loading before return).
+        The scaling of the brain along the y dimension (applied on loading
+        before return).
 
     z_scaling_factor : float
-        The scaling of the brain along the z dimension (applied on loading before return).
+        The scaling of the brain along the z dimension (applied on loading
+        before return).
 
     anti_aliasing : bool
-        Whether to apply a Gaussian filter to smooth the image prior to down-scaling.
-        It is crucial to filter when down-sampling the image to avoid aliasing artifacts.
+        Whether to apply a Gaussian filter to smooth the image prior to
+        down-scaling. It is crucial to filter when down-sampling the image to
+        avoid aliasing artifacts.
 
     load_parallel : bool
         Load planes in parallel using multiprocessing for faster data loading.
 
     sort_input_file : bool
-        If set to true and the input is a filepaths file, it will be naturally sorted.
+        If set to true and the input is a filepaths file, it will be naturally
+        sorted.
 
     as_numpy : bool
-        Whether to convert the image to a numpy array in memory (rather than a memmap).
-        Only relevant for .nii files.
+        Whether to convert the image to a numpy array in memory (rather than a
+        memmap). Only relevant for .nii files.
 
     verbose : bool
         Print more information about the process.
@@ -165,17 +170,21 @@ def load_img_stack(
         The path of the image to be loaded.
 
     x_scaling_factor : float
-        The scaling of the brain along the x dimension (applied on loading before return).
+        The scaling of the brain along the x dimension (applied on loading
+        before return).
 
     y_scaling_factor : float
-        The scaling of the brain along the y dimension (applied on loading before return).
+        The scaling of the brain along the y dimension (applied on loading
+        before return).
 
     z_scaling_factor : float
-        The scaling of the brain along the z dimension (applied on loading before return).
+        The scaling of the brain along the z dimension (applied on loading
+        before return).
 
     anti_aliasing : bool
-        Whether to apply a Gaussian filter to smooth the image prior to down-scaling.
-        It is crucial to filter when down-sampling the image to avoid aliasing artifacts.
+        Whether to apply a Gaussian filter to smooth the image prior to
+        down-scaling. It is crucial to filter when down-sampling the image to
+        avoid aliasing artifacts.
 
     Returns
     -------
@@ -224,10 +233,12 @@ def load_nii(src_path, as_array=False, as_numpy=False):
         The path to the nifty file on the filesystem.
 
     as_array : bool
-        Whether to convert the brain to a numpy array or keep it as a nifty object.
+        Whether to convert the brain to a numpy array or keep it as a nifty
+        object.
 
     as_numpy : bool
-        Whether to convert the image to a numpy array in memory (rather than a memmap).
+        Whether to convert the image to a numpy array in memory (rather than a
+        memmap).
 
     Returns
     -------
@@ -258,9 +269,9 @@ def load_from_folder(
 ):
     """
     Load a brain from a folder. All tiff files will be read sorted and assumed
-    to belong to the same sample. Optionally, a name_filter string can be supplied
-    which will have to be present in the file names for them to be considered part
-    of the sample.
+    to belong to the same sample. Optionally, a name_filter string can be
+    supplied which will have to be present in the file names for them to be
+    considered part of the sample.
 
     Parameters
     ----------
@@ -268,20 +279,24 @@ def load_from_folder(
         The source folder containing tiff files.
 
     x_scaling_factor : float
-        The scaling of the brain along the x dimension (applied on loading before return).
+        The scaling of the brain along the x dimension (applied on loading
+        before return).
 
     y_scaling_factor : float
-        The scaling of the brain along the y dimension (applied on loading before return).
+        The scaling of the brain along the y dimension (applied on loading
+        before return).
 
     z_scaling_factor : float
         The scaling of the brain along the z dimension.
 
     anti_aliasing : bool
-        Whether to apply a Gaussian filter to smooth the image prior to down-scaling.
-        It is crucial to filter when down-sampling the image to avoid aliasing artifacts.
+        Whether to apply a Gaussian filter to smooth the image prior to
+        down-scaling. It is crucial to filter when down-sampling the image to
+        avoid aliasing artifacts.
 
     file_extension : str
-        Will have to be present in the file names for them to be considered part of the sample.
+        Will have to be present in the file names for them to be considered
+        part of the sample.
 
     load_parallel : bool
         Use multiprocessing to speed up image loading.
@@ -324,26 +339,31 @@ def load_img_sequence(
     Parameters
     ----------
     img_sequence_file_path : str
-        The path to the file containing the ordered list of image paths (one per line).
+        The path to the file containing the ordered list of image paths (one
+        per line).
 
     x_scaling_factor : float
-        The scaling of the brain along the x dimension (applied on loading before return).
+        The scaling of the brain along the x dimension (applied on loading
+        before return).
 
     y_scaling_factor : float
-        The scaling of the brain along the y dimension (applied on loading before return).
+        The scaling of the brain along the y dimension (applied on loading
+        before return).
 
     z_scaling_factor : float
         The scaling of the brain along the z dimension.
 
     anti_aliasing : bool
-        Whether to apply a Gaussian filter to smooth the image prior to down-scaling.
-        It is crucial to filter when down-sampling the image to avoid aliasing artifacts.
+        Whether to apply a Gaussian filter to smooth the image prior to
+        down-scaling. It is crucial to filter when down-sampling the image to
+        avoid aliasing artifacts.
 
     load_parallel : bool
         Use multiprocessing to speed up image loading.
 
     sort : bool
-        If set to true, will perform a natural sort of the file paths in the list.
+        If set to true, will perform a natural sort of the file paths in the
+        list.
 
     n_free_cpus : int
         Number of CPU cores to leave free.
@@ -390,17 +410,20 @@ def load_image_series(
         Ordered list of image paths.
 
     x_scaling_factor : float
-        The scaling of the brain along the x dimension (applied on loading before return).
+        The scaling of the brain along the x dimension (applied on loading
+        before return).
 
     y_scaling_factor : float
-        The scaling of the brain along the y dimension (applied on loading before return).
+        The scaling of the brain along the y dimension (applied on loading
+        before return).
 
     z_scaling_factor : float
         The scaling of the brain along the z dimension.
 
     anti_aliasing : bool
-        Whether to apply a Gaussian filter to smooth the image prior to down-scaling.
-        It is crucial to filter when down-sampling the image to avoid aliasing artifacts.
+        Whether to apply a Gaussian filter to smooth the image prior to
+        down-scaling. It is crucial to filter when down-sampling the image to
+        avoid aliasing artifacts.
 
     load_parallel : bool
         Use multiprocessing to speed up image loading.
@@ -452,14 +475,17 @@ def threaded_load_from_sequence(
         The sorted list of the planes paths on the filesystem.
 
     x_scaling_factor : float
-        The scaling of the brain along the x dimension (applied on loading before return).
+        The scaling of the brain along the x dimension (applied on loading
+        before return).
 
     y_scaling_factor : float
-        The scaling of the brain along the y dimension (applied on loading before return).
+        The scaling of the brain along the y dimension (applied on loading
+        before return).
 
     anti_aliasing : bool
-        Whether to apply a Gaussian filter to smooth the image prior to down-scaling.
-        It is crucial to filter when down-sampling the image to avoid aliasing artifacts.
+        Whether to apply a Gaussian filter to smooth the image prior to
+        down-scaling. It is crucial to filter when down-sampling the image to
+        avoid aliasing artifacts.
 
     n_free_cpus : int
         Number of CPU cores to leave free.
@@ -518,14 +544,17 @@ def load_from_paths_sequence(
         The sorted list of the planes paths on the filesystem.
 
     x_scaling_factor : float
-        The scaling of the brain along the x dimension (applied on loading before return).
+        The scaling of the brain along the x dimension (applied on loading
+        before return).
 
     y_scaling_factor : float
-        The scaling of the brain along the y dimension (applied on loading before return).
+        The scaling of the brain along the y dimension (applied on loading
+        before return).
 
     anti_aliasing : bool
-        Whether to apply a Gaussian filter to smooth the image prior to down-scaling.
-        It is crucial to filter when down-sampling the image to avoid aliasing artifacts.
+        Whether to apply a Gaussian filter to smooth the image prior to
+        down-scaling. It is crucial to filter when down-sampling the image to
+        avoid aliasing artifacts.
 
     Returns
     -------
