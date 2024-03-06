@@ -13,16 +13,22 @@ def to_nii(img, dest_path, scale=None, affine_transform=None):
     # TODO: see if we want also real units scale
 
     """
-    Write the brain volume to disk as nifty image.
+    Write the brain volume to disk as a nifty image.
 
-    :param img: A nifty image object or numpy array brain
-    :param str dest_path: The path where to save the brain.
-    :param tuple scale: A tuple of floats to indicate the 'zooms' of the nifty
-        image
-    :param np.ndarray affine_transform: A 4x4 matrix indicating the transform
-        to save in the metadata of the image
-        (required only if not nibabel input)
-    :return:
+    Parameters
+    ----------
+    img : nifty image object or np.ndarray
+        A nifty image object or numpy array representing a brain.
+
+    dest_path : str
+        The path where to save the brain.
+
+    scale : tuple of floats, optional
+        A tuple of floats to indicate the 'zooms' of the nifty image.
+
+    affine_transform : np.ndarray, optional
+        A 4x4 matrix indicating the transform to save in the metadata of the
+        image. Required only if not nibabel input.
     """
     dest_path = str(dest_path)
     if affine_transform is None:
@@ -36,10 +42,15 @@ def to_nii(img, dest_path, scale=None, affine_transform=None):
 
 def to_tiff(img_volume, dest_path):
     """
-    Saves the image volume (numpy array) to a tiff stack
+    Save the image volume (numpy array) to a tiff stack.
 
-    :param np.ndarray img_volume: The image to be saved
-    :param dest_path: Where to save the tiff stack
+    Parameters
+    ----------
+    img_volume : np.ndarray
+        The image to be saved.
+
+    dest_path : str
+        Where to save the tiff stack.
     """
     dest_path = str(dest_path)
     tifffile.imwrite(dest_path, img_volume)
@@ -48,12 +59,22 @@ def to_tiff(img_volume, dest_path):
 def to_tiffs(img_volume, path_prefix, path_suffix="", extension=".tif"):
     """
     Save the image volume (numpy array) as a sequence of tiff planes.
-    Each plane will have a filepath of the following for:
+    Each plane will have a filepath of the following format:
     pathprefix_zeroPaddedIndex_suffix.tif
 
-    :param np.ndarray img_volume: The image to be saved
-    :param str path_prefix:  The prefix for each plane
-    :param str path_suffix: The suffix for each plane
+    Parameters
+    ----------
+    img_volume : np.ndarray
+        The image to be saved.
+
+    path_prefix : str
+        The prefix for each plane.
+
+    path_suffix : str, optional
+        The suffix for each plane.
+
+    extension : str, optional
+        The file extension for each plane.
     """
     z_size = img_volume.shape[0]
     pad_width = int(round(z_size / 10)) + 1
@@ -67,10 +88,15 @@ def to_tiffs(img_volume, path_prefix, path_suffix="", extension=".tif"):
 
 def to_nrrd(img_volume, dest_path):
     """
-    Saves the image volume (numpy array) as nrrd
+    Save the image volume (numpy array) as nrrd.
 
-    :param np.ndarray img_volume: The image to be saved
-    :param dest_path: Where to save the nrrd image
+    Parameters
+    ----------
+    img_volume : np.ndarray
+        The image to be saved.
+
+    dest_path : str
+        Where to save the nrrd image.
     """
     dest_path = str(dest_path)
     nrrd.write(dest_path, img_volume)
