@@ -47,38 +47,38 @@ def load_any(
         Can be the path of a nifty file, tiff file, tiff files folder, or text
         file containing a list of paths.
 
-    x_scaling_factor : float
+    x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
         before return).
 
-    y_scaling_factor : float
+    y_scaling_factor : float, optional
         The scaling of the brain along the y dimension (applied on loading
         before return).
 
-    z_scaling_factor : float
+    z_scaling_factor : float, optional
         The scaling of the brain along the z dimension (applied on loading
         before return).
 
-    anti_aliasing : bool
+    anti_aliasing : bool, optional
         Whether to apply a Gaussian filter to smooth the image prior to
         down-scaling. It is crucial to filter when down-sampling the image to
         avoid aliasing artifacts.
 
-    load_parallel : bool
+    load_parallel : bool, optional
         Load planes in parallel using multiprocessing for faster data loading.
 
-    sort_input_file : bool
+    sort_input_file : bool, optional
         If set to true and the input is a filepaths file, it will be naturally
         sorted.
 
-    as_numpy : bool
+    as_numpy : bool, optional
         Whether to convert the image to a numpy array in memory (rather than a
         memmap). Only relevant for .nii files.
 
-    verbose : bool
+    verbose : bool, optional
         Print more information about the process.
 
-    n_free_cpus : int
+    n_free_cpus : int, optional
         Number of CPU cores to leave free.
 
     Returns
@@ -181,7 +181,7 @@ def load_img_stack(
         The scaling of the brain along the z dimension (applied on loading
         before return).
 
-    anti_aliasing : bool
+    anti_aliasing : bool, optional
         Whether to apply a Gaussian filter to smooth the image prior to
         down-scaling. It is crucial to filter when down-sampling the image to
         avoid aliasing artifacts.
@@ -232,11 +232,11 @@ def load_nii(src_path, as_array=False, as_numpy=False):
     src_path : str
         The path to the nifty file on the filesystem.
 
-    as_array : bool
+    as_array : bool, optional
         Whether to convert the brain to a numpy array or keep it as a nifty
         object.
 
-    as_numpy : bool
+    as_numpy : bool, optional
         Whether to convert the image to a numpy array in memory (rather than a
         memmap).
 
@@ -278,30 +278,30 @@ def load_from_folder(
     src_folder : str
         The source folder containing tiff files.
 
-    x_scaling_factor : float
+    x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
         before return).
 
-    y_scaling_factor : float
+    y_scaling_factor : float, optional
         The scaling of the brain along the y dimension (applied on loading
         before return).
 
-    z_scaling_factor : float
+    z_scaling_factor : float, optional
         The scaling of the brain along the z dimension.
 
-    anti_aliasing : bool
+    anti_aliasing : bool, optional
         Whether to apply a Gaussian filter to smooth the image prior to
         down-scaling. It is crucial to filter when down-sampling the image to
         avoid aliasing artifacts.
 
-    file_extension : str
+    file_extension : str, optional
         Will have to be present in the file names for them to be considered
         part of the sample.
 
-    load_parallel : bool
+    load_parallel : bool, optional
         Use multiprocessing to speed up image loading.
 
-    n_free_cpus : int
+    n_free_cpus : int, optional
         Number of CPU cores to leave free.
 
     Returns
@@ -342,30 +342,30 @@ def load_img_sequence(
         The path to the file containing the ordered list of image paths (one
         per line).
 
-    x_scaling_factor : float
+    x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
         before return).
 
-    y_scaling_factor : float
+    y_scaling_factor : float, optional
         The scaling of the brain along the y dimension (applied on loading
         before return).
 
-    z_scaling_factor : float
+    z_scaling_factor : float, optional
         The scaling of the brain along the z dimension.
 
-    anti_aliasing : bool
+    anti_aliasing : bool, optional
         Whether to apply a Gaussian filter to smooth the image prior to
         down-scaling. It is crucial to filter when down-sampling the image to
         avoid aliasing artifacts.
 
-    load_parallel : bool
+    load_parallel : bool, optional
         Use multiprocessing to speed up image loading.
 
-    sort : bool
+    sort : bool, optional
         If set to true, will perform a natural sort of the file paths in the
         list.
 
-    n_free_cpus : int
+    n_free_cpus : int, optional
         Number of CPU cores to leave free.
 
     Returns
@@ -409,26 +409,26 @@ def load_image_series(
     paths : list
         Ordered list of image paths.
 
-    x_scaling_factor : float
+    x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
         before return).
 
-    y_scaling_factor : float
+    y_scaling_factor : float, optional
         The scaling of the brain along the y dimension (applied on loading
         before return).
 
-    z_scaling_factor : float
+    z_scaling_factor : float, optional
         The scaling of the brain along the z dimension.
 
-    anti_aliasing : bool
+    anti_aliasing : bool, optional
         Whether to apply a Gaussian filter to smooth the image prior to
         down-scaling. It is crucial to filter when down-sampling the image to
         avoid aliasing artifacts.
 
-    load_parallel : bool
+    load_parallel : bool, optional
         Use multiprocessing to speed up image loading.
 
-    n_free_cpus : int
+    n_free_cpus : int, optional
         Number of CPU cores to leave free.
 
     Returns
@@ -474,20 +474,20 @@ def threaded_load_from_sequence(
     paths_sequence : list
         The sorted list of the planes paths on the filesystem.
 
-    x_scaling_factor : float
+    x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
         before return).
 
-    y_scaling_factor : float
+    y_scaling_factor : float, optional
         The scaling of the brain along the y dimension (applied on loading
         before return).
 
-    anti_aliasing : bool
+    anti_aliasing : bool, optional
         Whether to apply a Gaussian filter to smooth the image prior to
         down-scaling. It is crucial to filter when down-sampling the image to
         avoid aliasing artifacts.
 
-    n_free_cpus : int
+    n_free_cpus : int, optional
         Number of CPU cores to leave free.
 
     Returns
@@ -543,15 +543,15 @@ def load_from_paths_sequence(
     paths_sequence : list
         The sorted list of the planes paths on the filesystem.
 
-    x_scaling_factor : float
+    x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
         before return).
 
-    y_scaling_factor : float
+    y_scaling_factor : float, optional
         The scaling of the brain along the y dimension (applied on loading
         before return).
 
-    anti_aliasing : bool
+    anti_aliasing : bool, optional
         Whether to apply a Gaussian filter to smooth the image prior to
         down-scaling. It is crucial to filter when down-sampling the image to
         avoid aliasing artifacts.

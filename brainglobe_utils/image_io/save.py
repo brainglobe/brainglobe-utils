@@ -23,7 +23,7 @@ def to_nii(img, dest_path, scale=None, affine_transform=None):
     dest_path : str
         The path where to save the brain.
 
-    scale : tuple of floats
+    scale : tuple of floats, optional
         A tuple of floats to indicate the 'zooms' of the nifty image.
 
     affine_transform : np.ndarray, optional
@@ -70,8 +70,11 @@ def to_tiffs(img_volume, path_prefix, path_suffix="", extension=".tif"):
     path_prefix : str
         The prefix for each plane.
 
-    path_suffix : str
+    path_suffix : str, optional
         The suffix for each plane.
+
+    extension : str, optional
+        The file extension for each plane.
     """
     z_size = img_volume.shape[0]
     pad_width = int(round(z_size / 10)) + 1
