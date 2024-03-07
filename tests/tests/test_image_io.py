@@ -64,8 +64,17 @@ def test_to_nii(tmp_path, start_array):
     Test that a 3D image can be written and read correctly as nii
     """
     nii_path = str(tmp_path / "test_array.nii")
-    save.to_nii(start_array, nii_path)
+    save.to_nii(start_array, nii_path, scale=(1, 1, 1))
     assert (load.load_nii(nii_path).get_fdata() == start_array).all()
+
+
+def test_to_nrrd(tmp_path, start_array):
+    """
+    Test that a 3D image can be written and read correctly as nrrd
+    """
+    nrrd_path = str(tmp_path / "test_array.nrrd")
+    save.to_nrrd(start_array, nrrd_path)
+    assert (load.load_nrrd(nrrd_path) == start_array).all()
 
 
 def test_scale_z(start_array):

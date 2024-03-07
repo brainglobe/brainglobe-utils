@@ -20,8 +20,8 @@ def to_nii(img, dest_path, scale=None, affine_transform=None):
     img : nifty image object or np.ndarray
         A nifty image object or numpy array representing a brain.
 
-    dest_path : str
-        The path where to save the brain.
+    dest_path : str or Path
+        The file path where to save the brain.
 
     scale : tuple of floats, optional
         A tuple of floats to indicate the 'zooms' of the nifty image.
@@ -49,8 +49,8 @@ def to_tiff(img_volume, dest_path):
     img_volume : np.ndarray
         The image to be saved.
 
-    dest_path : str
-        Where to save the tiff stack.
+    dest_path : str or Path
+        The file path where to save the tiff stack.
     """
     dest_path = str(dest_path)
     tifffile.imwrite(dest_path, img_volume)
@@ -60,7 +60,7 @@ def to_tiffs(img_volume, path_prefix, path_suffix="", extension=".tif"):
     """
     Save the image volume (numpy array) as a sequence of tiff planes.
     Each plane will have a filepath of the following format:
-    pathprefix_zeroPaddedIndex_suffix.tif
+    {path_prefix}_{zeroPaddedIndex}{path_suffix}{extension}
 
     Parameters
     ----------
@@ -95,8 +95,8 @@ def to_nrrd(img_volume, dest_path):
     img_volume : np.ndarray
         The image to be saved.
 
-    dest_path : str
-        Where to save the nrrd image.
+    dest_path : str or Path
+        The file path where to save the nrrd image.
     """
     dest_path = str(dest_path)
     nrrd.write(dest_path, img_volume)

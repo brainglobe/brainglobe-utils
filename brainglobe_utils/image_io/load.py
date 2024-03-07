@@ -166,7 +166,7 @@ def load_img_stack(
 
     Parameters
     ----------
-    stack_path : str
+    stack_path : str or Path
         The path of the image to be loaded.
 
     x_scaling_factor : float
