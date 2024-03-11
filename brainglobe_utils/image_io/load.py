@@ -401,8 +401,7 @@ def load_image_series(
     n_free_cpus=2,
 ):
     """
-    Load a brain from a sequence of files specified in a text file containing
-    an ordered list of paths.
+    Load a brain from a sequence of image paths.
 
     Parameters
     ----------
