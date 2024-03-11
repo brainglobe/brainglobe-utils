@@ -54,7 +54,7 @@ def to_tiff(img_volume, dest_path, photometric="minisblack"):
 
     photometric: str
         Color space of image (to pass to tifffile.imwrite)
-        Use 'minisblack' for grayscale and 'rgb' for rgb
+        Use 'minisblack' (default) for grayscale and 'rgb' for rgb
     """
     dest_path = str(dest_path)
     tifffile.imwrite(dest_path, img_volume, photometric=photometric)
