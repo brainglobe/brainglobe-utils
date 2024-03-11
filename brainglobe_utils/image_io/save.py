@@ -40,7 +40,7 @@ def to_nii(img, dest_path, scale=None, affine_transform=None):
     nib.save(img, dest_path)
 
 
-def to_tiff(img_volume, dest_path):
+def to_tiff(img_volume, dest_path, photometric="minisblack"):
     """
     Save the image volume (numpy array) to a tiff stack.
 
@@ -51,9 +51,13 @@ def to_tiff(img_volume, dest_path):
 
     dest_path : str
         Where to save the tiff stack.
+
+    photometric: str
+        Color space of image (to pass to tifffile.imwrite)
+        Use 'minisblack' (default) for grayscale and 'rgb' for rgb
     """
     dest_path = str(dest_path)
-    tifffile.imwrite(dest_path, img_volume)
+    tifffile.imwrite(dest_path, img_volume, photometric=photometric)
 
 
 def to_tiffs(img_volume, path_prefix, path_suffix="", extension=".tif"):
