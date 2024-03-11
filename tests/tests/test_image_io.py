@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import pytest
 
@@ -13,7 +15,7 @@ def array_2d():
 @pytest.fixture()
 def array_3d(array_2d):
     """Create a 4x4x4 array of 32-bit integers"""
-    volume = np.dstack((array_2d, 2 * array_2d, 3 * array_2d, 4 * array_2d))
+    volume = np.stack((array_2d, 2 * array_2d, 3 * array_2d, 4 * array_2d))
     return volume
 
 
@@ -26,7 +28,7 @@ def image_array(request, array_2d, array_3d):
         return array_3d
 
 
-def write_tiff_sequence_with_txt_file(txt_path, image_array):
+def write_tiff_sequence_with_txt_file(txt_path, image_array, shuffle=False):
     """
     Write an image array to a series of tiffs, and write a text file
     containing all the tiff file paths in order (one per line).
@@ -42,10 +44,11 @@ def write_tiff_sequence_with_txt_file(txt_path, image_array):
     save.to_tiffs(image_array, str(sub_dir / "image_array"))
 
     # Write txt file containing all tiff file paths (one per line)
+    tiff_paths = sorted(sub_dir.iterdir())
+    if shuffle:
+        random.Random(4).shuffle(tiff_paths)
     txt_path.write_text(
-        "\n".join(
-            [str(sub_dir / fname) for fname in sorted(sub_dir.iterdir())]
-        )
+        "\n".join([str(sub_dir / fname) for fname in tiff_paths])
     )
 
 
@@ -125,6 +128,29 @@ def test_load_img_sequence_from_txt(tmp_path, array_3d):
     assert (reloaded_array == array_3d).all()
 
 
+@pytest.mark.parametrize(
+    "sort",
+    [True, False],
+)
+def test_sort_img_sequence_from_txt(tmp_path, array_3d, sort):
+    """
+    Test that filepaths read from a txt file can be sorted correctly
+    """
+    img_sequence_file = tmp_path / "imgs_file.txt"
+    write_tiff_sequence_with_txt_file(
+        img_sequence_file, array_3d, shuffle=True
+    )
+
+    # Load image from paths in text file
+    reloaded_array = load.load_img_sequence(
+        str(img_sequence_file), 1, 1, 1, sort=sort
+    )
+    if sort:
+        assert (reloaded_array == array_3d).all()
+    else:
+        assert not (reloaded_array == array_3d).all()
+
+
 def test_nii_io(tmp_path, array_3d):
     """
     Test that a 3D image can be written and read correctly as nii
@@ -132,6 +158,17 @@ def test_nii_io(tmp_path, array_3d):
     nii_path = str(tmp_path / "test_array.nii")
     save.to_nii(array_3d, nii_path, scale=(1, 1, 1))
     assert (load.load_nii(nii_path).get_fdata() == array_3d).all()
+
+
+def test_nii_read_to_numpy(tmp_path, array_3d):
+    """
+    Test that conversion of loaded nii image to an in-memory numpy array works
+    """
+    nii_path = str(tmp_path / "test_array.nii")
+    save.to_nii(array_3d, nii_path, scale=(1, 1, 1))
+
+    reloaded_array = load.load_nii(nii_path, as_array=True, as_numpy=True)
+    assert (reloaded_array == array_3d).all()
 
 
 def test_nrrd_io(tmp_path, array_3d):
