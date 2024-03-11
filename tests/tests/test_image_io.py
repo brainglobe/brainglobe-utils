@@ -105,14 +105,43 @@ def test_3d_tiff_scaling(
     assert reloaded.shape[2] == array_3d.shape[2] * x_scaling_factor
 
 
-def test_tiff_sequence_io(tmp_path, array_3d):
+@pytest.mark.parametrize(
+    "load_parallel",
+    [
+        pytest.param(True, id="parallel loading"),
+        pytest.param(False, id="no parallel loading"),
+    ],
+)
+def test_tiff_sequence_io(tmp_path, array_3d, load_parallel):
     """
     Test that a 3D image can be written and read correctly as a sequence
-    of 2D tiffs
+    of 2D tiffs (with or without parallel loading)
     """
     save.to_tiffs(array_3d, str(tmp_path / "image_array"))
-    reloaded_array = load.load_from_folder(str(tmp_path), 1, 1, 1)
+    reloaded_array = load.load_from_folder(
+        str(tmp_path), 1, 1, 1, load_parallel=load_parallel
+    )
     assert (reloaded_array == array_3d).all()
+
+
+@pytest.mark.parametrize(
+    "x_scaling_factor, y_scaling_factor, z_scaling_factor",
+    [(1, 1, 1), (0.5, 0.5, 1), (0.25, 0.25, 0.25)],
+)
+def test_tiff_sequence_scaling(
+    tmp_path, array_3d, x_scaling_factor, y_scaling_factor, z_scaling_factor
+):
+    """
+    Test that a tiff sequence is scaled correctly on loading
+    """
+    save.to_tiffs(array_3d, str(tmp_path / "image_array"))
+    reloaded_array = load.load_from_folder(
+        str(tmp_path), x_scaling_factor, y_scaling_factor, z_scaling_factor
+    )
+
+    assert reloaded_array.shape[0] == array_3d.shape[0] * z_scaling_factor
+    assert reloaded_array.shape[1] == array_3d.shape[1] * y_scaling_factor
+    assert reloaded_array.shape[2] == array_3d.shape[2] * x_scaling_factor
 
 
 def test_load_img_sequence_from_txt(tmp_path, array_3d):
