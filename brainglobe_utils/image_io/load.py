@@ -43,9 +43,9 @@ def load_any(
 
     Parameters
     ----------
-    src_path : str
-        Can be the path of a nifty file, tiff file, tiff files folder, or text
-        file containing a list of paths.
+    src_path : str or Path
+        Can be the path of a nifty file, nrrd file, tiff file, tiff files
+        folder, or text file containing a list of paths.
 
     x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
