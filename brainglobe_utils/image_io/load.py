@@ -600,7 +600,8 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
     Parameters
     ----------
     file_path : str
-        File containing file_paths in a text file, or as a list.
+        Filepath of text file containing paths of all 2D files, or
+        filepath of a directory containing all 2D files.
 
     file_extension : str, optional
         Optional file extension (if a directory is passed).

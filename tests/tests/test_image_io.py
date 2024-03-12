@@ -244,3 +244,22 @@ def test_scale_z(array_3d):
     """
     assert utils.scale_z(array_3d, 0.5).shape[0] == array_3d.shape[0] / 2
     assert utils.scale_z(array_3d, 2).shape[0] == array_3d.shape[0] * 2
+
+
+def test_image_size_dir(tmp_path, array_3d):
+    save.to_tiffs(array_3d, str(tmp_path / "image_array"))
+
+    image_shape = load.get_size_image_from_file_paths(str(tmp_path))
+    assert image_shape["x"] == array_3d.shape[2]
+    assert image_shape["y"] == array_3d.shape[1]
+    assert image_shape["z"] == array_3d.shape[0]
+
+
+def test_image_size_txt(tmp_path, array_3d):
+    txt_filepath = tmp_path / "image.txt"
+    write_tiff_sequence_with_txt_file(txt_filepath, array_3d)
+
+    image_shape = load.get_size_image_from_file_paths(str(txt_filepath))
+    assert image_shape["x"] == array_3d.shape[2]
+    assert image_shape["y"] == array_3d.shape[1]
+    assert image_shape["z"] == array_3d.shape[0]
