@@ -20,7 +20,7 @@ def to_nii(img, dest_path, scale=None, affine_transform=None):
     img : nifty image object or np.ndarray
         A nifty image object or numpy array representing a brain.
 
-    dest_path : str or Path
+    dest_path : str
         The file path where to save the brain.
 
     scale : tuple of floats, optional
@@ -49,7 +49,7 @@ def to_tiff(img_volume, dest_path, photometric="minisblack"):
     img_volume : np.ndarray
         The image to be saved.
 
-    dest_path : str or Path
+    dest_path : str
         The file path where to save the tiff stack.
 
     photometric: str
@@ -99,7 +99,7 @@ def to_nrrd(img_volume, dest_path):
     img_volume : np.ndarray
         The image to be saved.
 
-    dest_path : str or Path
+    dest_path : str
         The file path where to save the nrrd image.
     """
     dest_path = str(dest_path)

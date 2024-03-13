@@ -43,7 +43,7 @@ def load_any(
 
     Parameters
     ----------
-    src_path : str or Path
+    src_path : str
         Can be the path of a nifty file, nrrd file, tiff file, tiff files
         folder, or text file containing a list of paths.
 
@@ -166,7 +166,7 @@ def load_img_stack(
 
     Parameters
     ----------
-    stack_path : str or Path
+    stack_path : str
         The path of the image to be loaded.
 
     x_scaling_factor : float
