@@ -1,26 +1,28 @@
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 
 from brainglobe_utils.brainmapper.analysis import (
     Point,
     count_points_per_brain_region,
+    create_all_cell_csv,
 )
 
 
 @pytest.fixture
 def points():
     p1 = Point(
-        raw_coordinate=[1.0, 1.0, 1.0],
-        atlas_coordinate=[1.0, 1.0, 1.0],
+        raw_coordinate=np.array([1.0, 1.0, 1.0]),
+        atlas_coordinate=np.array([1.0, 1.0, 1.0]),
         structure="Paraventricular hypothalamic nucleus, descending division",
         structure_id=56,
         hemisphere="right",
     )
     p2 = Point(
-        raw_coordinate=[2.0, 2.0, 2.0],
-        atlas_coordinate=[2.0, 2.0, 2.0],
+        raw_coordinate=np.array([2.0, 2.0, 2.0]),
+        atlas_coordinate=np.array([2.0, 2.0, 2.0]),
         structure="Anterodorsal nucleus",
         structure_id=57,
         hemisphere="left",
@@ -80,3 +82,26 @@ def test_get_region_totals(tmp_path, points, structures_with_points):
         produced_df
     ), "Produced DataFrame no longer matches per-region "
     "count from expected DataFrame"
+
+
+def test_create_all_cell_csv(tmp_path, points):
+    """
+    Test that a csv file can be created summarising a list of points
+    """
+    output_path = tmp_path / "cell.csv"
+    create_all_cell_csv(points, output_path)
+
+    assert output_path.exists()
+
+    produced_df = pd.read_csv(output_path)
+    for index, row in produced_df.iterrows():
+        assert row["structure_name"] == points[index].structure
+        assert row["hemisphere"] == points[index].hemisphere
+        raw_coord = row.loc[
+            "coordinate_raw_axis_0":"coordinate_raw_axis_2"
+        ].to_numpy()
+        atlas_coord = row.loc[
+            "coordinate_atlas_axis_0":"coordinate_atlas_axis_2"
+        ].to_numpy()
+        assert (raw_coord == points[index].raw_coordinate).all()
+        assert (atlas_coord == points[index].atlas_coordinate).all()
