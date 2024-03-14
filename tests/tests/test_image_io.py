@@ -29,14 +29,34 @@ def image_array(request, array_2d, array_3d):
 
 
 @pytest.fixture()
-def shuffled_txt_path(tmp_path, array_3d):
+def txt_path(tmp_path, array_3d):
+    """
+    Return the path to a text file containing the paths of a series of 2D tiffs
+    in order
+    """
+    txt_path = tmp_path / "imgs_file.txt"
+    directory = txt_path.parent
+
+    # Write tiff sequence to sub-folder
+    sub_dir = directory / "sub"
+    sub_dir.mkdir()
+    save.to_tiffs(array_3d, str(sub_dir / "image"))
+
+    # Write txt file containing all tiff file paths (one per line)
+    tiff_paths = sorted(sub_dir.iterdir())
+    txt_path.write_text(
+        "\n".join([str(sub_dir / fname) for fname in tiff_paths])
+    )
+
+    return txt_path
+
+
+@pytest.fixture()
+def shuffled_txt_path(txt_path):
     """
     Return the path to a text file containing the paths of a series of 2D tiffs
     in a random order
     """
-    txt_path = tmp_path / "imgs_file.txt"
-    save.to_tiffs_with_txt(array_3d, txt_path)
-
     # Shuffle paths in the text file into a random order
     with open(txt_path, "r+") as f:
         tiff_paths = f.read().splitlines()
@@ -125,28 +145,6 @@ def test_tiff_sequence_scaling(
     assert reloaded_array.shape[2] == array_3d.shape[2] * x_scaling_factor
 
 
-def test_img_sequence_txt_io(tmp_path, array_3d):
-    """
-    Test that an image can be read/written to a tiff sequence + a text file
-    containing an ordered list of the tiff file paths (one per line)
-    """
-    img_sequence_file = tmp_path / "imgs_file.txt"
-    subdir_name = "tiffs"
-    save.to_tiffs_with_txt(
-        array_3d, img_sequence_file, subdir_name=subdir_name
-    )
-
-    tiff_dir = tmp_path / subdir_name
-    assert len(list(tiff_dir.glob("*.tif"))) == array_3d.shape[0]
-    with open(img_sequence_file, "r") as f:
-        tiff_paths = f.read().splitlines()
-        assert tiff_paths == [str(path) for path in sorted(tiff_dir.iterdir())]
-
-    # Load image from paths in text file
-    reloaded_array = load.load_img_sequence(str(img_sequence_file), 1, 1, 1)
-    assert (reloaded_array == array_3d).all()
-
-
 @pytest.mark.parametrize(
     "sort",
     [True, False],
@@ -195,7 +193,6 @@ def test_nii_read_to_numpy(tmp_path, array_3d):
     [
         "test_array.tiff",
         "test_array.tif",
-        "test_array.txt",
         "test_array.nrrd",
         "test_array.nii",
         pytest.param("", id="dir of tiffs"),
@@ -210,6 +207,14 @@ def test_save_and_load_any(tmp_path, array_3d, file_name):
     save.save_any(array_3d, src_path)
 
     assert (load.load_any(str(src_path)) == array_3d).all()
+
+
+def test_load_any_txt(txt_path, array_3d):
+    """
+    Test that load_any can read a tiff sequence from a text file containing an
+    ordered list of the tiff file paths (one per line)
+    """
+    assert (load.load_any(str(txt_path)) == array_3d).all()
 
 
 def test_load_any_error(tmp_path):
