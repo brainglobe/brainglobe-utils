@@ -1,4 +1,5 @@
 import warnings
+from pathlib import Path
 
 import nrrd
 import numpy as np
@@ -104,3 +105,82 @@ def to_nrrd(img_volume, dest_path):
     """
     dest_path = str(dest_path)
     nrrd.write(dest_path, img_volume)
+
+
+def to_tiffs_with_txt(
+    img_volume, txt_path, subdir_name="sub", tiff_prefix="image"
+):
+    """
+    Save the image volume (numpy array) as a sequence of tiff planes, and write
+    a text file containing all the tiff file paths in order (one per line).
+
+    The tiff sequence will be saved to a sub-folder inside the same folder
+    as the text file.
+
+    Parameters
+    ----------
+    img_volume : np.ndarray
+        The image to be saved.
+
+    txt_path : str or pathlib.Path
+        Filepath of text file to create.
+
+    subdir_name : str
+        Name of subdirectory where the tiff sequence will be written.
+
+    tiff_prefix : str
+        The prefix to each tiff file name e.g. 'image' would give files like
+        'image_0.tif', 'image_1.tif'...
+    """
+    txt_path = Path(txt_path)
+    directory = txt_path.parent
+
+    # Write tiff sequence to sub-folder
+    sub_dir = directory / subdir_name
+    sub_dir.mkdir()
+    to_tiffs(img_volume, str(sub_dir / tiff_prefix))
+
+    # Write txt file containing all tiff file paths (one per line)
+    tiff_paths = sorted(sub_dir.iterdir())
+    txt_path.write_text(
+        "\n".join([str(sub_dir / fname) for fname in tiff_paths])
+    )
+
+
+def save_any(img_volume, dest_path):
+    """
+    Save the image volume (numpy array) to the given file path, using the save
+    function matching its file extension.
+
+    Parameters
+    ----------
+    img_volume : np.ndarray
+        The image to be saved.
+
+    dest_path : str or pathlib.Path
+        The file path to save the image to.
+        Supports directories (will save a sequence of tiffs), .tif, .tiff,
+        .nrrd, .nii and .txt (will save a sequence of tiffs and a
+        corresponding text file containing their paths).
+    """
+    dest_path = Path(dest_path)
+
+    if dest_path.is_dir():
+        to_tiffs(img_volume, str(dest_path / "image"))
+
+    elif dest_path.suffix == ".txt":
+        to_tiffs_with_txt(img_volume, dest_path)
+
+    elif dest_path.suffix == ".tif" or dest_path.suffix == ".tiff":
+        to_tiff(img_volume, str(dest_path))
+
+    elif dest_path.suffix == ".nrrd":
+        to_nrrd(img_volume, str(dest_path))
+
+    elif dest_path.suffix == ".nii":
+        to_nii(img_volume, str(dest_path))
+
+    else:
+        raise NotImplementedError(
+            f"Could not guess data type for path {dest_path}"
+        )

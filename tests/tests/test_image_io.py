@@ -35,7 +35,7 @@ def shuffled_txt_path(tmp_path, array_3d):
     in a random order
     """
     txt_path = tmp_path / "imgs_file.txt"
-    write_tiff_sequence_with_txt_file(txt_path, array_3d)
+    save.to_tiffs_with_txt(array_3d, txt_path)
 
     # Shuffle paths in the text file into a random order
     with open(txt_path, "r+") as f:
@@ -48,71 +48,14 @@ def shuffled_txt_path(tmp_path, array_3d):
     return txt_path
 
 
-def write_tiff_sequence_with_txt_file(txt_path, image_array):
-    """
-    Write an image array to a series of tiffs, and write a text file
-    containing all the tiff file paths in order (one per line).
-
-    The tiff sequence will be saved to a sub-folder inside the same folder
-    as the text file.
-
-    Parameters
-    ----------
-    txt_path : pathlib.Path
-        Filepath of text file to create
-    image_array : np.ndarray
-        Image to write as sequence of tiffs
-    """
-    directory = txt_path.parent
-
-    # Write tiff sequence to sub-folder
-    sub_dir = directory / "sub"
-    sub_dir.mkdir()
-    save.to_tiffs(image_array, str(sub_dir / "image_array"))
-
-    # Write txt file containing all tiff file paths (one per line)
-    tiff_paths = sorted(sub_dir.iterdir())
-    txt_path.write_text(
-        "\n".join([str(sub_dir / fname) for fname in tiff_paths])
-    )
-
-
-def save_any(file_path, image_array):
-    """
-    Save image_array to given file path, using the save function matching
-    its file extension
-
-    Parameters
-    ----------
-    file_path : pathlib.Path
-        File path of image to save
-    image_array : np.ndarray
-        Image to save
-    """
-    if file_path.is_dir():
-        save.to_tiffs(image_array, str(file_path / "image_array"))
-
-    elif file_path.suffix == ".txt":
-        write_tiff_sequence_with_txt_file(file_path, image_array)
-
-    elif file_path.suffix == ".tif" or file_path.suffix == ".tiff":
-        save.to_tiff(image_array, str(file_path))
-
-    elif file_path.suffix == ".nrrd":
-        save.to_nrrd(image_array, str(file_path))
-
-    elif file_path.suffix == ".nii":
-        save.to_nii(image_array, str(file_path), scale=(1, 1, 1))
-
-
 def test_tiff_io(tmp_path, image_array):
     """
     Test that a 2D/3D tiff can be written and read correctly
     """
     dest_path = tmp_path / "image_array.tiff"
-    save_any(dest_path, image_array)
+    save.save_any(image_array, dest_path)
+    reloaded = load.load_any(str(dest_path))
 
-    reloaded = load.load_img_stack(str(dest_path), 1, 1, 1)
     assert (reloaded == image_array).all()
 
 
@@ -127,11 +70,14 @@ def test_3d_tiff_scaling(
     Test that a 3D tiff is scaled correctly on loading
     """
     dest_path = tmp_path / "image_array.tiff"
-    save_any(dest_path, array_3d)
-
-    reloaded = load.load_img_stack(
-        str(dest_path), x_scaling_factor, y_scaling_factor, z_scaling_factor
+    save.save_any(array_3d, dest_path)
+    reloaded = load.load_any(
+        str(dest_path),
+        x_scaling_factor=x_scaling_factor,
+        y_scaling_factor=y_scaling_factor,
+        z_scaling_factor=z_scaling_factor,
     )
+
     assert reloaded.shape[0] == array_3d.shape[0] * z_scaling_factor
     assert reloaded.shape[1] == array_3d.shape[1] * y_scaling_factor
     assert reloaded.shape[2] == array_3d.shape[2] * x_scaling_factor
@@ -149,10 +95,10 @@ def test_tiff_sequence_io(tmp_path, array_3d, load_parallel):
     Test that a 3D image can be written and read correctly as a sequence
     of 2D tiffs (with or without parallel loading)
     """
-    save_any(tmp_path, array_3d)
-    reloaded_array = load.load_from_folder(
-        str(tmp_path), 1, 1, 1, load_parallel=load_parallel
-    )
+    save.save_any(array_3d, tmp_path)
+    assert len(list(tmp_path.glob("*.tif"))) == array_3d.shape[0]
+
+    reloaded_array = load.load_any(str(tmp_path), load_parallel=load_parallel)
     assert (reloaded_array == array_3d).all()
 
 
@@ -166,9 +112,12 @@ def test_tiff_sequence_scaling(
     """
     Test that a tiff sequence is scaled correctly on loading
     """
-    save_any(tmp_path, array_3d)
-    reloaded_array = load.load_from_folder(
-        str(tmp_path), x_scaling_factor, y_scaling_factor, z_scaling_factor
+    save.save_any(array_3d, tmp_path)
+    reloaded_array = load.load_any(
+        str(tmp_path),
+        x_scaling_factor=x_scaling_factor,
+        y_scaling_factor=y_scaling_factor,
+        z_scaling_factor=z_scaling_factor,
     )
 
     assert reloaded_array.shape[0] == array_3d.shape[0] * z_scaling_factor
@@ -176,13 +125,22 @@ def test_tiff_sequence_scaling(
     assert reloaded_array.shape[2] == array_3d.shape[2] * x_scaling_factor
 
 
-def test_load_img_sequence_from_txt(tmp_path, array_3d):
+def test_img_sequence_txt_io(tmp_path, array_3d):
     """
-    Test that a tiff sequence can be loaded from a text file containing an
-    ordered list of the tiff file paths (one per line)
+    Test that an image can be read/written to a tiff sequence + a text file
+    containing an ordered list of the tiff file paths (one per line)
     """
     img_sequence_file = tmp_path / "imgs_file.txt"
-    save_any(img_sequence_file, array_3d)
+    subdir_name = "tiffs"
+    save.to_tiffs_with_txt(
+        array_3d, img_sequence_file, subdir_name=subdir_name
+    )
+
+    tiff_dir = tmp_path / subdir_name
+    assert len(list(tiff_dir.glob("*.tif"))) == array_3d.shape[0]
+    with open(img_sequence_file, "r") as f:
+        tiff_paths = f.read().splitlines()
+        assert tiff_paths == [str(path) for path in sorted(tiff_dir.iterdir())]
 
     # Load image from paths in text file
     reloaded_array = load.load_img_sequence(str(img_sequence_file), 1, 1, 1)
@@ -209,11 +167,16 @@ def test_sort_img_sequence_from_txt(shuffled_txt_path, array_3d, sort):
 
 def test_nii_io(tmp_path, array_3d):
     """
-    Test that a 3D image can be written and read correctly as nii
+    Test that a 3D image can be written and read correctly as nii with scale
+    (keeping it as a nifty object with no numpy conversion on loading)
     """
-    nii_path = tmp_path / "test_array.nii"
-    save_any(nii_path, array_3d)
-    assert (load.load_nii(str(nii_path)).get_fdata() == array_3d).all()
+    nii_path = str(tmp_path / "test_array.nii")
+    scale = (5, 5, 5)
+    save.to_nii(array_3d, nii_path, scale=scale)
+    reloaded = load.load_nii(nii_path)
+
+    assert (reloaded.get_fdata() == array_3d).all()
+    assert reloaded.header.get_zooms() == scale
 
 
 def test_nii_read_to_numpy(tmp_path, array_3d):
@@ -221,19 +184,10 @@ def test_nii_read_to_numpy(tmp_path, array_3d):
     Test that conversion of loaded nii image to an in-memory numpy array works
     """
     nii_path = tmp_path / "test_array.nii"
-    save_any(nii_path, array_3d)
+    save.save_any(array_3d, nii_path)
+    reloaded_array = load.load_any(str(nii_path), as_numpy=True)
 
-    reloaded_array = load.load_nii(str(nii_path), as_array=True, as_numpy=True)
     assert (reloaded_array == array_3d).all()
-
-
-def test_nrrd_io(tmp_path, array_3d):
-    """
-    Test that a 3D image can be written and read correctly as nrrd
-    """
-    nrrd_path = tmp_path / "test_array.nrrd"
-    save_any(nrrd_path, array_3d)
-    assert (load.load_nrrd(str(nrrd_path)) == array_3d).all()
 
 
 @pytest.mark.parametrize(
@@ -247,12 +201,13 @@ def test_nrrd_io(tmp_path, array_3d):
         pytest.param("", id="dir of tiffs"),
     ],
 )
-def test_load_any(tmp_path, array_3d, file_name):
+def test_save_and_load_any(tmp_path, array_3d, file_name):
     """
-    Test that load_any can read all required image file types
+    Test that save_any/load_any can write/read all required image
+    file types.
     """
     src_path = tmp_path / file_name
-    save_any(src_path, array_3d)
+    save.save_any(array_3d, src_path)
 
     assert (load.load_any(str(src_path)) == array_3d).all()
 
@@ -263,6 +218,14 @@ def test_load_any_error(tmp_path):
     """
     with pytest.raises(NotImplementedError):
         load.load_any(str(tmp_path / "test.unknown"))
+
+
+def test_save_any_error(tmp_path, array_3d):
+    """
+    Test that save_any throws an error for an unknown file extension
+    """
+    with pytest.raises(NotImplementedError):
+        save.save_any(array_3d, str(tmp_path / "test.unknown"))
 
 
 def test_scale_z(array_3d):
@@ -286,7 +249,7 @@ def test_image_size(tmp_path, array_3d, file_name):
     a text file containing the paths of a sequence of 2D tiffs
     """
     file_path = tmp_path / file_name
-    save_any(file_path, array_3d)
+    save.save_any(array_3d, file_path)
 
     image_shape = load.get_size_image_from_file_paths(str(file_path))
     assert image_shape["x"] == array_3d.shape[2]
