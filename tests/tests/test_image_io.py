@@ -28,7 +28,27 @@ def image_array(request, array_2d, array_3d):
         return array_3d
 
 
-def write_tiff_sequence_with_txt_file(txt_path, image_array, shuffle=False):
+@pytest.fixture()
+def shuffled_txt_path(tmp_path, array_3d):
+    """
+    Return the path to a text file containing the paths of a series of 2D tiffs
+    in a random order
+    """
+    txt_path = tmp_path / "imgs_file.txt"
+    write_tiff_sequence_with_txt_file(txt_path, array_3d)
+
+    # Shuffle paths in the text file into a random order
+    with open(txt_path, "r+") as f:
+        tiff_paths = f.read().splitlines()
+        random.Random(4).shuffle(tiff_paths)
+        f.seek(0)
+        f.writelines(line + "\n" for line in tiff_paths)
+        f.truncate()
+
+    return txt_path
+
+
+def write_tiff_sequence_with_txt_file(txt_path, image_array):
     """
     Write an image array to a series of tiffs, and write a text file
     containing all the tiff file paths in order (one per line).
@@ -42,8 +62,6 @@ def write_tiff_sequence_with_txt_file(txt_path, image_array, shuffle=False):
         Filepath of text file to create
     image_array : np.ndarray
         Image to write as sequence of tiffs
-    shuffle : bool
-        Whether to shuffle the order of filepaths in the text file
     """
     directory = txt_path.parent
 
@@ -54,8 +72,6 @@ def write_tiff_sequence_with_txt_file(txt_path, image_array, shuffle=False):
 
     # Write txt file containing all tiff file paths (one per line)
     tiff_paths = sorted(sub_dir.iterdir())
-    if shuffle:
-        random.Random(4).shuffle(tiff_paths)
     txt_path.write_text(
         "\n".join([str(sub_dir / fname) for fname in tiff_paths])
     )
@@ -177,18 +193,13 @@ def test_load_img_sequence_from_txt(tmp_path, array_3d):
     "sort",
     [True, False],
 )
-def test_sort_img_sequence_from_txt(tmp_path, array_3d, sort):
+def test_sort_img_sequence_from_txt(shuffled_txt_path, array_3d, sort):
     """
-    Test that filepaths read from a txt file can be sorted correctly
+    Test that shuffled filepaths read from a txt file can be sorted correctly
     """
-    img_sequence_file = tmp_path / "imgs_file.txt"
-    write_tiff_sequence_with_txt_file(
-        img_sequence_file, array_3d, shuffle=True
-    )
-
-    # Load image from paths in text file
+    # Load image from shuffled paths in text file
     reloaded_array = load.load_img_sequence(
-        str(img_sequence_file), 1, 1, 1, sort=sort
+        str(shuffled_txt_path), 1, 1, 1, sort=sort
     )
     if sort:
         assert (reloaded_array == array_3d).all()
