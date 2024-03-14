@@ -241,22 +241,24 @@ def test_scale_z(array_3d):
     assert utils.scale_z(array_3d, 2).shape[0] == array_3d.shape[0] * 2
 
 
-@pytest.mark.parametrize(
-    "file_name",
-    [
-        "test_array.txt",
-        pytest.param("", id="dir of tiffs"),
-    ],
-)
-def test_image_size(tmp_path, array_3d, file_name):
+def test_image_size_dir(tmp_path, array_3d):
     """
-    Test that image size can be detected from a directory of 2D tiffs, or
-    a text file containing the paths of a sequence of 2D tiffs
+    Test that image size can be detected from a directory of 2D tiffs
     """
-    file_path = tmp_path / file_name
-    save.save_any(array_3d, file_path)
+    save.save_any(array_3d, tmp_path)
 
-    image_shape = load.get_size_image_from_file_paths(str(file_path))
+    image_shape = load.get_size_image_from_file_paths(str(tmp_path))
+    assert image_shape["x"] == array_3d.shape[2]
+    assert image_shape["y"] == array_3d.shape[1]
+    assert image_shape["z"] == array_3d.shape[0]
+
+
+def test_image_size_txt(txt_path, array_3d):
+    """
+    Test that image size can be detected from a text file containing the paths
+    of a sequence of 2D tiffs
+    """
+    image_shape = load.get_size_image_from_file_paths(str(txt_path))
     assert image_shape["x"] == array_3d.shape[2]
     assert image_shape["y"] == array_3d.shape[1]
     assert image_shape["z"] == array_3d.shape[0]
