@@ -44,8 +44,8 @@ def load_any(
     Parameters
     ----------
     src_path : str
-        Can be the path of a nifty file, tiff file, tiff files folder, or text
-        file containing a list of paths.
+        Can be the path of a nifty file, nrrd file, tiff file, tiff files
+        folder, or text file containing a list of paths.
 
     x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
@@ -401,8 +401,7 @@ def load_image_series(
     n_free_cpus=2,
 ):
     """
-    Load a brain from a sequence of files specified in a text file containing
-    an ordered list of paths.
+    Load a brain from a sequence of image paths.
 
     Parameters
     ----------
@@ -601,7 +600,8 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
     Parameters
     ----------
     file_path : str
-        File containing file_paths in a text file, or as a list.
+        Filepath of text file containing paths of all 2D files, or
+        filepath of a directory containing all 2D files.
 
     file_extension : str, optional
         Optional file extension (if a directory is passed).
