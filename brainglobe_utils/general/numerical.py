@@ -3,9 +3,17 @@ import argparse
 
 def is_even(num):
     """
-    Returns True if a number is even
-    :param num:
-    :return:
+    Returns True if a number is even.
+
+    Parameters
+    ----------
+    num : int
+        Input number.
+
+    Returns
+    -------
+    bool
+        True if number is even, otherwise False.
     """
     if num == 0:
         raise NotImplementedError(
@@ -20,11 +28,26 @@ def is_even(num):
 
 def check_positive_float(value, none_allowed=True):
     """
-    Used in argparse to enforce positive floats
-    FromL https://stackoverflow.com/questions/14117415
-    :param value: Input value
-    :param none_allowed: If false, throw an error for None values
-    :return: Input value, if it's positive
+    Used in argparse to enforce positive floats.
+    Source: https://stackoverflow.com/questions/14117415
+
+    Parameters
+    ----------
+    value : float
+        Input value.
+
+    none_allowed : bool, optional
+        If False, throw an error for None values.
+
+    Returns
+    -------
+    float
+        Input value, if it's positive.
+
+    Raises
+    ------
+    argparse.ArgumentTypeError
+        If input value is invalid.
     """
     ivalue = value
     if ivalue is not None:
@@ -42,11 +65,26 @@ def check_positive_float(value, none_allowed=True):
 
 def check_positive_int(value, none_allowed=True):
     """
-    Used in argparse to enforce positive ints
-    FromL https://stackoverflow.com/questions/14117415
-    :param value: Input value
-    :param none_allowed: If false, throw an error for None values
-    :return: Input value, if it's positive
+    Used in argparse to enforce positive ints.
+    Source: https://stackoverflow.com/questions/14117415
+
+    Parameters
+    ----------
+    value : int
+        Input value.
+
+    none_allowed : bool, optional
+        If False, throw an error for None values.
+
+    Returns
+    -------
+    int
+        Input value, if it's positive.
+
+    Raises
+    ------
+    argparse.ArgumentTypeError
+        If input value is invalid.
     """
     ivalue = value
     if ivalue is not None:
