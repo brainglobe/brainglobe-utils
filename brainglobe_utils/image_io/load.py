@@ -1,8 +1,8 @@
 import logging
 import math
-import os
 import warnings
 from concurrent.futures import ProcessPoolExecutor
+from pathlib import Path
 
 import nrrd
 import numpy as np
@@ -43,7 +43,7 @@ def load_any(
 
     Parameters
     ----------
-    src_path : str
+    src_path : str or pathlib.Path
         Can be the path of a nifty file, nrrd file, tiff file, tiff files
         folder, or text file containing a list of paths.
 
@@ -86,9 +86,9 @@ def load_any(
     np.ndarray
         The loaded brain.
     """
-    src_path = str(src_path)
+    src_path = Path(src_path)
 
-    if os.path.isdir(src_path):
+    if src_path.is_dir():
         logging.debug("Data type is: directory of files")
         img = load_from_folder(
             src_path,
@@ -100,7 +100,7 @@ def load_any(
             load_parallel=load_parallel,
             n_free_cpus=n_free_cpus,
         )
-    elif src_path.endswith(".txt"):
+    elif src_path.suffix == ".txt":
         logging.debug("Data type is: list of file paths")
         img = load_img_sequence(
             src_path,
@@ -112,7 +112,7 @@ def load_any(
             sort=sort_input_file,
             n_free_cpus=n_free_cpus,
         )
-    elif src_path.endswith((".tif", ".tiff")):
+    elif src_path.suffix == ".tif" or src_path.suffix == ".tiff":
         logging.debug("Data type is: tif stack")
         img = load_img_stack(
             src_path,
@@ -121,10 +121,10 @@ def load_any(
             z_scaling_factor,
             anti_aliasing=anti_aliasing,
         )
-    elif src_path.endswith(".nrrd"):
+    elif src_path.suffix == ".nrrd":
         logging.debug("Data type is: nrrd")
         img = load_nrrd(src_path)
-    elif src_path.endswith((".nii", ".nii.gz")):
+    elif src_path.suffix == ".nii" or src_path.suffix == ".nii.gz":
         logging.debug("Data type is: NifTI")
         img = load_nii(src_path, as_array=True, as_numpy=as_numpy)
     else:
@@ -141,7 +141,7 @@ def load_nrrd(src_path):
 
     Parameters
     ----------
-    src_path : str
+    src_path : str or pathlib.Path
         The path of the image to be loaded.
 
     Returns
@@ -149,7 +149,9 @@ def load_nrrd(src_path):
     np.ndarray
         The loaded brain array.
     """
-    src_path = str(src_path)
+    if isinstance(src_path, Path):
+        src_path = str(src_path.resolve())
+
     stack, _ = nrrd.read(src_path)
     return stack
 
@@ -166,7 +168,7 @@ def load_img_stack(
 
     Parameters
     ----------
-    stack_path : str
+    stack_path : str or pathlib.Path
         The path of the image to be loaded.
 
     x_scaling_factor : float
@@ -191,7 +193,7 @@ def load_img_stack(
     np.ndarray
         The loaded brain array.
     """
-    stack_path = str(stack_path)
+    stack_path = Path(stack_path)
     logging.debug(f"Loading: {stack_path}")
     stack = tifffile.imread(stack_path)
 
@@ -229,7 +231,7 @@ def load_nii(src_path, as_array=False, as_numpy=False):
 
     Parameters
     ----------
-    src_path : str
+    src_path : str or pathlib.Path
         The path to the nifty file on the filesystem.
 
     as_array : bool, optional
@@ -245,7 +247,7 @@ def load_nii(src_path, as_array=False, as_numpy=False):
     np.ndarray or nifty object
         The loaded brain. The format depends on the `as_array` flag.
     """
-    src_path = str(src_path)
+    src_path = Path(src_path)
     nii_img = nib.load(src_path)
     if as_array:
         image = nii_img.get_fdata()
@@ -275,7 +277,7 @@ def load_from_folder(
 
     Parameters
     ----------
-    src_folder : str
+    src_folder : str or pathlib.Path
         The source folder containing tiff files.
 
     x_scaling_factor : float, optional
@@ -338,7 +340,7 @@ def load_img_sequence(
 
     Parameters
     ----------
-    img_sequence_file_path : str
+    img_sequence_file_path : str or pathlib.Path
         The path to the file containing the ordered list of image paths (one
         per line).
 
@@ -373,7 +375,7 @@ def load_img_sequence(
     np.ndarray
         The loaded and scaled brain.
     """
-    img_sequence_file_path = str(img_sequence_file_path)
+    img_sequence_file_path = Path(img_sequence_file_path)
     with open(img_sequence_file_path, "r") as in_file:
         paths = in_file.readlines()
         paths = [p.strip() for p in paths]
@@ -405,7 +407,7 @@ def load_image_series(
 
     Parameters
     ----------
-    paths : list
+    paths : list of str or list of pathlib.Path
         Ordered list of image paths.
 
     x_scaling_factor : float, optional
@@ -470,7 +472,7 @@ def threaded_load_from_sequence(
 
     Parameters
     ----------
-    paths_sequence : list
+    paths_sequence : list of str or list of pathlib.Path
         The sorted list of the planes paths on the filesystem.
 
     x_scaling_factor : float, optional
@@ -539,7 +541,7 @@ def load_from_paths_sequence(
 
     Parameters
     ----------
-    paths_sequence : list
+    paths_sequence : list of str or list of pathlib.Path
         The sorted list of the planes paths on the filesystem.
 
     x_scaling_factor : float, optional
@@ -599,7 +601,7 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
 
     Parameters
     ----------
-    file_path : str
+    file_path : str or pathlib.Path
         Filepath of text file containing paths of all 2D files, or
         filepath of a directory containing all 2D files.
 
@@ -611,7 +613,7 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
     dict
         Dict of image sizes.
     """
-    file_path = str(file_path)
+    file_path = Path(file_path)
 
     img_paths = get_sorted_file_paths(file_path, file_extension=file_extension)
     z_shape = len(img_paths)
