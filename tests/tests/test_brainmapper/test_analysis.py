@@ -128,16 +128,7 @@ def points_in_atlas_space(points_mouse):
 @pytest.fixture
 def atlas(tmp_path):
     """Get the allen mouse 100um atlas"""
-    brainglobe_dir = tmp_path / "brainglobe_dir"
-    interm_download_dir = tmp_path / "interim"
-    brainglobe_dir.mkdir()
-    interm_download_dir.mkdir()
-
-    return BrainGlobeAtlas(
-        "allen_mouse_100um",
-        brainglobe_dir=brainglobe_dir,
-        interm_download_dir=interm_download_dir,
-    )
+    return BrainGlobeAtlas("allen_mouse_100um")
 
 
 @pytest.fixture
@@ -202,7 +193,6 @@ def test_get_region_totals(
     "count from expected DataFrame"
 
 
-@pytest.mark.slow
 def test_summarise_points_by_region(
     tmp_path,
     atlas,

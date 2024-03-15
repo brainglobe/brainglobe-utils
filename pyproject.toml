@@ -81,9 +81,6 @@ exclude = ["tests", "docs*"]
 
 [tool.pytest.ini_options]
 addopts = "--cov=brainglobe_utils"
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-]
 filterwarnings = [
     "error",
     # Emitted by scikit-image on import, see https://github.com/scikit-image/scikit-image/issues/6663
