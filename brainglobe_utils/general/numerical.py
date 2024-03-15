@@ -3,7 +3,7 @@ import argparse
 
 def is_even(num):
     """
-    Returns True if a number is even.
+    Returns True if the non-zero input number is even.
 
     Parameters
     ----------
@@ -14,6 +14,11 @@ def is_even(num):
     -------
     bool
         True if number is even, otherwise False.
+
+    Raises
+    ------
+    NotImplementedError
+        If the input number is zero.
     """
     if num == 0:
         raise NotImplementedError(
