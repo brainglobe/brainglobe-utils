@@ -81,18 +81,16 @@ def to_tiffs(img_volume, path_prefix, path_suffix="", extension=".tif"):
     extension : str, optional
         The file extension for each plane.
     """
-    path_prefix = Path(path_prefix)
-    directory = path_prefix.parent
-    filename = path_prefix.name
+    if isinstance(path_prefix, Path):
+        path_prefix = str(path_prefix.resolve())
 
     z_size = img_volume.shape[0]
     pad_width = int(round(z_size / 10)) + 1
     for i in range(z_size):
         img = img_volume[i, :, :]
-        filename = (
-            f"{filename}_{str(i).zfill(pad_width)}{path_suffix}{extension}"
+        dest_path = (
+            f"{path_prefix}_{str(i).zfill(pad_width)}{path_suffix}{extension}"
         )
-        dest_path = directory / filename
         tifffile.imwrite(dest_path, img)
 
 
