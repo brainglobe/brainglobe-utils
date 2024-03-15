@@ -22,12 +22,24 @@ MAX_PROCESSES_WINDOWS = 61
 
 def replace_extension(file, new_extension, check_leading_period=True):
     """
-    Replaces the file extension of a given file
-    :param str file: Input file with file extension to replace
-    :param str new_extension: New file extension
-    :param bool check_leading_period: If True, any leading period of the
-    new extension is removed, preventing "file..txt"
-    :return str: File with new file extension
+    Replaces the file extension of a given file.
+
+    Parameters
+    ----------
+    file : str
+        Input file path with file extension to replace.
+
+    new_extension : str
+        New file extension.
+
+    check_leading_period : bool, optional
+        If True, any leading period of the new extension is removed,
+        preventing "file..txt".
+
+    Returns
+    -------
+    str
+        File path with new file extension.
     """
     if check_leading_period:
         new_extension = remove_leading_character(new_extension, ".")
@@ -37,10 +49,20 @@ def replace_extension(file, new_extension, check_leading_period=True):
 def remove_leading_character(string, character):
     """
     If "string" starts with "character", strip that leading character away.
-    Only removes the first instance
-    :param string:
-    :param character:
-    :return: String without the specified, leading character
+    Only removes the first instance.
+
+    Parameters
+    ----------
+    string : str
+        Input string.
+
+    character : str
+        Character to be stripped if found at the beginning of the string.
+
+    Returns
+    -------
+    str
+        String without the specified leading character.
     """
     if string.startswith(character):
         return string[1:]
@@ -50,9 +72,13 @@ def remove_leading_character(string, character):
 
 def ensure_directory_exists(directory):
     """
-    If a directory doesn't exist, make it. Works for pathlib objects, and
-    strings.
-    :param directory:
+    If a directory doesn't exist, make it. Works for pathlib objects,
+    and strings.
+
+    Parameters
+    ----------
+    directory : str or pathlib.Path
+        Directory to be created if it doesn't exist.
     """
     if isinstance(directory, str):
         if not os.path.exists(directory):
@@ -64,16 +90,26 @@ def ensure_directory_exists(directory):
 def get_sorted_file_paths(file_path, file_extension=None, encoding=None):
     """
     Sorts file paths with numbers "naturally" (i.e. 1, 2, 10, a, b), not
-    lexiographically (i.e. 1, 10, 2, a, b).
-    :param str file_path: File containing file_paths in a text file,
-    or as a list.
-    :param str file_extension: Optional file extension (if a directory
-     is passed)
-    :param encoding: If opening a text file, what encoding it has.
-    Default: None (platform dependent)
-    :return: Sorted list of file paths
-    """
+    lexicographically (i.e. 1, 10, 2, a, b).
 
+    Parameters
+    ----------
+    file_path : list of str or str
+        List of file paths, or path of a text file containing these paths,
+        or path of a directory containing files.
+
+    file_extension : str, optional
+        Only return filepaths with this extension (if a directory is passed).
+
+    encoding : str, optional
+        If opening a text file, what encoding it has.
+        Default is None (platform dependent).
+
+    Returns
+    -------
+    list of str
+        Sorted list of file paths.
+    """
     if isinstance(file_path, list):
         return natsorted(file_path)
 
@@ -101,10 +137,20 @@ def get_sorted_file_paths(file_path, file_extension=None, encoding=None):
 
 def check_path_in_dir(file_path, directory_path):
     """
-    Check if a file path is in a directory
-    :param file_path: Full path to a file
-    :param directory_path: Full path to a directory the file may be in
-    :return: True if the file is in the directory
+    Check if a file path is in a directory.
+
+    Parameters
+    ----------
+    file_path : str or pathlib.Path
+        Full path to a file.
+
+    directory_path : str or pathlib.Path
+        Full path to a directory the file may be in.
+
+    Returns
+    -------
+    bool
+        True if the file is in the directory, False otherwise.
     """
     directory = Path(directory_path)
     parent = Path(file_path).parent
@@ -120,21 +166,39 @@ def get_num_processes(
     enforce_single_cpu=True,
 ):
     """
-    Determine how many CPU cores to use, based on a minimum number of cpu cores
-    to leave free, and an optional max number of processes.
+    Determine how many CPU cores to use, based on a minimum number of CPU cores
+    to leave free, and an optional maximum number of processes.
 
     Cluster computing aware for the SLURM job scheduler, and not yet
     implemented for other environments.
-    :param int min_free_cpu_cores: How many cpu cores to leave free
-    :param float ram_needed_per_process: Memory requirements per process. Set
-    this to ensure that the number of processes isn't too high.
-    :param float fraction_free_ram: Fraction of the ram to ensure stays free
-    regardless of the current program.
-    :param int n_max_processes: Maximum number of processes
-    :param float max_ram_usage: Maximum amount of RAM (in bytes)
-    to use (allthough available may be lower)
-    :param enforce_single_cpu: Ensure that >=1 cpu cores are chosen
-    :return: Number of processes to
+
+    Parameters
+    ----------
+    min_free_cpu_cores : int, optional
+        How many CPU cores to leave free.
+
+    ram_needed_per_process : float, optional
+        Memory requirements per process. Set this to ensure that the number of
+        processes isn't too high.
+
+    fraction_free_ram : float, optional
+        Fraction of the RAM to ensure stays free regardless of the current
+        program.
+
+    n_max_processes : int, optional
+        Maximum number of processes.
+
+    max_ram_usage : float, optional
+        Maximum amount of RAM (in bytes) to use (although available may be
+        lower).
+
+    enforce_single_cpu : bool, optional
+        Ensure that >=1 CPU core is chosen.
+
+    Returns
+    -------
+    int
+        Number of processes to use.
     """
     logging.debug("Determining the maximum number of CPU cores to use")
 
@@ -215,14 +279,25 @@ def how_many_cores_with_sufficient_ram(
     amount of free RAM. N.B. this does not relate to how many CPU cores
     are actually available.
 
-    :param float ram_needed_per_cpu: Memory requirements per process. Set
-    this to ensure that the number of processes isn't too high.
-    :param float fraction_free_ram: Fraction of the ram to ensure stays free
-    regardless of the current program.
-    :param float max_ram_usage: The Maximum amount of RAM (in bytes)
-    to use (although available may be lower)
-    :return: How many CPU cores could be theoretically used based on
-    the amount of free RAM
+    Parameters
+    ----------
+    ram_needed_per_cpu : float
+        Memory requirements per process. Set this to ensure that the number of
+        processes isn't too high.
+
+    fraction_free_ram : float, optional
+        Fraction of the RAM to ensure stays free regardless of the current
+        program.
+
+    max_ram_usage : float, optional
+        The Maximum amount of RAM (in bytes) to use (although available may be
+        lower).
+
+    Returns
+    -------
+    int
+        How many CPU cores could be theoretically used based on the amount of
+        free RAM.
     """
 
     try:
@@ -252,8 +327,16 @@ def how_many_cores_with_sufficient_ram(
 def disk_free_gb(file_path):
     """
     Return the free disk space, on a disk defined by a file path.
-    :param file_path: File path on the disk to be checked
-    :return: Free space in GB
+
+    Parameters
+    ----------
+    file_path : str
+        File path on the disk to be checked.
+
+    Returns
+    -------
+    float
+        Free space in GB.
     """
     if platform.system() == "Windows":
         drive, _ = os.path.splitdrive(file_path)
@@ -266,8 +349,12 @@ def disk_free_gb(file_path):
 
 def get_free_ram():
     """
-    Returns the amount of free RAM in bytes
-    :return: Available RAM in bytes
+    Returns the amount of free RAM in bytes.
+
+    Returns
+    -------
+    int
+        Available RAM in bytes.
     """
     return psutil.virtual_memory().available
 
@@ -280,10 +367,16 @@ def safe_execute_command(cmd, log_file_path=None, error_file_path=None):
     From https://github.com/SainsburyWellcomeCentre/amap_python by
     Charly Rousseau (https://github.com/crousseau).
 
-    :param cmd:
-    :param log_file_path:
-    :param error_file_path:
-    :return:
+    Parameters
+    ----------
+    cmd : str
+        Command to be executed.
+
+    log_file_path : str, optional
+        File path to log the output.
+
+    error_file_path : str, optional
+        File path to log any errors.
     """
     if log_file_path is None:
         log_file_path = os.path.abspath(
@@ -341,8 +434,15 @@ class SafeExecuteCommandError(Exception):
 
 def delete_directory_contents(directory, progress=False):
     """
-    Removes all contents of a directory
-    :param directory: Directory with files to be removed
+    Removes all contents of a directory.
+
+    Parameters
+    ----------
+    directory : str
+        Directory with files to be removed.
+
+    progress : bool, optional
+        Whether to show a progress bar.
     """
     files = os.listdir(directory)
     if progress:
@@ -355,9 +455,22 @@ def delete_directory_contents(directory, progress=False):
 
 def check_path_exists(file):
     """
-    Returns True is a file exists, otherwise throws a FileNotFoundError
-    :param file: Input file
-    :return: True, if the file exists
+    Returns True if a file exists, otherwise throws a FileNotFoundError.
+
+    Parameters
+    ----------
+    file : str or pathlib.Path
+        Input file.
+
+    Returns
+    -------
+    bool
+        True if the file exists.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the file doesn't exist.
     """
     file = Path(file)
     if file.exists():
@@ -368,9 +481,17 @@ def check_path_exists(file):
 
 def catch_input_file_error(path):
     """
-    Catches if an input path doesn't exist, and returns an informative error
-    :param path: Input file path
-    default)
+    Catches if an input path doesn't exist, and returns an informative error.
+
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        Input file path.
+
+    Raises
+    ------
+    CommandLineInputError
+        If the file doesn't exist.
     """
     try:
         check_path_exists(path)
