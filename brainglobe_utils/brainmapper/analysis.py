@@ -243,17 +243,19 @@ def summarise_points_by_atlas_region(
     ----------
     points_in_raw_data_space : np.ndarray
         A numpy array representing points in the raw data space.
+        The shape of the array should be (n_points, 3).
     points_in_atlas_space : np.ndarray
         A numpy array representing points in the atlas space.
+        The shape of the array should be (n_points, 3).
     atlas : BrainGlobeAtlas
         The BrainGlobe atlas object used for the analysis
     brainreg_volume_csv_path : Union[str, Path]
         The path to the CSV file containing volume information from the
         brainreg registration.
     points_list_output_filename : Union[str, Path]
-        The path where the detailed points list will be saved.
+        The csv path where the detailed points list will be saved.
     summary_filename : Union[str, Path]
-        The path where the summary of points by atlas region will be saved.
+        The csv path where the summary of points by atlas region will be saved.
 
     Returns
     -------
