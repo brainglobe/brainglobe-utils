@@ -94,7 +94,7 @@ def get_sorted_file_paths(file_path, file_extension=None, encoding=None):
 
     Parameters
     ----------
-    file_path : list of str or str
+    file_path : list of str or str or pathlib.Path
         List of file paths, or path of a text file containing these paths,
         or path of a directory containing files.
 

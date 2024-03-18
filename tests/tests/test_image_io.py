@@ -68,13 +68,20 @@ def shuffled_txt_path(txt_path):
     return txt_path
 
 
-def test_tiff_io(tmp_path, image_array):
+@pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
+def test_tiff_io(tmp_path, image_array, use_path):
     """
-    Test that a 2D/3D tiff can be written and read correctly
+    Test that a 2D/3D tiff can be written and read correctly, using string
+    or pathlib.Path input.
     """
-    dest_path = tmp_path / "image_array.tiff"
-    save.save_any(image_array, dest_path)
-    reloaded = load.load_any(dest_path)
+    filename = "image_array.tiff"
+    if use_path:
+        dest_path = tmp_path / filename
+    else:
+        dest_path = str(tmp_path / filename)
+
+    save.to_tiff(image_array, dest_path)
+    reloaded = load.load_img_stack(dest_path, 1, 1, 1)
 
     assert (reloaded == image_array).all()
 
@@ -103,6 +110,7 @@ def test_3d_tiff_scaling(
     assert reloaded.shape[2] == array_3d.shape[2] * x_scaling_factor
 
 
+@pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
 @pytest.mark.parametrize(
     "load_parallel",
     [
@@ -110,15 +118,25 @@ def test_3d_tiff_scaling(
         pytest.param(False, id="no parallel loading"),
     ],
 )
-def test_tiff_sequence_io(tmp_path, array_3d, load_parallel):
+def test_tiff_sequence_io(tmp_path, array_3d, load_parallel, use_path):
     """
     Test that a 3D image can be written and read correctly as a sequence
-    of 2D tiffs (with or without parallel loading)
+    of 2D tiffs (with or without parallel loading). Tests using both
+    string and pathlib.Path input.
     """
-    save.save_any(array_3d, tmp_path)
+    prefix = "image"
+    dest_path = tmp_path / prefix
+    dir_path = tmp_path
+    if not use_path:
+        dest_path = str(dest_path)
+        dir_path = str(dir_path)
+
+    save.to_tiffs(array_3d, dest_path)
     assert len(list(tmp_path.glob("*.tif"))) == array_3d.shape[0]
 
-    reloaded_array = load.load_any(tmp_path, load_parallel=load_parallel)
+    reloaded_array = load.load_from_folder(
+        dir_path, load_parallel=load_parallel
+    )
     assert (reloaded_array == array_3d).all()
 
 
@@ -145,6 +163,20 @@ def test_tiff_sequence_scaling(
     assert reloaded_array.shape[2] == array_3d.shape[2] * x_scaling_factor
 
 
+@pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
+def test_load_img_sequence_from_txt(txt_path, array_3d, use_path):
+    """
+    Test that a tiff sequence can be read from a text file containing an
+    ordered list of the tiff file paths (one per line). Tests using both str
+    and pathlib.Path input.
+    """
+    if not use_path:
+        txt_path = str(txt_path)
+
+    reloaded_array = load.load_img_sequence(txt_path)
+    assert (reloaded_array == array_3d).all()
+
+
 @pytest.mark.parametrize(
     "sort",
     [True, False],
@@ -163,12 +195,19 @@ def test_sort_img_sequence_from_txt(shuffled_txt_path, array_3d, sort):
         assert not (reloaded_array == array_3d).all()
 
 
-def test_nii_io(tmp_path, array_3d):
+@pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
+def test_nii_io(tmp_path, array_3d, use_path):
     """
     Test that a 3D image can be written and read correctly as nii with scale
-    (keeping it as a nifty object with no numpy conversion on loading)
+    (keeping it as a nifty object with no numpy conversion on loading).
+    Tests using both str and pathlib.Path input.
     """
-    nii_path = tmp_path / "test_array.nii"
+    filename = "test_array.nii"
+    if use_path:
+        nii_path = tmp_path / filename
+    else:
+        nii_path = str(tmp_path / filename)
+
     scale = (5, 5, 5)
     save.to_nii(array_3d, nii_path, scale=scale)
     reloaded = load.load_nii(nii_path)
@@ -186,6 +225,22 @@ def test_nii_read_to_numpy(tmp_path, array_3d):
     reloaded_array = load.load_any(nii_path, as_numpy=True)
 
     assert (reloaded_array == array_3d).all()
+
+
+@pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
+def test_nrrd_io(tmp_path, array_3d, use_path):
+    """
+    Test that a 3D image can be written and read correctly as nrrd, using both
+    str and pathlib.Path input.
+    """
+    filename = "test_array.nrrd"
+    if use_path:
+        nrrd_path = tmp_path / filename
+    else:
+        nrrd_path = str(tmp_path / filename)
+
+    save.to_nrrd(array_3d, nrrd_path)
+    assert (load.load_nrrd(nrrd_path) == array_3d).all()
 
 
 @pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
