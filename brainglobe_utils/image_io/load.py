@@ -112,7 +112,7 @@ def load_any(
             sort=sort_input_file,
             n_free_cpus=n_free_cpus,
         )
-    elif src_path.suffix == ".tif" or src_path.suffix == ".tiff":
+    elif src_path.suffix in [".tif", ".tiff"]:
         logging.debug("Data type is: tif stack")
         img = load_img_stack(
             src_path,
@@ -124,7 +124,7 @@ def load_any(
     elif src_path.suffix == ".nrrd":
         logging.debug("Data type is: nrrd")
         img = load_nrrd(src_path)
-    elif src_path.suffix == ".nii" or src_path.suffix == ".nii.gz":
+    elif src_path.suffix in [".nii", ".nii.gz"]:
         logging.debug("Data type is: NifTI")
         img = load_nii(src_path, as_array=True, as_numpy=as_numpy)
     else:

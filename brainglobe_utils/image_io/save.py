@@ -132,7 +132,7 @@ def save_any(img_volume, dest_path):
     if dest_path.is_dir():
         to_tiffs(img_volume, dest_path / "image")
 
-    elif dest_path.suffix == ".tif" or dest_path.suffix == ".tiff":
+    elif dest_path.suffix in [".tif", ".tiff"]:
         to_tiff(img_volume, dest_path)
 
     elif dest_path.suffix == ".nrrd":
