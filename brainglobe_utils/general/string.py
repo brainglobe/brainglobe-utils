@@ -12,15 +12,32 @@ def get_text_lines(
     encoding="utf8",
 ):
     """
-    Return only the nth line of a text file
-    :param file: Any text file
-    :param return_lines: Which specific line/lines to read
-    :param rstrip: Remove trailing characters
-    :param sort: If true, naturally sort the data
-    :param remove_empty_lines: If True, ignore empty lines
-    :param encoding: What encoding the text file has.
-    Default: None (platform dependent)
-    :return: The nth line
+    Return only the nth line of a text file.
+
+    Parameters
+    ----------
+    file : str or pathlib.Path
+        Path to any text file.
+
+    return_lines : int, optional
+        Which specific line to read.
+
+    rstrip : bool, optional
+        Whether to remove trailing characters.
+
+    sort : bool, optional
+        If True, naturally sort the data.
+
+    remove_empty_lines : bool, optional
+        If True, ignore empty lines.
+
+    encoding : str, optional
+        What encoding the text file has.
+
+    Returns
+    -------
+    str or list of str
+        The nth line or lines.
     """
     with open(file, encoding=encoding) as f:
         lines = f.readlines()

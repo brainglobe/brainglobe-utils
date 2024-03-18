@@ -4,8 +4,16 @@ from natsort import natsorted
 def remove_empty_string(str_list):
     """
     Removes any empty strings from a list of strings
-    :param str_list: List of strings
-    :return: List of strings without the empty strings
+
+    Parameters
+    ----------
+    str_list : list of str
+        List of strings.
+
+    Returns
+    -------
+    list of str
+        List of strings without the empty strings.
     """
     return list(filter(None, str_list))
 
@@ -17,11 +25,23 @@ def unique_elements_lists(list_in):
 
 def check_unique_list(in_list, natural_sort=True):
     """
-    Checks if all the items in a list are unique or not
-    :param list in_list: Input list
-    :param bool natural_sort: Sort the resulting items naturally
-    (default: True)
-    :return: True/False and a list of any repeated values
+    Checks if all the items in a list are unique or not.
+
+    Parameters
+    ----------
+    in_list : list
+        Input list.
+
+    natural_sort : bool, optional
+        Sort the resulting items naturally. Default is True.
+
+    Returns
+    -------
+    bool
+        True if all items are unique, False otherwise.
+
+    list
+        A list of any repeated values.
     """
     unique = set(in_list)
     repeated_items = []
@@ -43,11 +63,25 @@ def common_member(a, b, natural_sort=True):
     """
     Checks if two lists (or sets) have a common member, and if so, returns
     the common members.
-    :param a: First list (or set)
-    :param b: Second list (or set)
-    :param bool natural_sort: Sort the resulting items naturally
-    (default: True)
-    :return: True/False and the list of values
+
+    Parameters
+    ----------
+    a : list or set
+        First list (or set).
+
+    b : list or set
+        Second list (or set).
+
+    natural_sort : bool, optional
+        Sort the resulting items naturally. Default is True.
+
+    Returns
+    -------
+    bool
+        True if common members exist, False otherwise.
+
+    list
+        The list of common values.
     """
     a_set = set(a)
     b_set = set(b)

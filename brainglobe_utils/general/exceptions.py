@@ -2,9 +2,10 @@ class CommandLineInputError(Exception):
     """Exception raised for incorrect or illogical command line inputs that
     are not caught elsewhere.
 
-    Attributes:
-        expression -- input expression in which the error occurred
-        message -- explanation of the error
+    Attributes
+    ----------
+        message : str
+            explanation of the error
     """
 
     def __init__(self, message):
