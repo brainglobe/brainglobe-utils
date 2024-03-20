@@ -1,15 +1,18 @@
-from pathlib import Path
-
 import numpy as np
 import pytest
 from tifffile import imread
 
 from brainglobe_utils.image.heatmap import heatmap_from_points, rescale_array
 
-data_dir = Path("tests", "data")
-heatmap_validate_path = data_dir / "image" / "heatmap.tif"
 
-points = np.array([[5, 5, 5], [10, 10, 10], [15, 15, 15]])
+@pytest.fixture
+def heatmap_validate_path(data_path):
+    return data_path / "image" / "heatmap.tif"
+
+
+@pytest.fixture
+def points():
+    return np.array([[5, 5, 5], [10, 10, 10], [15, 15, 15]])
 
 
 @pytest.fixture
@@ -29,7 +32,9 @@ def test_rescale_array(mask_array):
     assert resized_array.shape == small_array.shape
 
 
-def test_heatmap_from_points(tmp_path, mask_array):
+def test_heatmap_from_points(
+    tmp_path, mask_array, points, heatmap_validate_path
+):
     output_filename = tmp_path / "test_heatmap.tif"
 
     heatmap_test = heatmap_from_points(

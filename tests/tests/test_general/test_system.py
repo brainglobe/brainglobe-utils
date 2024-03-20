@@ -11,27 +11,40 @@ from brainglobe_utils.general import system
 from brainglobe_utils.general.exceptions import CommandLineInputError
 from brainglobe_utils.general.string import get_text_lines
 
-data_dir = Path("tests", "data")
-cubes_dir = data_dir / "cubes"
-jabberwocky = data_dir / "general" / "jabberwocky.txt"
-jabberwocky_sorted = data_dir / "general" / "jabberwocky_sorted.txt"
 
-cubes = [
-    "pCellz222y2805x9962Ch1.tif",
-    "pCellz222y2805x9962Ch2.tif",
-    "pCellz258y3892x10559Ch1.tif",
-    "pCellz258y3892x10559Ch2.tif",
-    "pCellz413y2308x9391Ch1.tif",
-    "pCellz413y2308x9391Ch2.tif",
-    "pCellz416y2503x5997Ch1.tif",
-    "pCellz416y2503x5997Ch2.tif",
-    "pCellz418y5457x9489Ch1.tif",
-    "pCellz418y5457x9489Ch2.tif",
-    "pCellz433y4425x7552Ch1.tif",
-    "pCellz433y4425x7552Ch2.tif",
-]
+@pytest.fixture
+def cubes_dir(data_path):
+    return data_path / "cubes"
 
-sorted_cubes_dir = [os.path.join(str(cubes_dir), cube) for cube in cubes]
+
+@pytest.fixture
+def jabberwocky(data_path):
+    return data_path / "general" / "jabberwocky.txt"
+
+
+@pytest.fixture
+def jabberwocky_sorted(data_path):
+    return data_path / "general" / "jabberwocky_sorted.txt"
+
+
+@pytest.fixture
+def sorted_cubes_dir(cubes_dir):
+    cubes = [
+        "pCellz222y2805x9962Ch1.tif",
+        "pCellz222y2805x9962Ch2.tif",
+        "pCellz258y3892x10559Ch1.tif",
+        "pCellz258y3892x10559Ch2.tif",
+        "pCellz413y2308x9391Ch1.tif",
+        "pCellz413y2308x9391Ch2.tif",
+        "pCellz416y2503x5997Ch1.tif",
+        "pCellz416y2503x5997Ch2.tif",
+        "pCellz418y5457x9489Ch1.tif",
+        "pCellz418y5457x9489Ch2.tif",
+        "pCellz433y4425x7552Ch1.tif",
+        "pCellz433y4425x7552Ch2.tif",
+    ]
+
+    return [str(cubes_dir / cube) for cube in cubes]
 
 
 @pytest.fixture
@@ -78,7 +91,9 @@ def test_ensure_directory_exists(tmpdir):
     exist_dir_pathlib.rmdir()
 
 
-def test_get_sorted_file_paths():
+def test_get_sorted_file_paths(
+    cubes_dir, jabberwocky, jabberwocky_sorted, sorted_cubes_dir
+):
     # test list
     shuffled = sorted_cubes_dir.copy()
     shuffle(shuffled)
@@ -102,8 +117,8 @@ def test_get_sorted_file_paths():
         system.get_sorted_file_paths(shuffled[0])
 
 
-def test_check_path_in_dir():
-    assert system.check_path_in_dir(jabberwocky, data_dir / "general")
+def test_check_path_in_dir(jabberwocky, data_path):
+    assert system.check_path_in_dir(jabberwocky, data_path / "general")
 
 
 def test_get_num_processes():

@@ -252,9 +252,16 @@ def group_cells_by_z(cells: List[Cell]) -> DefaultDict[float, List[Cell]]:
     """
     For a list of Cells return a dict of lists of cells, grouped by plane.
 
-    :param list cells: list of cells from cellfinder.cells.cells.Cell
-    :return:  defaultdict, with each key being a plane (e.g. 1280)
-    and each entry being a list of Cells
+    Parameters
+    ----------
+    cells : List of Cell
+        List of cells from cellfinder.cells.cells.Cell
+
+    Returns
+    -------
+    DefaultDict
+        defaultdict, with each key being a plane (e.g. 1280) and each entry
+        being a list of Cells
     """
     cells_groups = defaultdict(list)
     for cell in cells:

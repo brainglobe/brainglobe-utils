@@ -1,16 +1,23 @@
 import os
 
+import pytest
 from natsort import natsorted
 
 from brainglobe_utils.cells import cells
 from brainglobe_utils.IO.cells import get_cells
 
-data_dir = os.path.join("tests", "data")
-cubes_dir = os.path.join(data_dir, "cube_extract", "cubes")
-xml_path = os.path.join(data_dir, "cells", "cells.xml")
+
+@pytest.fixture
+def cubes_dir(data_path):
+    return str(data_path / "cube_extract" / "cubes")
 
 
-def test_pos_from_file_name():
+@pytest.fixture
+def xml_path(data_path):
+    return str(data_path / "cells" / "cells.xml")
+
+
+def test_pos_from_file_name(cubes_dir):
     positions_validate = [
         [392, 522, 10],
         [340, 1004, 15],
@@ -24,7 +31,7 @@ def test_pos_from_file_name():
     assert natsorted(positions) == natsorted(positions_validate)
 
 
-def test_group_cells_by_z():
+def test_group_cells_by_z(xml_path):
     z_planes_validate = [
         1272,
         1273,

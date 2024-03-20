@@ -1,13 +1,13 @@
-from pathlib import Path
-
+import pytest
 from skimage import measure
 from skimage.draw import ellipsoid
 
 from brainglobe_utils.IO.surfaces import marching_cubes_to_obj
 
-test_obj = (
-    Path(__file__).parent.parent.parent / "data" / "IO" / "obj" / "test.obj"
-)
+
+@pytest.fixture
+def test_obj(data_path):
+    return data_path / "IO" / "obj" / "test.obj"
 
 
 def compare_text_files(a, b):
@@ -18,7 +18,7 @@ def compare_text_files(a, b):
     assert a_contents == b_contents
 
 
-def test_marching_cubes_to_obj(tmp_path):
+def test_marching_cubes_to_obj(tmp_path, test_obj):
     output_file = tmp_path / "test.obj"
     ellip_base = ellipsoid(6, 10, 16, levelset=True)
     marching_cubes_out = measure.marching_cubes(ellip_base, 0)
