@@ -21,15 +21,6 @@ def array_3d(array_2d):
     return volume
 
 
-@pytest.fixture(params=["2D", "3D"])
-def image_array(request, array_2d, array_3d):
-    """Create both a 2D and 3D array of 32-bit integers"""
-    if request.param == "2D":
-        return array_2d
-    else:
-        return array_3d
-
-
 @pytest.fixture()
 def txt_path(tmp_path, array_3d):
     """
@@ -71,9 +62,9 @@ def shuffled_txt_path(txt_path):
 
 
 @pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
-def test_tiff_io(tmp_path, image_array, use_path):
+def test_tiff_io(tmp_path, array_3d, use_path):
     """
-    Test that a 2D/3D tiff can be written and read correctly, using string
+    Test that a 3D tiff can be written and read correctly, using string
     or pathlib.Path input.
     """
     filename = "image_array.tiff"
@@ -82,10 +73,10 @@ def test_tiff_io(tmp_path, image_array, use_path):
     else:
         dest_path = str(tmp_path / filename)
 
-    save.to_tiff(image_array, dest_path)
+    save.to_tiff(array_3d, dest_path)
     reloaded = load.load_img_stack(dest_path, 1, 1, 1)
 
-    assert (reloaded == image_array).all()
+    assert (reloaded == array_3d).all()
 
 
 @pytest.mark.parametrize(
@@ -140,6 +131,17 @@ def test_tiff_sequence_io(tmp_path, array_3d, load_parallel, use_path):
         dir_path, load_parallel=load_parallel
     )
     assert (reloaded_array == array_3d).all()
+
+
+def test_2d_tiff(tmp_path, array_2d):
+    """
+    Test that an error is thrown when loading a single 2D tiff
+    """
+    image_path = tmp_path / "image.tif"
+    save.to_tiff(array_2d, image_path)
+
+    with pytest.raises(utils.ImageIOLoadException):
+        load.load_any(image_path)
 
 
 @pytest.mark.parametrize(

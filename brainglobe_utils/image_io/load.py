@@ -198,6 +198,9 @@ def load_img_stack(
     logging.debug(f"Loading: {stack_path}")
     stack = tifffile.imread(stack_path)
 
+    if stack.ndim != 3:
+        raise ImageIOLoadException(error_type="2D tiff")
+
     # Downsampled plane by plane because the 3D downsampling in scipy etc
     # uses too much RAM
 
@@ -218,11 +221,10 @@ def load_img_stack(
         logging.debug("Converting downsampled stack to array")
         stack = np.array(downsampled_stack)
 
-    if stack.ndim == 3:
-        # stack = np.rollaxis(stack, 0, 3)
-        if z_scaling_factor != 1:
-            logging.debug("Downsampling stack in Z")
-            stack = scale_z(stack, z_scaling_factor)
+    # stack = np.rollaxis(stack, 0, 3)
+    if z_scaling_factor != 1:
+        logging.debug("Downsampling stack in Z")
+        stack = scale_z(stack, z_scaling_factor)
     return stack
 
 
@@ -534,9 +536,9 @@ def threaded_load_from_sequence(
     stack_shapes = set()
     for i in range(len(stacks)):
         stacks[i] = stacks[i].result()
-        stack_shapes.add(stacks[i].shape)
+        stack_shapes.add(stacks[i].shape[0:2])
 
-    # Raise an error if the shapes of all stacks aren't the same
+    # Raise an error if the x/y shape of all stacks aren't the same
     if len(stack_shapes) > 1:
         raise ImageIOLoadException("sequence_shape")
 
@@ -616,8 +618,8 @@ def load_from_paths_sequence(
 
 def get_size_image_from_file_paths(file_path, file_extension="tif"):
     """
-    Returns the size of an image (which is a list of 2D files), without loading
-    the whole image.
+    Returns the size of an image (which is a list of 2D tiff files),
+    without loading the whole image.
 
     Parameters
     ----------
@@ -641,7 +643,7 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
     logging.debug(
         "Loading file: {} to check raw image size" "".format(img_paths[0])
     )
-    image_0 = load_any(img_paths[0])
+    image_0 = tifffile.imread(img_paths[0])
     y_shape, x_shape = image_0.shape
 
     image_shape = {"x": x_shape, "y": y_shape, "z": z_shape}

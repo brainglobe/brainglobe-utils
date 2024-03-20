@@ -1,25 +1,20 @@
-import traceback
-
 import psutil
 from scipy.ndimage import zoom
 
 
 class ImageIOLoadException(Exception):
     """
-    Custom exception class for errors found loading image with
-    image_io.load.load_any.
+    Custom exception class for errors found loading images with
+    image_io.load.
 
-    If the passed target brain directory contains only a single
-    .tiff, alert the user.
-    Otherwise, alert the user there was an issue loading the file and
-    including the full traceback
+    Alerts the user of: loading a directory containing only a single .tiff,
+    loading a single 2D .tiff, loading an image sequence where all 2D images
+    don't have the same shape, lack of memory to complete loading.
 
     Set the error message to self.message to read during testing.
     """
 
-    def __init__(
-        self, error_type=None, base_error=None, total_size=None, free_mem=None
-    ):
+    def __init__(self, error_type=None, total_size=None, free_mem=None):
         if error_type == "single_tiff":
             self.message = (
                 "Attempted to load directory containing "
@@ -28,6 +23,9 @@ class ImageIOLoadException(Exception):
                 "filename. Single 2D .tiff file input is "
                 "not supported."
             )
+
+        elif error_type == "2D tiff":
+            self.message = "Single 2D .tiff file input is not supported."
 
         elif error_type == "sequence_shape":
             self.message = (
@@ -46,14 +44,9 @@ class ImageIOLoadException(Exception):
                     f" Needed {total_size}, only {free_mem} " f"available."
                 )
 
-        elif base_error is not None:
-            original_traceback = "".join(
-                traceback.format_tb(base_error.__traceback__)
-                + [base_error.__str__()]
-            )
+        else:
             self.message = (
-                f"{original_traceback}\nFile failed to load with "
-                "brainglobe_utils.image_io. "
+                "File failed to load with brainglobe_utils.image_io."
             )
 
         super().__init__(self.message)
