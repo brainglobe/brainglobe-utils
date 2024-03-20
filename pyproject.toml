@@ -119,6 +119,17 @@ ignore_errors = true
 # ignore_errors = false
 # strict = true
 
+[tool.numpydoc_validation]
+checks = [
+    "all",  # report on all checks, except the below
+    "EX01", # No examples section found
+    "SA01", # No See Also section found
+    "ES01", # No extended summary found
+    "GL08", # The object does not have a docstring
+    "SS06", # Summary should fit on a single line
+    "SS05"  # Summary should start with infinitive verb
+]
+
 [tool.tox]
 legacy_tox_ini = """
 [tox]
