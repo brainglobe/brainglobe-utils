@@ -15,6 +15,7 @@ from brainglobe_utils.general.system import (
     get_num_processes,
     get_sorted_file_paths,
 )
+from brainglobe_utils.image_io.utils import ImageIOLoadException
 
 from .utils import check_mem, scale_z
 
@@ -437,6 +438,11 @@ def load_image_series(
     np.ndarray
         The loaded and scaled brain.
     """
+    # Throw an error if there's only one image to load - should be an image
+    # series, so at least 2 paths.
+    if len(paths) == 1:
+        raise ImageIOLoadException("single_tiff")
+
     if load_parallel:
         img = threaded_load_from_sequence(
             paths,
@@ -524,7 +530,17 @@ def threaded_load_from_sequence(
             anti_aliasing=anti_aliasing,
         )
         stacks.append(process)
-    stack = np.dstack([s.result() for s in stacks])
+
+    stack_shapes = set()
+    for i in range(len(stacks)):
+        stacks[i] = stacks[i].result()
+        stack_shapes.add(stacks[i].shape)
+
+    # Raise an error if the shapes of all stacks aren't the same
+    if len(stack_shapes) > 1:
+        raise ImageIOLoadException("sequence_shape")
+
+    stack = np.dstack(stacks)
     return stack
 
 
@@ -590,6 +606,10 @@ def load_from_paths_sequence(
                     preserve_range=True,
                     anti_aliasing=anti_aliasing,
                 )
+
+        # Raise an error if the shapes of the images aren't the same
+        if not volume[:, :, i].shape == img.shape:
+            raise ImageIOLoadException("sequence_shape")
         volume[:, :, i] = img
     return volume
 

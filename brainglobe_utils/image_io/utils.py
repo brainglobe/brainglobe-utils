@@ -1,9 +1,62 @@
+import traceback
+
 import psutil
 from scipy.ndimage import zoom
 
 
 class ImageIOLoadException(Exception):
-    pass
+    """
+    Custom exception class for errors found loading image with
+    image_io.load.load_any.
+
+    If the passed target brain directory contains only a single
+    .tiff, alert the user.
+    Otherwise, alert the user there was an issue loading the file and
+    including the full traceback
+
+    Set the error message to self.message to read during testing.
+    """
+
+    def __init__(
+        self, error_type=None, base_error=None, total_size=None, free_mem=None
+    ):
+        if error_type == "single_tiff":
+            self.message = (
+                "Attempted to load directory containing "
+                "a single .tiff file. If the .tiff file "
+                "is 3D please pass the full path with "
+                "filename. Single 2D .tiff file input is "
+                "not supported."
+            )
+
+        elif error_type == "sequence_shape":
+            self.message = (
+                "Attempted to load an image sequence where individual 2D "
+                "images did not have the same shape. Please ensure all image "
+                "files contain the same number of pixels."
+            )
+
+        elif error_type == "memory":
+            self.message = (
+                "Not enough memory on the system to complete "
+                "loading operation."
+            )
+            if total_size is not None and free_mem is not None:
+                self.message += (
+                    f" Needed {total_size}, only {free_mem} " f"available."
+                )
+
+        elif base_error is not None:
+            original_traceback = "".join(
+                traceback.format_tb(base_error.__traceback__)
+                + [base_error.__str__()]
+            )
+            self.message = (
+                f"{original_traceback}\nFile failed to load with "
+                "brainglobe_utils.image_io. "
+            )
+
+        super().__init__(self.message)
 
 
 def check_mem(img_byte_size, n_imgs):
@@ -31,8 +84,7 @@ def check_mem(img_byte_size, n_imgs):
     free_mem = psutil.virtual_memory().available
     if total_size >= free_mem:
         raise ImageIOLoadException(
-            "Not enough memory on the system to complete loading operation"
-            "Needed {}, only {} available.".format(total_size, free_mem)
+            error_type="memory", total_size=total_size, free_mem=free_mem
         )
 
 

@@ -1,6 +1,8 @@
 import random
+from collections import namedtuple
 
 import numpy as np
+import psutil
 import pytest
 
 from brainglobe_utils.image_io import load, save, utils
@@ -161,6 +163,36 @@ def test_tiff_sequence_scaling(
     assert reloaded_array.shape[0] == array_3d.shape[0] * z_scaling_factor
     assert reloaded_array.shape[1] == array_3d.shape[1] * y_scaling_factor
     assert reloaded_array.shape[2] == array_3d.shape[2] * x_scaling_factor
+
+
+def test_tiff_sequence_one_tiff(tmp_path):
+    """
+    Test that an error is thrown when loading a directory containing a
+    single tiff via load_any
+    """
+    save.to_tiff(np.ones((3, 3)), tmp_path / "image.tif")
+
+    with pytest.raises(utils.ImageIOLoadException):
+        load.load_any(tmp_path)
+
+
+@pytest.mark.parametrize(
+    "load_parallel",
+    [
+        pytest.param(True, id="parallel loading"),
+        pytest.param(False, id="no parallel loading"),
+    ],
+)
+def test_tiff_sequence_diff_shape(tmp_path, array_3d, load_parallel):
+    """
+    Test that an error is thrown when trying to load a tiff sequence where
+    individual 2D tiffs have different shapes
+    """
+    save.to_tiff(np.ones((2, 2)), tmp_path / "image_1.tif")
+    save.to_tiff(np.ones((3, 3)), tmp_path / "image_2.tif")
+
+    with pytest.raises(utils.ImageIOLoadException):
+        load.load_any(tmp_path, load_parallel=load_parallel)
 
 
 @pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
@@ -325,3 +357,20 @@ def test_image_size_txt(txt_path, array_3d):
     assert image_shape["x"] == array_3d.shape[2]
     assert image_shape["y"] == array_3d.shape[1]
     assert image_shape["z"] == array_3d.shape[0]
+
+
+def test_memory_error(monkeypatch):
+    """
+    Test that check_mem throws an error when there's not enough memory
+    available.
+    """
+
+    # Use monkeypatch to always return a set value for the available memory.
+    def mock_memory():
+        VirtualMemory = namedtuple("VirtualMemory", "available")
+        return VirtualMemory(500)
+
+    monkeypatch.setattr(psutil, "virtual_memory", mock_memory)
+
+    with pytest.raises(utils.ImageIOLoadException):
+        utils.check_mem(8, 1000)
