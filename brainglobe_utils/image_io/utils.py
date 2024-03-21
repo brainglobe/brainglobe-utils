@@ -70,7 +70,7 @@ def check_mem(img_byte_size, n_imgs):
 
     Raises
     ------
-    BrainLoadException
+    ImageIOLoadException
         If not enough memory is available.
     """
     total_size = img_byte_size * n_imgs
