@@ -1,13 +1,22 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from brainglobe_utils.pandas import misc as pandas_misc
 
-columns = ["name", "number"]
-data_with_nan = [["one", np.nan], ["two", 15], ["three", np.nan]]
-df_with_nan = pd.DataFrame(data_with_nan, columns=columns)
-data_with_inf = [["one", np.inf], ["two", 15], ["three", np.inf]]
-df_with_inf = pd.DataFrame(data_with_inf, columns=columns)
+
+@pytest.fixture
+def df_with_inf():
+    columns = ["name", "number"]
+    data_with_inf = [["one", np.inf], ["two", 15], ["three", np.inf]]
+    return pd.DataFrame(data_with_inf, columns=columns)
+
+
+@pytest.fixture
+def df_with_nan():
+    columns = ["name", "number"]
+    data_with_nan = [["one", np.nan], ["two", 15], ["three", np.nan]]
+    return pd.DataFrame(data_with_nan, columns=columns)
 
 
 def test_initialise_df():
@@ -16,7 +25,7 @@ def test_initialise_df():
     assert df.equals(test_df)
 
 
-def test_sanitise_df():
+def test_sanitise_df(df_with_nan, df_with_inf):
     sanitised_df = pandas_misc.sanitise_df(df_with_inf)
     assert sanitised_df.equals(df_with_nan)
 

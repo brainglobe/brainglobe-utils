@@ -132,9 +132,9 @@ def atlas(tmp_path):
 
 
 @pytest.fixture
-def brainmapper_data_path():
+def brainmapper_data_path(data_path):
     """Directory storing all brainmapper test data"""
-    return Path(__file__).parent.parent.parent / "data" / "brainmapper"
+    return data_path / "brainmapper"
 
 
 @pytest.fixture
