@@ -15,6 +15,7 @@ from brainglobe_utils.general.system import (
     get_num_processes,
     get_sorted_file_paths,
 )
+from brainglobe_utils.image_io.utils import ImageIOLoadException
 
 from .utils import check_mem, scale_z
 
@@ -85,6 +86,15 @@ def load_any(
     -------
     np.ndarray
         The loaded brain.
+
+    Raises
+    ------
+    ImageIOLoadException
+        If there was an issue loading the image with image_io.
+
+    See Also
+    ------
+    image_io.utils.ImageIOLoadException
     """
     src_path = Path(src_path)
 
@@ -169,7 +179,8 @@ def load_img_stack(
     Parameters
     ----------
     stack_path : str or pathlib.Path
-        The path of the image to be loaded.
+        The path of the image to be loaded. Note that only 3D tiffs are
+        supported.
 
     x_scaling_factor : float
         The scaling of the brain along the x dimension (applied on loading
@@ -192,10 +203,18 @@ def load_img_stack(
     -------
     np.ndarray
         The loaded brain array.
+
+    Raises
+    ------
+    ImageIOLoadException
+        If attempt to load a 2D tiff.
     """
     stack_path = Path(stack_path)
     logging.debug(f"Loading: {stack_path}")
     stack = tifffile.imread(stack_path)
+
+    if stack.ndim != 3:
+        raise ImageIOLoadException(error_type="2D tiff")
 
     # Downsampled plane by plane because the 3D downsampling in scipy etc
     # uses too much RAM
@@ -217,11 +236,9 @@ def load_img_stack(
         logging.debug("Converting downsampled stack to array")
         stack = np.array(downsampled_stack)
 
-    if stack.ndim == 3:
-        # stack = np.rollaxis(stack, 0, 3)
-        if z_scaling_factor != 1:
-            logging.debug("Downsampling stack in Z")
-            stack = scale_z(stack, z_scaling_factor)
+    if z_scaling_factor != 1:
+        logging.debug("Downsampling stack in Z")
+        stack = scale_z(stack, z_scaling_factor)
     return stack
 
 
@@ -278,7 +295,8 @@ def load_from_folder(
     Parameters
     ----------
     src_folder : str or pathlib.Path
-        The source folder containing tiff files.
+        The source folder containing tiff files. Note that this folder must
+        contain at least 2 tiffs, and all tiff images must have the same shape.
 
     x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
@@ -310,6 +328,12 @@ def load_from_folder(
     -------
     np.ndarray
         The loaded and scaled brain.
+
+    Raises
+    ------
+    ImageIOLoadException
+        If attempt to load a directory containing only a single tiff, or a
+        sequence of tiffs that have different shapes.
     """
     paths = get_sorted_file_paths(src_folder, file_extension=file_extension)
 
@@ -342,7 +366,8 @@ def load_img_sequence(
     ----------
     img_sequence_file_path : str or pathlib.Path
         The path to the file containing the ordered list of image paths (one
-        per line).
+        per line). Note that this file must contain at least 2 paths, and all
+        referenced images must have the same shape.
 
     x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
@@ -374,6 +399,12 @@ def load_img_sequence(
     -------
     np.ndarray
         The loaded and scaled brain.
+
+    Raises
+    ------
+    ImageIOLoadException
+        If attempt to load a txt file containing only a single path, or a
+        sequence of paths that load images with different shapes.
     """
     img_sequence_file_path = Path(img_sequence_file_path)
     with open(img_sequence_file_path, "r") as in_file:
@@ -408,7 +439,8 @@ def load_image_series(
     Parameters
     ----------
     paths : list of str or list of pathlib.Path
-        Ordered list of image paths.
+        Ordered list of image paths. Must contain at least 2 paths, and all
+        referenced images must have the same shape.
 
     x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
@@ -436,7 +468,18 @@ def load_image_series(
     -------
     np.ndarray
         The loaded and scaled brain.
+
+    Raises
+    ------
+    ImageIOLoadException
+        If attempt to load a single path, or a sequence of paths that load
+        images with different shapes.
     """
+    # Throw an error if there's only one image to load - should be an image
+    # series, so at least 2 paths.
+    if len(paths) == 1:
+        raise ImageIOLoadException("single_tiff")
+
     if load_parallel:
         img = threaded_load_from_sequence(
             paths,
@@ -473,7 +516,8 @@ def threaded_load_from_sequence(
     Parameters
     ----------
     paths_sequence : list of str or list of pathlib.Path
-        The sorted list of the planes paths on the filesystem.
+        The sorted list of the planes paths on the filesystem. All planes
+        must have the same shape.
 
     x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
@@ -495,6 +539,11 @@ def threaded_load_from_sequence(
     -------
     np.ndarray
         The loaded and scaled brain.
+
+    Raises
+    ------
+    ImageIOLoadException
+        If attempt to load a sequence of images with different shapes.
     """
     stacks = []
     n_processes = get_num_processes(min_free_cpu_cores=n_free_cpus)
@@ -524,7 +573,17 @@ def threaded_load_from_sequence(
             anti_aliasing=anti_aliasing,
         )
         stacks.append(process)
-    stack = np.dstack([s.result() for s in stacks])
+
+    stack_shapes = set()
+    for i in range(len(stacks)):
+        stacks[i] = stacks[i].result()
+        stack_shapes.add(stacks[i].shape[0:2])
+
+    # Raise an error if the x/y shape of all stacks aren't the same
+    if len(stack_shapes) > 1:
+        raise ImageIOLoadException("sequence_shape")
+
+    stack = np.dstack(stacks)
     return stack
 
 
@@ -542,7 +601,8 @@ def load_from_paths_sequence(
     Parameters
     ----------
     paths_sequence : list of str or list of pathlib.Path
-        The sorted list of the planes paths on the filesystem.
+        The sorted list of the planes paths on the filesystem. All planes
+        must have the same shape.
 
     x_scaling_factor : float, optional
         The scaling of the brain along the x dimension (applied on loading
@@ -561,6 +621,11 @@ def load_from_paths_sequence(
     -------
     np.ndarray
         The loaded and scaled brain.
+
+    Raises
+    ------
+    ImageIOLoadException
+        If attempt to load a sequence of images with different shapes.
     """
     for i, p in enumerate(
         tqdm(paths_sequence, desc="Loading images", unit="plane")
@@ -590,14 +655,18 @@ def load_from_paths_sequence(
                     preserve_range=True,
                     anti_aliasing=anti_aliasing,
                 )
+
+        # Raise an error if the shapes of the images aren't the same
+        if not volume[:, :, i].shape == img.shape:
+            raise ImageIOLoadException("sequence_shape")
         volume[:, :, i] = img
     return volume
 
 
 def get_size_image_from_file_paths(file_path, file_extension="tif"):
     """
-    Returns the size of an image (which is a list of 2D files), without loading
-    the whole image.
+    Returns the size of an image (which is a list of 2D tiff files),
+    without loading the whole image.
 
     Parameters
     ----------
@@ -621,7 +690,7 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
     logging.debug(
         "Loading file: {} to check raw image size" "".format(img_paths[0])
     )
-    image_0 = load_any(img_paths[0])
+    image_0 = tifffile.imread(img_paths[0])
     y_shape, x_shape = image_0.shape
 
     image_shape = {"x": x_shape, "y": y_shape, "z": z_shape}

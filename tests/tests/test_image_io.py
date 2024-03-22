@@ -1,6 +1,8 @@
 import random
+from collections import namedtuple
 
 import numpy as np
+import psutil
 import pytest
 
 from brainglobe_utils.image_io import load, save, utils
@@ -17,15 +19,6 @@ def array_3d(array_2d):
     """Create a 4x4x4 array of 32-bit integers"""
     volume = np.stack((array_2d, 2 * array_2d, 3 * array_2d, 4 * array_2d))
     return volume
-
-
-@pytest.fixture(params=["2D", "3D"])
-def image_array(request, array_2d, array_3d):
-    """Create both a 2D and 3D array of 32-bit integers"""
-    if request.param == "2D":
-        return array_2d
-    else:
-        return array_3d
 
 
 @pytest.fixture()
@@ -69,9 +62,9 @@ def shuffled_txt_path(txt_path):
 
 
 @pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
-def test_tiff_io(tmp_path, image_array, use_path):
+def test_tiff_io(tmp_path, array_3d, use_path):
     """
-    Test that a 2D/3D tiff can be written and read correctly, using string
+    Test that a 3D tiff can be written and read correctly, using string
     or pathlib.Path input.
     """
     filename = "image_array.tiff"
@@ -80,10 +73,10 @@ def test_tiff_io(tmp_path, image_array, use_path):
     else:
         dest_path = str(tmp_path / filename)
 
-    save.to_tiff(image_array, dest_path)
+    save.to_tiff(array_3d, dest_path)
     reloaded = load.load_img_stack(dest_path, 1, 1, 1)
 
-    assert (reloaded == image_array).all()
+    assert (reloaded == array_3d).all()
 
 
 @pytest.mark.parametrize(
@@ -140,6 +133,17 @@ def test_tiff_sequence_io(tmp_path, array_3d, load_parallel, use_path):
     assert (reloaded_array == array_3d).all()
 
 
+def test_2d_tiff(tmp_path, array_2d):
+    """
+    Test that an error is thrown when loading a single 2D tiff
+    """
+    image_path = tmp_path / "image.tif"
+    save.to_tiff(array_2d, image_path)
+
+    with pytest.raises(utils.ImageIOLoadException):
+        load.load_any(image_path)
+
+
 @pytest.mark.parametrize(
     "x_scaling_factor, y_scaling_factor, z_scaling_factor",
     [(1, 1, 1), (0.5, 0.5, 1), (0.25, 0.25, 0.25)],
@@ -161,6 +165,36 @@ def test_tiff_sequence_scaling(
     assert reloaded_array.shape[0] == array_3d.shape[0] * z_scaling_factor
     assert reloaded_array.shape[1] == array_3d.shape[1] * y_scaling_factor
     assert reloaded_array.shape[2] == array_3d.shape[2] * x_scaling_factor
+
+
+def test_tiff_sequence_one_tiff(tmp_path):
+    """
+    Test that an error is thrown when loading a directory containing a
+    single tiff via load_any
+    """
+    save.to_tiff(np.ones((3, 3)), tmp_path / "image.tif")
+
+    with pytest.raises(utils.ImageIOLoadException):
+        load.load_any(tmp_path)
+
+
+@pytest.mark.parametrize(
+    "load_parallel",
+    [
+        pytest.param(True, id="parallel loading"),
+        pytest.param(False, id="no parallel loading"),
+    ],
+)
+def test_tiff_sequence_diff_shape(tmp_path, array_3d, load_parallel):
+    """
+    Test that an error is thrown when trying to load a tiff sequence where
+    individual 2D tiffs have different shapes
+    """
+    save.to_tiff(np.ones((2, 2)), tmp_path / "image_1.tif")
+    save.to_tiff(np.ones((3, 3)), tmp_path / "image_2.tif")
+
+    with pytest.raises(utils.ImageIOLoadException):
+        load.load_any(tmp_path, load_parallel=load_parallel)
 
 
 @pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
@@ -325,3 +359,20 @@ def test_image_size_txt(txt_path, array_3d):
     assert image_shape["x"] == array_3d.shape[2]
     assert image_shape["y"] == array_3d.shape[1]
     assert image_shape["z"] == array_3d.shape[0]
+
+
+def test_memory_error(monkeypatch):
+    """
+    Test that check_mem throws an error when there's not enough memory
+    available.
+    """
+
+    # Use monkeypatch to always return a set value for the available memory.
+    def mock_memory():
+        VirtualMemory = namedtuple("VirtualMemory", "available")
+        return VirtualMemory(500)
+
+    monkeypatch.setattr(psutil, "virtual_memory", mock_memory)
+
+    with pytest.raises(utils.ImageIOLoadException):
+        utils.check_mem(8, 1000)
