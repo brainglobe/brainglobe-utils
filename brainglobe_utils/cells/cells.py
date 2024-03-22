@@ -198,7 +198,7 @@ class Cell:
     ) -> None:
         """
         Scale and/or offset the cell position. New values will be saved into
-        .transformed_x, .transformed.y and .transformed.z. Original .x, .y and
+        .transformed_x, .transformed_y and .transformed_z. Original .x, .y and
         .z will remain unchanged.
 
         See Also
@@ -224,7 +224,7 @@ class Cell:
     def to_xml_element(self) -> EtElement:
         """
         Create an xml element representing the cell, including its xyz
-        coordinate
+        coordinate.
         """
         sub_elements = [EtElement("Marker{}".format(axis)) for axis in "XYZ"]
         coords = [int(coord) for coord in (self.x, self.y, self.z)]
