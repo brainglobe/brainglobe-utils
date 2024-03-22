@@ -1,5 +1,6 @@
 import os
 
+import pandas as pd
 import pytest
 from natsort import natsorted
 
@@ -17,7 +18,24 @@ def xml_path(data_path):
     return str(data_path / "cells" / "cells.xml")
 
 
+@pytest.fixture
+def z_planes_validate(data_path):
+    csv_path = data_path / "cells" / "z_planes_validate.csv"
+    df = pd.read_csv(csv_path, header=None)
+    return df.to_numpy().flatten().tolist()
+
+
+@pytest.fixture
+def cell_numbers_in_groups_validate(data_path):
+    csv_path = data_path / "cells" / "cell_numbers_in_groups_validate.csv"
+    df = pd.read_csv(csv_path, header=None)
+    return df.to_numpy().flatten().tolist()
+
+
 def test_pos_from_file_name(cubes_dir):
+    """
+    Test that [x, y, z] positions can be extracted from filenames
+    """
     positions_validate = [
         [392, 522, 10],
         [340, 1004, 15],
@@ -31,65 +49,12 @@ def test_pos_from_file_name(cubes_dir):
     assert natsorted(positions) == natsorted(positions_validate)
 
 
-def test_group_cells_by_z(xml_path):
-    z_planes_validate = [
-        1272,
-        1273,
-        1274,
-        1275,
-        1276,
-        1277,
-        1278,
-        1279,
-        1280,
-        1281,
-        1282,
-        1283,
-        1284,
-        1285,
-        1286,
-        1287,
-        1288,
-        1289,
-        1290,
-        1291,
-        1292,
-        1294,
-        1295,
-        1296,
-        1297,
-        1298,
-    ]
-
-    cell_numbers_in_groups_validate = [
-        1,
-        3,
-        7,
-        8,
-        3,
-        1,
-        4,
-        3,
-        1,
-        2,
-        2,
-        1,
-        1,
-        2,
-        5,
-        2,
-        2,
-        2,
-        3,
-        1,
-        1,
-        6,
-        1,
-        1,
-        1,
-        1,
-    ]
-
+def test_group_cells_by_z(
+    xml_path, z_planes_validate, cell_numbers_in_groups_validate
+):
+    """
+    Test that a list of cells can be grouped by z plane
+    """
     cell_list = get_cells(xml_path)
     cells_groups = cells.group_cells_by_z(cell_list)
     z_planes_test = list(cells_groups.keys())

@@ -242,6 +242,8 @@ def pos_from_xml_marker(element: ElementTree.Element) -> List[float]:
 
 
 def pos_from_file_name(file_name: str) -> List[float]:
+    """Return [x, y, z] position from filename. For example,
+    'pCellz10y522x392Ch0.tif' would return [392, 522, 10]"""
     x = re.findall(r"x\d+", file_name.lower())
     y = re.findall(r"y\d+", file_name.lower())
     z = re.findall(r"z\d+", file_name.lower())
@@ -255,7 +257,7 @@ def group_cells_by_z(cells: List[Cell]) -> DefaultDict[float, List[Cell]]:
     Parameters
     ----------
     cells : List of Cell
-        List of cells from cellfinder.cells.cells.Cell
+        List of cells from brainglobe_utils.cells.cells.Cell
 
     Returns
     -------
