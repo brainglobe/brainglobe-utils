@@ -67,7 +67,7 @@ def test_group_cells_by_z(
     cell_numbers_in_groups_test = [
         len(cells_groups[plane]) for plane in z_planes_test
     ]
-    assert  cell_numbers_in_groups_test == cell_numbers_in_groups_validate
+    assert cell_numbers_in_groups_test == cell_numbers_in_groups_validate
 
 
 @pytest.mark.parametrize(
@@ -123,7 +123,7 @@ def test_cell_transform(
         x_scale, y_scale, z_scale, x_offset, y_offset, z_offset, integer
     )
 
-    assert  [cell.x, cell.y, cell.z] == expected
+    assert [cell.x, cell.y, cell.z] == expected
 
 
 @pytest.mark.parametrize(
