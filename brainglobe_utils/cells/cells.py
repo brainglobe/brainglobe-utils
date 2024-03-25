@@ -15,6 +15,54 @@ from xml.etree.ElementTree import Element as EtElement
 
 @total_ordering
 class Cell:
+    """
+    A class representing a cell with a specific type.
+
+    Parameters
+    ----------
+    pos : str or ElementTree.Element or Dict[str, float] or List of float
+        Cell position (x, y, z). Input can be a filename containing the x/y/z
+        position, an xml marker element, a dictionary with keys "x", "y" and
+        "z", or a list of the positions [x, y, z].
+
+    cell_type : int or str or None
+        Cell type represented by an integer: 1 for unknown/no cell,
+        2 for cell, -1 for artifact. The usual way to set this is to use:
+        Cell.ARTIFACT, Cell.CELL, Cell.UNKNOWN, or Cell.NO_CELL as input.
+        You can also pass "cell" or "no_cell", as well as None (which will
+        map to Cell.UNKNOWN).
+
+    Attributes
+    ----------
+    x : float
+        X position.
+
+    y : float
+        Y position.
+
+    z : float
+        Z position.
+
+    type : int
+        Cell type. 1 for unknown/no cell, 2 for cell, -1 for artifact.
+
+    transformed_x : float
+        Transformed x position.
+
+    transformed_y : float
+        Transformed y position.
+
+    transformed_z : float
+        Transformed z position.
+
+    structure_id : int
+        ID of brain structure.
+
+    hemisphere : str
+        Hemisphere of brain.
+    """
+
+    # integers for self.type
     ARTIFACT = -1
     CELL = 2
     UNKNOWN = 1
@@ -108,6 +156,32 @@ class Cell:
         z_offset: float = 0,
         integer: bool = False,
     ) -> None:
+        """
+        Scale and/or offset the cell position. .x / .y / .z will be updated.
+
+        Parameters
+        ----------
+        x_scale : float
+            Value to scale the x coordinate by.
+
+        y_scale : float
+            Value to scale the y coordinate by.
+
+        z_scale : float
+            Value to scale the z coordinate by.
+
+        x_offset : float
+            Distance to offset in x.
+
+        y_offset : float
+            Distance to offset in y.
+
+        z_offset : float
+            Distance to offset in z.
+
+        integer : bool
+            Whether to round xyz position to nearest integer.
+        """
         transformed_coords = self._transform(
             x_scale, y_scale, z_scale, x_offset, y_offset, z_offset, integer
         )
@@ -123,6 +197,15 @@ class Cell:
         z_offset: float = 0,
         integer: bool = False,
     ) -> None:
+        """
+        Scale and/or offset the cell position. New values will be saved into
+        .transformed_x, .transformed_y and .transformed_z. Original .x, .y and
+        .z will remain unchanged.
+
+        See Also
+        --------
+        Cell.transform : For description of parameters.
+        """
         transformed_coords = self._transform(
             x_scale, y_scale, z_scale, x_offset, y_offset, z_offset, integer
         )
@@ -133,12 +216,17 @@ class Cell:
         ) = transformed_coords
 
     def flip_x_y(self) -> None:
+        """Swap the x and y coordinate"""
         self.y, self.x = self.x, self.y
 
     def is_cell(self) -> bool:
         return self.type == Cell.CELL
 
     def to_xml_element(self) -> EtElement:
+        """
+        Create an xml element representing the cell, including its xyz
+        coordinate.
+        """
         sub_elements = [EtElement("Marker{}".format(axis)) for axis in "XYZ"]
         coords = [int(coord) for coord in (self.x, self.y, self.z)]
         for sub_element, coord in zip(sub_elements, coords):
@@ -155,6 +243,7 @@ class Cell:
         return element
 
     def __eq__(self, other: Any) -> bool:
+        """Return true if position and type of the cells are equal"""
         if not isinstance(other, self.__class__):
             return False
         return (self.x, self.y, self.z, self.type) == (
@@ -208,6 +297,21 @@ class Cell:
 
 
 class UntypedCell(Cell):
+    """
+    A class representing a cell with no type.
+
+    Parameters
+    ----------
+    pos : str or ElementTree.Element or Dict[str, float] or List of float
+        Cell position (x, y, z). Input can be a filename containing the x/y/z
+        position, an xml marker element, a dictionary with keys "x", "y" and
+        "z", or a list of the positions [x, y, z].
+
+    See Also
+    --------
+    Cell : For description of attributes.
+    """
+
     def __init__(
         self,
         pos: Union[str, ElementTree.Element, Dict[str, float], List[float]],
@@ -231,10 +335,12 @@ class UntypedCell(Cell):
 
 
 def pos_from_dict(position_dict: Dict[str, float]) -> List[float]:
+    """Return [x, y, z] position from dictionary with keys of x, y and z"""
     return [position_dict["x"], position_dict["y"], position_dict["z"]]
 
 
 def pos_from_xml_marker(element: ElementTree.Element) -> List[float]:
+    """Return [x, y, z] position from xml marker"""
     marker_names = ["Marker{}".format(axis) for axis in "XYZ"]
     markers = [element.find(marker_name) for marker_name in marker_names]
     pos = [marker.text for marker in markers if marker is not None]
@@ -242,6 +348,8 @@ def pos_from_xml_marker(element: ElementTree.Element) -> List[float]:
 
 
 def pos_from_file_name(file_name: str) -> List[float]:
+    """Return [x, y, z] position from filename. For example,
+    'pCellz10y522x392Ch0.tif' would return [392, 522, 10]"""
     x = re.findall(r"x\d+", file_name.lower())
     y = re.findall(r"y\d+", file_name.lower())
     z = re.findall(r"z\d+", file_name.lower())
@@ -255,7 +363,7 @@ def group_cells_by_z(cells: List[Cell]) -> DefaultDict[float, List[Cell]]:
     Parameters
     ----------
     cells : List of Cell
-        List of cells from cellfinder.cells.cells.Cell
+        List of cells from brainglobe_utils.cells.cells.Cell
 
     Returns
     -------
@@ -270,4 +378,6 @@ def group_cells_by_z(cells: List[Cell]) -> DefaultDict[float, List[Cell]]:
 
 
 class MissingCellsError(Exception):
+    """Custom exception class for when no cells are found in a file"""
+
     pass
