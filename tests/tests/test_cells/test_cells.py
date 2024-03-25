@@ -55,7 +55,7 @@ def test_group_cells_by_z(
     xml_path, z_planes_validate, cell_numbers_in_groups_validate
 ):
     """
-    Test that a list of cells can be grouped by z plane
+    Regression test that a list of cells can be grouped by z plane
     """
     cell_list = get_cells(xml_path)
     cells_groups = cells.group_cells_by_z(cell_list)
@@ -67,7 +67,7 @@ def test_group_cells_by_z(
     cell_numbers_in_groups_test = [
         len(cells_groups[plane]) for plane in z_planes_test
     ]
-    assert cell_numbers_in_groups_validate == cell_numbers_in_groups_test
+    assert  cell_numbers_in_groups_test == cell_numbers_in_groups_validate
 
 
 @pytest.mark.parametrize(
@@ -117,13 +117,13 @@ def test_cell_transform(
     start_position = [1, 1, 1]
     cell = cells.Cell(start_position, cells.Cell.CELL)
 
-    assert start_position == [cell.x, cell.y, cell.z]
+    assert [cell.x, cell.y, cell.z] == start_position
 
     cell.transform(
         x_scale, y_scale, z_scale, x_offset, y_offset, z_offset, integer
     )
 
-    assert expected == [cell.x, cell.y, cell.z]
+    assert  [cell.x, cell.y, cell.z] == expected
 
 
 @pytest.mark.parametrize(
@@ -168,7 +168,7 @@ def test_cell_flip_xy():
     """
     start_position = [1, 2, 3]
     cell = cells.Cell(start_position, cells.Cell.CELL)
-    assert start_position == [cell.x, cell.y, cell.z]
+    assert [cell.x, cell.y, cell.z] == start_position
 
     cell.flip_x_y()
     assert cell.x == start_position[1]
