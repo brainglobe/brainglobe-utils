@@ -62,7 +62,7 @@ def test_group_cells_by_z(
     z_planes_test = list(cells_groups.keys())
     z_planes_test.sort()
 
-    assert z_planes_validate == z_planes_test
+    assert z_planes_test == z_planes_validate
 
     cell_numbers_in_groups_test = [
         len(cells_groups[plane]) for plane in z_planes_test
@@ -148,18 +148,18 @@ def test_cell_soft_transform(
     start_position = [1, 1, 1]
     cell = cells.Cell(start_position, cells.Cell.CELL)
 
-    assert start_position == [cell.x, cell.y, cell.z]
+    assert [cell.x, cell.y, cell.z] == start_position
 
     cell.soft_transform(
         x_scale, y_scale, z_scale, x_offset, y_offset, z_offset, integer
     )
 
-    assert expected == [
+    assert [
         cell.transformed_x,
         cell.transformed_y,
         cell.transformed_z,
-    ]
-    assert start_position == [cell.x, cell.y, cell.z]
+    ] == expected
+    assert [cell.x, cell.y, cell.z] == start_position
 
 
 def test_cell_flip_xy():

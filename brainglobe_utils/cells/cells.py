@@ -29,7 +29,8 @@ class Cell:
         Cell type represented by an integer: 1 for unknown/no cell,
         2 for cell, -1 for artifact. The usual way to set this is to use:
         Cell.ARTIFACT, Cell.CELL, Cell.UNKNOWN, or Cell.NO_CELL as input.
-        You can also pass "cell" or "no_cell", as well as None.
+        You can also pass "cell" or "no_cell", as well as None (which will
+        map to Cell.UNKNOWN).
 
     Attributes
     ----------
