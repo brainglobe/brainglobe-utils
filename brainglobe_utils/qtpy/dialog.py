@@ -17,7 +17,7 @@ def display_warning(widget: QWidget, title: str, message: str) -> bool:
         return False
 
 
-def display_info(widget, title, message):
+def display_info(widget: QWidget, title: str, message: str):
     """
     Display information in a pop-up that can only be accepted
     """
