@@ -46,8 +46,16 @@ def add_button(
 
 
 def add_checkbox(
-    layout, default, label, row: int = 0, column: int = 0, tooltip=None
-):
+    layout: QLayout,
+    default: bool,
+    label: str,
+    row: int = 0,
+    column: int = 0,
+    tooltip: Optional[str] = None,
+) -> QCheckBox:
+    """
+    Add a checkbox to *layout*.
+    """
     box = QCheckBox()
     box.setChecked(default)
     if tooltip:
@@ -58,16 +66,19 @@ def add_checkbox(
 
 
 def add_float_box(
-    layout,
-    default,
-    minimum,
-    maximum,
-    label,
-    step,
+    layout: QLayout,
+    default: float,
+    minimum: float,
+    maximum: float,
+    label: str,
+    step: float,
     row: int = 0,
     column: int = 0,
-    tooltip=None,
-):
+    tooltip: Optional[str] = None,
+) -> QDoubleSpinBox:
+    """
+    Add a spin box for float values to *layout*.
+    """
     box = QDoubleSpinBox()
     box.setMinimum(minimum)
     box.setMaximum(maximum)
@@ -81,15 +92,18 @@ def add_float_box(
 
 
 def add_int_box(
-    layout,
-    default,
-    minimum,
-    maximum,
-    label,
+    layout: QLayout,
+    default: int,
+    minimum: int,
+    maximum: int,
+    label: str,
     row: int = 0,
     column: int = 0,
-    tooltip=None,
-):
+    tooltip: Optional[str] = None,
+) -> QSpinBox:
+    """
+    Add a spin box for integer values to *layout*.
+    """
     box = QSpinBox()
     box.setMinimum(minimum)
     box.setMaximum(maximum)
