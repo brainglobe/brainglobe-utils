@@ -123,7 +123,7 @@ def add_combobox(
     row: int = 0,
     column: int = 0,
     label_stack: bool = False,
-    callback=None,
+    callback: Optional[Callable] = None,
     width: int = 150,
 ) -> Tuple[QComboBox, Optional[QLabel]]:
     """
