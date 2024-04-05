@@ -26,7 +26,8 @@ def box() -> QGroupBox:
 @pytest.mark.parametrize("label", ["A label", None])
 def test_add_combobox(qtbot, box, label, label_stack):
     """
-    Smoke test for add_combobox for all conditional branches
+    Smoke test for add_combobox. Tests if a combobox can be added to a layout
+    with/without a label, and with/without label_stack.
     """
     qtbot.addWidget(box)
     layout = box.layout()
@@ -60,7 +61,8 @@ def test_add_combobox(qtbot, box, label, label_stack):
 @pytest.mark.parametrize("alignment", ["center", "left", "right"])
 def test_add_button(qtbot, box, alignment):
     """
-    Smoke tests for add_button for all conditional branches
+    Smoke test for add_button. Tests if a button can be added to a layout with
+    the correct label/tooltip using different alignments.
     """
     qtbot.addWidget(box)
     layout = box.layout()
@@ -84,7 +86,8 @@ def test_add_button(qtbot, box, alignment):
 
 def test_add_checkbox(qtbot, box):
     """
-    Smoke tests for add_checkbox for all conditional branches
+    Smoke test for add_checkbox. Tests if a checkbox can be added to a layout
+    with the correct label/tooltip.
     """
     qtbot.addWidget(box)
     layout = box.layout()
@@ -104,7 +107,8 @@ def test_add_checkbox(qtbot, box):
 
 def test_add_float_box(qtbot, box):
     """
-    Smoke tests for add_float_box for all conditional branches
+    Smoke test for add_float_box. Tests if a float spinbox can be added to a
+    layout with the correct label, tooltip, minimum, maximum and default value.
     """
     qtbot.addWidget(box)
     layout = box.layout()
@@ -136,7 +140,8 @@ def test_add_float_box(qtbot, box):
 
 def test_add_int_box(qtbot, box):
     """
-    Smoke tests for add_float_box for all conditional branches
+    Smoke test for add_int_box. Tests if an int spinbox can be added to a
+    layout with the correct label, tooltip, minimum, maximum and default value.
     """
     qtbot.addWidget(box)
     layout = box.layout()
