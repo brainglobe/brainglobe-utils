@@ -2,11 +2,13 @@ def marching_cubes_to_obj(marching_cubes_out, output_file):
     """
     Saves the output of skimage.measure.marching_cubes as an .obj file
 
-    :param marching_cubes_out: tuple
-    :param output_file: str
-
+    Parameters
+    ----------
+    marching_cubes_out : tuple of np.ndarray
+        Output from skimage.measure.marching_cubes.
+    output_file : str or pathlib.Path
+        Path of .obj file to write output into.
     """
-
     verts, faces, normals, _ = marching_cubes_out
     with open(output_file, "w") as f:
         for item in verts:
