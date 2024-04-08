@@ -1,10 +1,11 @@
+import os
 from pathlib import Path
 
 import pandas as pd
 import pytest
 from natsort import natsorted
 
-from brainglobe_utils.cells.cells import Cell
+from brainglobe_utils.cells.cells import Cell, UntypedCell
 from brainglobe_utils.IO import cells as cell_io
 
 
@@ -224,3 +225,31 @@ def test_cells_to_csv(tmp_path, xml_path, x_vals, y_vals, z_vals, type_vals):
     cell_io.cells_to_csv(cells, tmp_cells_out_path)
     cells_df = pd.read_csv(tmp_cells_out_path)
     assert_cells_df(cells_df, x_vals, y_vals, z_vals, type_vals)
+
+
+@pytest.mark.parametrize(
+    "cell_def_path", ["", "cells.xml"], ids=["directory", "xml"]
+)
+def test_find_relevant_tiffs(data_path, tmp_path, cell_def_path):
+    """
+    Test that tiff paths can be selected that match cells from an xml file
+    or directory.
+    """
+    tiff_dir = data_path / "cube_extract" / "cubes"
+
+    # Write a cell_def xml file or directory that only contains 2 of the
+    # cells from tiff_dir
+    cell_def_path = tmp_path / cell_def_path
+    chosen_tiffs = os.listdir(tiff_dir)[0:2]
+    cells = [UntypedCell(tiff) for tiff in chosen_tiffs]
+    if cell_def_path.suffix == ".xml":
+        cell_io.cells_to_xml(cells, cell_def_path)
+    else:
+        for cell in cells:
+            cell_path = cell_def_path / f"x{cell.x}_y{cell.y}_z{cell.z}.tif"
+            cell_path.touch()
+
+    selected = cell_io.find_relevant_tiffs(
+        os.listdir(tiff_dir), str(cell_def_path)
+    )
+    assert natsorted(selected) == natsorted(chosen_tiffs)

@@ -359,7 +359,7 @@ def pretty_xml(elem, indentation_str="  "):
 
 def find_relevant_tiffs(tiffs, cell_def):
     """
-    Find tiffs that match those in cell_def
+    Find tiffs that match those in cell_def.
 
     Parameters
     ----------
