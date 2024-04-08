@@ -36,9 +36,9 @@ def get_cells(
     Parameters
     ----------
     cells_file_path : str
-        Path of cells file to read. Can be .xml, .yml, or a directory.
+        Path to cells file to read. Can be .xml, .yml, or a directory.
     cells_only : bool, optional
-        Only relevant for .xml files. If True, it will only include Cells with
+        Only relevant for .xml files. If True, will only read Cells with
         type Cell.CELL i.e. exclude all Cell.ARTIFACT, Cell.UNKNOWN, and
         Cell.NO_CELL.
     cell_type : int, optional
@@ -95,9 +95,9 @@ def get_cells_xml(xml_file_path, cells_only=False):
     Parameters
     ----------
     xml_file_path : str or pathlib.Path
-        Path of xml file to read from.
+        Path to xml file to read from.
     cells_only : bool, optional
-        Whether to only include Cells with type Cell.CELL i.e. exclude all
+        Whether to only read Cells with type Cell.CELL i.e. exclude all
         Cell.ARTIFACT, Cell.UNKNOWN, and Cell.NO_CELL.
 
     Returns
@@ -128,7 +128,7 @@ def get_cells_yml(cells_file_path, ignore_type=False, marker="markers"):
     Parameters
     ----------
     cells_file_path : str or pathlib.Path
-        Path of yml file to read from.
+        Path to yml file to read from.
     ignore_type : bool, optional
         Whether to ignore the type of cells - all will be assigned type
         Cell.UNKNOWN. Currently only True is supported.
@@ -166,7 +166,7 @@ def get_cells_dir(cells_file_path, cell_type=None):
     Parameters
     ----------
     cells_file_path : str or pathlib.Path
-        Path of directory containing Cells. Each file in the directory will
+        Path to directory containing Cells. Each file in the directory will
         create one Cell, based on its filename. This filename must contain the
         cell's x, y and z position E.g. 'Cell_z358_y564_x4056'
     cell_type : int or str or None, optional
@@ -233,7 +233,7 @@ def cells_to_xml(
     cells, xml_file_path, indentation_str="  ", artifact_keep=True
 ):
     """
-    Save cells to xml file.
+    Save cells to an xml file.
 
     Parameters
     ----------
@@ -265,7 +265,6 @@ def cells_to_dataframe(cells: List[Cell]) -> pd.DataFrame:
 
 def cells_to_csv(cells: List[Cell], csv_file_path: Union[str, pathlib.Path]):
     """Save cells to csv file"""
-
     df = cells_to_dataframe(cells)
     df.to_csv(csv_file_path)
 
@@ -359,7 +358,7 @@ def pretty_xml(elem, indentation_str="  "):
 
 def find_relevant_tiffs(tiffs, cell_def):
     """
-    Find tiffs that match those in cell_def.
+    Find tiffs that match those read from cell_def.
 
     Parameters
     ----------
@@ -367,13 +366,16 @@ def find_relevant_tiffs(tiffs, cell_def):
         List of paths to tiff files. Each tiff filename must contain the cell's
         x, y and z position.
     cell_def : str
-        Path of cells file to read. Can be .xml, .yml, or a directory.
+        Path to cells to read. Can be an .xml file, .yml file, or a directory.
+        If a directory is passed, each file in the directory will
+        create one Cell, based on its filename. Each filename must contain the
+        cell's x, y and z position.
 
     Returns
     -------
     list of str
-        List of paths to tiff files, only including those that match cells
-        within cell_def.
+        Filtered list of paths to tiff files, only including those that match
+        cells read from cell_def.
     """
     cells = [UntypedCell(tiff) for tiff in tiffs]
     if os.path.isdir(cell_def):
