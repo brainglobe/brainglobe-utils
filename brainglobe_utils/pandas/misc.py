@@ -4,18 +4,34 @@ import pandas as pd
 
 def initialise_df(*column_names):
     """
-    Initialise a pandasdataframe with n column names
-    :param str column_names: N column names
-    :return: Empty pandas dataframe with specified column names
+    Initialise a pandas dataframe with n column names.
+
+    Parameters
+    ----------
+    *column_names : str
+        N column names
+
+    Returns
+    -------
+    pd.DataFrame
+        Empty pandas dataframe with specified column names
     """
     return pd.DataFrame(columns=column_names)
 
 
 def sanitise_df(df):
     """
-    Replaces infinite values in a dataframe with NaN
-    :param df: Any dataframe
-    :return: Dataframe with Inf replaced with NaN
+    Replaces infinite values in a dataframe with NaN.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Any dataframe
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe with Inf replaced with NaN.
     """
     df = df.replace(np.inf, np.nan)
     return df
@@ -25,14 +41,24 @@ def safe_pandas_concat(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     """
     Concatenate two DataFrames without relying on deprecated functionality
     when one of the DataFrames is empty.
+
     If df1 and df2 are non-empty, return the concatenation.
     If df1 is empty and df2 is not, return a copy of df2.
     If df1 is non-empty and df2 is, return a copy of df1.
     If df1 and df2 are empty, return an empty DataFrame with the same column
     names as df1.
-    :param df1: DataFrame to concatenate.
-    :param df2: DataFrame to concatenate.
-    :returns: DataFrame formed from concatenation of df1 and df2.
+
+    Parameters
+    ----------
+    df1 : pd.DataFrame
+        DataFrame to concatenate.
+    df2 : pd.DataFrame
+        DataFrame to concatenate.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame formed from concatenation of df1 and df2.
     """
     if df1.empty and df2.empty:
         return pd.DataFrame(columns=df1.columns)
