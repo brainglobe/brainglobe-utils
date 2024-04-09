@@ -31,12 +31,11 @@ def test_transform_points_from_downsampled_to_atlas_space(
     * check that deformation field of ones maps to 1,1,1*resolution
     * check that too small deformation field maps points to out-of-bounds
 
-    Args:
-        mocker: The mocker object used to patch the reading of deformation
-                field tiffs.
-
-    Returns:
-        None
+    Parameters
+    ----------
+    mocker : pytest_mock.plugin.MockerFixture
+        The mocker object used to patch the reading of deformation
+        field tiffs.
     """
     mocker.patch(
         "brainglobe_utils.brainreg.transform.tifffile.imread",
