@@ -42,7 +42,7 @@ def safe_pandas_concat(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     Concatenate two DataFrames without relying on deprecated functionality
     when one of the DataFrames is empty.
 
-    If df1 and df2 are non-empty, return the concatenation.
+    If df1 and df2 are non-empty, return the concatenation. df2 will extend df1 in the resulting DataFrame.
     If df1 is empty and df2 is not, return a copy of df2.
     If df1 is non-empty and df2 is, return a copy of df1.
     If df1 and df2 are empty, return an empty DataFrame with the same column
