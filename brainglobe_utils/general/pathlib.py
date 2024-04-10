@@ -1,4 +1,10 @@
-def append_to_pathlib_stem(path, string_to_append):
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+
+def append_to_pathlib_stem(path: "Path", string_to_append):
     """
     Appends a string to the stem of a pathlib object.
 
