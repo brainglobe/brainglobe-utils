@@ -1,7 +1,14 @@
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
+
 import yaml
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-def read_yaml_section(yaml_file, section):
+
+def read_yaml_section(
+    yaml_file: Union[str, "Path"], section: str
+) -> Dict[str, Any]:
     """
     Read section from yaml file.
 
@@ -21,7 +28,7 @@ def read_yaml_section(yaml_file, section):
     return contents
 
 
-def open_yaml(yaml_file):
+def open_yaml(yaml_file: Union[str, "Path"]) -> Dict[str, Any]:
     """
     Read the contents of a yaml file.
 
@@ -40,7 +47,11 @@ def open_yaml(yaml_file):
     return yaml_contents
 
 
-def save_yaml(yaml_contents, output_file, default_flow_style=False):
+def save_yaml(
+    yaml_contents: Dict[str, Any],
+    output_file: Union[str, "Path"],
+    default_flow_style: Optional[bool] = False,
+):
     """
     Save contents to a yaml file.
 
