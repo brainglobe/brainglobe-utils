@@ -703,7 +703,8 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
         if set(axes) != {"x", "y", "z"}:
             raise ValueError(
                 f"Attempted to load {file_path} but didn't find a xyz-stack. "
-                f"Found {axes} axes with shape {shape}")
+                f"Found {axes} axes with shape {shape}"
+            )
 
         image_shape = {name: shape[i] for name, i in indices.items()}
         return image_shape
