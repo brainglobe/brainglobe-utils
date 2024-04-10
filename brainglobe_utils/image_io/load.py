@@ -665,14 +665,15 @@ def load_from_paths_sequence(
 
 def get_size_image_from_file_paths(file_path, file_extension="tif"):
     """
-    Returns the size of an image (which is a list of 2D tiff files),
-    without loading the whole image.
+    Returns the size of an image (which is a list of 2D tiff files or a
+    single-file tif stack), without loading the whole image.
 
     Parameters
     ----------
     file_path : str or pathlib.Path
-        Filepath of text file containing paths of all 2D files, or
-        filepath of a directory containing all 2D files.
+        Filepath of text file containing paths of all 2D files, a
+        filepath of a directory containing all 2D files, or a single
+        tiff file z-stack.
 
     file_extension : str, optional
         Optional file extension (if a directory is passed).
@@ -683,6 +684,29 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
         Dict of image sizes.
     """
     file_path = Path(file_path)
+    if file_path.name.endswith(".tif") or file_path.name.endswith(".tiff"):
+        # read just the metadata
+        tiff = tifffile.TiffFile(file_path)
+        if not len(tiff.series):
+            raise ValueError(
+                f"Attempted to load {file_path} but couldn't read a z-stack"
+            )
+        if len(tiff.series) != 1:
+            raise ValueError(
+                f"Attempted to load {file_path} but found multiple stacks"
+            )
+
+        shape = tiff.series[0].shape
+        axes = tiff.series[0].axes.lower()
+        # axes is e.g. "ZXY"
+        indices = {ax: i for i, ax in enumerate(axes)}
+        if set(axes) != {"x", "y", "z"}:
+            raise ValueError(
+                f"Attempted to load {file_path} but didn't find a xyz-stack. "
+                f"Found {axes} axes with shape {shape}")
+
+        image_shape = {name: shape[i] for name, i in indices.items()}
+        return image_shape
 
     img_paths = get_sorted_file_paths(file_path, file_extension=file_extension)
     z_shape = len(img_paths)
