@@ -88,7 +88,9 @@ def raise_cell_read_error(cells_file_path):
     )
 
 
-def get_cells_xml(xml_file_path: Union[str, Path], cells_only: Optional[bool] = False):
+def get_cells_xml(
+    xml_file_path: Union[str, Path], cells_only: Optional[bool] = False
+):
     """
     Read cells from an xml file.
 
@@ -162,7 +164,9 @@ def get_cells_yml(
     return cells
 
 
-def get_cells_dir(cells_file_path: Union[str, Path], cell_type: Optional[bool] = None):
+def get_cells_dir(
+    cells_file_path: Union[str, Path], cell_type: Optional[bool] = None
+):
     """
     Read cells from a directory. Cells will be created based on the filenames
     of files in the directory, one cell per file.
