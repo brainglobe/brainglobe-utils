@@ -1,9 +1,7 @@
-from typing import TYPE_CHECKING, Tuple, Union
+from pathlib import Path
+from typing import Tuple, Union
 
-if TYPE_CHECKING:
-    from pathlib import Path
-
-    from numpy.typing import NDArray
+from numpy.typing import NDArray
 
 
 def marching_cubes_to_obj(

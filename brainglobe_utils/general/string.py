@@ -1,11 +1,9 @@
-from typing import TYPE_CHECKING, Optional
+from pathlib import Path
+from typing import Optional
 
 from natsort import natsorted
 
 from brainglobe_utils.general import list
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 def get_text_lines(

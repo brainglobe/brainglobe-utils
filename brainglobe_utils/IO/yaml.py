@@ -1,14 +1,10 @@
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union
+from pathlib import Path
+from typing import Any, Dict, Optional, Union
 
 import yaml
 
-if TYPE_CHECKING:
-    from pathlib import Path
 
-
-def read_yaml_section(
-    yaml_file: Union[str, "Path"], section: str
-) -> Dict[str, Any]:
+def read_yaml_section(yaml_file: Union[str, "Path"], section: str) -> Any:
     """
     Read section from yaml file.
 
