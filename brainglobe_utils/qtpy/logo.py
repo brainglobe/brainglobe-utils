@@ -1,4 +1,5 @@
 from importlib.resources import files
+from typing import Optional
 
 from qtpy.QtWidgets import QGroupBox, QHBoxLayout, QLabel, QWidget
 
@@ -6,12 +7,12 @@ from qtpy.QtWidgets import QGroupBox, QHBoxLayout, QLabel, QWidget
 def _docs_links_widget(
     package_name: str,
     package_tagline: str,
-    tutorial_file_name: str = None,
-    documentation_path: str = None,
-    citation_doi: str = None,
-    github_repo_name: str = None,
-    help_text: str = None,
-    parent: QWidget = None,
+    tutorial_file_name: Optional[str] = None,
+    documentation_path: Optional[str] = None,
+    citation_doi: Optional[str] = None,
+    github_repo_name: Optional[str] = None,
+    help_text: Optional[str] = None,
+    parent: Optional[QWidget] = None,
 ):
     lines = [
         "<h3>",
@@ -55,7 +56,7 @@ def _docs_links_widget(
     return docs_links_widget
 
 
-def _logo_widget(package_name: str, parent: QWidget = None):
+def _logo_widget(package_name: str, parent: Optional[QWidget] = None):
     brainglobe_logo = files("brainglobe_utils").joinpath("qtpy/brainglobe.png")
 
     _logo_html = f"""
@@ -71,12 +72,12 @@ def _logo_widget(package_name: str, parent: QWidget = None):
 def header_widget(
     package_name: str,
     package_tagline: str,
-    tutorial_file_name: str = None,
-    documentation_path: str = None,
-    citation_doi: str = None,
-    github_repo_name: str = None,
-    help_text: str = None,
-    parent: QWidget = None,
+    tutorial_file_name: Optional[str] = None,
+    documentation_path: Optional[str] = None,
+    citation_doi: Optional[str] = None,
+    github_repo_name: Optional[str] = None,
+    help_text: Optional[str] = None,
+    parent: Optional[QWidget] = None,
 ) -> QGroupBox:
     """
     Render HTML in a QGroupBox with a BrainGlobe logo and links to the docs
@@ -92,7 +93,8 @@ def header_widget(
         The name of the tutorial file (must include .html),
          e.g. "brainrender-qtpy.html"
     documentation_path : str, optional
-        The relative path of a documentation file (must include .html),
+        Path of documentation file relative to
+        https://brainglobe.info/documentation/ (must include .html),
         e.g. "cellfinder/user-guide/napari-plugin/index.html"
     citation_doi : str, optional
         Doi of citation e.g. "https://doi.org/10.1371/journal.pcbi.1009074"
@@ -103,7 +105,7 @@ def header_widget(
     help_text : str, optional
         Help text to display at the bottom or the header e.g.
         "For help, hover the cursor over each parameter."
-    parent : QWidget
+    parent : QWidget, optional
         The parent widget, defaults to None
 
     Returns
