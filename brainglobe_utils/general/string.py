@@ -7,7 +7,7 @@ from brainglobe_utils.general import list
 
 
 def get_text_lines(
-    file: "Path",
+    file: Path,
     return_lines: Optional[int] = None,
     rstrip: Optional[bool] = True,
     sort: Optional[bool] = False,

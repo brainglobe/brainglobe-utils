@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 
 
 def marching_cubes_to_obj(
-    marching_cubes_out: Tuple["NDArray"], output_file: Union[str, "Path"]
+    marching_cubes_out: Tuple[NDArray], output_file: Union[str, Path]
 ):
     """
     Saves the output of skimage.measure.marching_cubes as an .obj file

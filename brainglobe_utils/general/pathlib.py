@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-def append_to_pathlib_stem(path: "Path", string_to_append: str):
+def append_to_pathlib_stem(path: Path, string_to_append: str):
     """
     Appends a string to the stem of a pathlib object.
 

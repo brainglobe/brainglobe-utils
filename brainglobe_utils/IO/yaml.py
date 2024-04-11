@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Union
 import yaml
 
 
-def read_yaml_section(yaml_file: Union[str, "Path"], section: str) -> Any:
+def read_yaml_section(yaml_file: Union[str, Path], section: str) -> Any:
     """
     Read section from yaml file.
 
@@ -24,7 +24,7 @@ def read_yaml_section(yaml_file: Union[str, "Path"], section: str) -> Any:
     return contents
 
 
-def open_yaml(yaml_file: Union[str, "Path"]) -> Dict[str, Any]:
+def open_yaml(yaml_file: Union[str, Path]) -> Dict[str, Any]:
     """
     Read the contents of a yaml file.
 
@@ -45,7 +45,7 @@ def open_yaml(yaml_file: Union[str, "Path"]) -> Dict[str, Any]:
 
 def save_yaml(
     yaml_contents: Dict[str, Any],
-    output_file: Union[str, "Path"],
+    output_file: Union[str, Path],
     default_flow_style: Optional[bool] = False,
 ):
     """
