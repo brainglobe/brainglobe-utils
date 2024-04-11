@@ -7,7 +7,7 @@ Christian Niedworok (https://github.com/cniedwor).
 
 import logging
 import os
-import pathlib
+from pathlib import Path
 from typing import List, Optional, Union
 from xml.dom import minidom
 from xml.etree import ElementTree
@@ -88,7 +88,9 @@ def raise_cell_read_error(cells_file_path):
     )
 
 
-def get_cells_xml(xml_file_path, cells_only=False):
+def get_cells_xml(
+    xml_file_path: Union[str, Path], cells_only: Optional[bool] = False
+):
     """
     Read cells from an xml file.
 
@@ -121,7 +123,11 @@ def get_cells_xml(xml_file_path, cells_only=False):
     return cells
 
 
-def get_cells_yml(cells_file_path, ignore_type=False, marker="markers"):
+def get_cells_yml(
+    cells_file_path: Union[str, Path],
+    ignore_type: Optional[bool] = False,
+    marker: Optional[str] = "markers",
+):
     """
     Read cells from a yml file.
 
@@ -158,7 +164,9 @@ def get_cells_yml(cells_file_path, ignore_type=False, marker="markers"):
     return cells
 
 
-def get_cells_dir(cells_file_path, cell_type=None):
+def get_cells_dir(
+    cells_file_path: Union[str, Path], cell_type: Optional[bool] = None
+):
     """
     Read cells from a directory. Cells will be created based on the filenames
     of files in the directory, one cell per file.
@@ -230,7 +238,10 @@ def save_cells(
 
 
 def cells_to_xml(
-    cells, xml_file_path, indentation_str="  ", artifact_keep=True
+    cells: List[Cell],
+    xml_file_path: Union[str, Path],
+    indentation_str: Optional[str] = "  ",
+    artifact_keep: Optional[bool] = True,
 ):
     """
     Save cells to an xml file.
@@ -263,7 +274,7 @@ def cells_to_dataframe(cells: List[Cell]) -> pd.DataFrame:
     return pd.DataFrame([c.to_dict() for c in cells])
 
 
-def cells_to_csv(cells: List[Cell], csv_file_path: Union[str, pathlib.Path]):
+def cells_to_csv(cells: List[Cell], csv_file_path: Union[str, Path]):
     """Save cells to csv file"""
     df = cells_to_dataframe(cells)
     df.to_csv(csv_file_path)

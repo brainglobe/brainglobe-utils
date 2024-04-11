@@ -1,15 +1,18 @@
+from pathlib import Path
+from typing import Optional
+
 from natsort import natsorted
 
 from brainglobe_utils.general import list
 
 
 def get_text_lines(
-    file,
-    return_lines=None,
-    rstrip=True,
-    sort=False,
-    remove_empty_lines=True,
-    encoding="utf8",
+    file: Path,
+    return_lines: Optional[int] = None,
+    rstrip: Optional[bool] = True,
+    sort: Optional[bool] = False,
+    remove_empty_lines: Optional[bool] = True,
+    encoding: Optional[str] = "utf8",
 ):
     """
     Return only the nth line of a text file.
