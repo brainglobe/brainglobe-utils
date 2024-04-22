@@ -58,7 +58,12 @@ def to_tiff(img_volume, dest_path, photometric="minisblack"):
         Use 'minisblack' (default) for grayscale and 'rgb' for rgb
     """
     dest_path = Path(dest_path)
-    tifffile.imwrite(dest_path, img_volume, photometric=photometric)
+    tifffile.imwrite(
+        dest_path,
+        img_volume,
+        photometric=photometric,
+        metadata={"axes": "ZYX"},
+    )
 
 
 def to_tiffs(img_volume, path_prefix, path_suffix="", extension=".tif"):
