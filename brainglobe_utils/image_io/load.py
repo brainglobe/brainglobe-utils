@@ -684,7 +684,7 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
         Dict of image sizes.
     """
     file_path = Path(file_path)
-    if file_path.name.endswith(".tif") or file_path.name.endswith(".tiff"):
+    if file_path.suffix in [".tif", ".tiff"]:
         # read just the metadata
         tiff = tifffile.TiffFile(file_path)
         if not len(tiff.series):
