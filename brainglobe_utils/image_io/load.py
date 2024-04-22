@@ -686,28 +686,27 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
     file_path = Path(file_path)
     if file_path.suffix in [".tif", ".tiff"]:
         # read just the metadata
-        tiff = tifffile.TiffFile(file_path)
-        if not len(tiff.series):
-            raise ValueError(
-                f"Attempted to load {file_path} but couldn't read a z-stack"
-            )
-        if len(tiff.series) != 1:
-            raise ValueError(
-                f"Attempted to load {file_path} but found multiple stacks"
-            )
+        with tifffile.TiffFile(file_path) as tiff:
+            if not len(tiff.series):
+                raise ValueError(
+                    f"Attempted to load {file_path} but didn't find a z-stack"
+                )
+            if len(tiff.series) != 1:
+                raise ValueError(
+                    f"Attempted to load {file_path} but found multiple stacks"
+                )
 
-        shape = tiff.series[0].shape
-        axes = tiff.series[0].axes.lower()
-        # axes is e.g. "ZXY"
-        indices = {ax: i for i, ax in enumerate(axes)}
-        if set(axes) != {"x", "y", "z"}:
-            raise ValueError(
-                f"Attempted to load {file_path} but didn't find a xyz-stack. "
-                f"Found {axes} axes with shape {shape}"
-            )
+            shape = tiff.series[0].shape
+            axes = tiff.series[0].axes.lower()
+            # axes is e.g. "zxy"
+            if set(axes) != {"x", "y", "z"}:
+                raise ValueError(
+                    f"Attempted to load {file_path} but didn't find a "
+                    f"xyz-stack. Found {axes} axes with shape {shape}"
+                )
 
-        image_shape = {name: shape[i] for name, i in indices.items()}
-        return image_shape
+            image_shape = {ax: n for ax, n in zip(axes, shape)}
+            return image_shape
 
     img_paths = get_sorted_file_paths(file_path, file_extension=file_extension)
     z_shape = len(img_paths)
