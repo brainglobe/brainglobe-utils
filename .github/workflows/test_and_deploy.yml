@@ -33,7 +33,9 @@ jobs:
         os: [ubuntu-latest]
         # Include one windows and macos run
         include:
-        - os: macos-latest
+        - os: macos-13 # Intel Mac
+          python-version: "3.11"
+        - os: macos-latest # ARM Mac
           python-version: "3.11"
         - os: windows-latest
           python-version: "3.11"
@@ -43,7 +45,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-
       # these libraries enable testing on Qt on linux
       - uses: pyvista/setup-headless-display-action@v2
         with:
