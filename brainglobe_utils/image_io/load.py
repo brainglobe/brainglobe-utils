@@ -698,15 +698,28 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
 
             shape = tiff.series[0].shape
             axes = tiff.series[0].axes.lower()
-            # axes is e.g. "zxy"
-            if set(axes) != {"x", "y", "z"}:
+
+            if len(shape) != 3:
                 raise ValueError(
                     f"Attempted to load {file_path} but didn't find a "
-                    f"xyz-stack. Found {axes} axes with shape {shape}"
+                    f"3-dimensional stack. Found {axes} axes "
+                    f"with shape {shape}"
                 )
-
-            image_shape = {ax: n for ax, n in zip(axes, shape)}
-            return image_shape
+            # axes is e.g. "zxy"
+            if set(axes) == {"x", "y", "z"}:
+                image_shape = {ax: n for ax, n in zip(axes, shape)}
+                return image_shape
+            else:  # metadata does not specify axes as expected,
+                logging.debug(
+                    f"Axis metadata is {axes}, "
+                    "which is not the expected set of x,y,z in any order. "
+                    "Assume z,y,x"
+                )
+                image_shape = {
+                    ax: n
+                    for ax, n in zip(["z", "y", "x"], tiff.series[0].shape)
+                }
+                return image_shape
 
     img_paths = get_sorted_file_paths(file_path, file_extension=file_extension)
     z_shape = len(img_paths)
