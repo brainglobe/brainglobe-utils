@@ -665,14 +665,15 @@ def load_from_paths_sequence(
 
 def get_size_image_from_file_paths(file_path, file_extension="tif"):
     """
-    Returns the size of an image (which is a list of 2D tiff files),
-    without loading the whole image.
+    Returns the size of an image (which is a list of 2D tiff files or a
+    single-file tif stack), without loading the whole image.
 
     Parameters
     ----------
     file_path : str or pathlib.Path
-        Filepath of text file containing paths of all 2D files, or
-        filepath of a directory containing all 2D files.
+        Filepath of text file containing paths of all 2D files, a
+        filepath of a directory containing all 2D files, or a single
+        tiff file z-stack.
 
     file_extension : str, optional
         Optional file extension (if a directory is passed).
@@ -683,6 +684,42 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
         Dict of image sizes.
     """
     file_path = Path(file_path)
+    if file_path.suffix in [".tif", ".tiff"]:
+        # read just the metadata
+        with tifffile.TiffFile(file_path) as tiff:
+            if not len(tiff.series):
+                raise ValueError(
+                    f"Attempted to load {file_path} but didn't find a z-stack"
+                )
+            if len(tiff.series) != 1:
+                raise ValueError(
+                    f"Attempted to load {file_path} but found multiple stacks"
+                )
+
+            shape = tiff.series[0].shape
+            axes = tiff.series[0].axes.lower()
+
+            if len(shape) != 3:
+                raise ValueError(
+                    f"Attempted to load {file_path} but didn't find a "
+                    f"3-dimensional stack. Found {axes} axes "
+                    f"with shape {shape}"
+                )
+            # axes is e.g. "zxy"
+            if set(axes) == {"x", "y", "z"}:
+                image_shape = {ax: n for ax, n in zip(axes, shape)}
+                return image_shape
+            else:  # metadata does not specify axes as expected,
+                logging.debug(
+                    f"Axis metadata is {axes}, "
+                    "which is not the expected set of x,y,z in any order. "
+                    "Assume z,y,x"
+                )
+                image_shape = {
+                    ax: n
+                    for ax, n in zip(["z", "y", "x"], tiff.series[0].shape)
+                }
+                return image_shape
 
     img_paths = get_sorted_file_paths(file_path, file_extension=file_extension)
     z_shape = len(img_paths)

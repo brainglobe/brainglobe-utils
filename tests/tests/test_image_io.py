@@ -350,6 +350,19 @@ def test_image_size_dir(tmp_path, array_3d):
     assert image_shape["z"] == array_3d.shape[0]
 
 
+def test_image_size_tiff_stack(tmp_path, array_3d):
+    """
+    Test that image size can be detected from a directory of 2D tiffs
+    """
+    filename = tmp_path.joinpath("image_size_tiff_stack.tif")
+    save.save_any(array_3d, filename)
+
+    image_shape = load.get_size_image_from_file_paths(filename)
+    assert image_shape["x"] == array_3d.shape[2]
+    assert image_shape["y"] == array_3d.shape[1]
+    assert image_shape["z"] == array_3d.shape[0]
+
+
 def test_image_size_txt(txt_path, array_3d):
     """
     Test that image size can be detected from a text file containing the paths
