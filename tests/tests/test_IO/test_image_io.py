@@ -22,6 +22,13 @@ def array_3d(array_2d):
 
 
 @pytest.fixture()
+def array_3D_as_2d_tiffs_path(tmp_path, array_3d, prefix="image"):
+    dest_path = tmp_path / prefix
+    save.to_tiffs(array_3d, dest_path)
+    return tmp_path
+
+
+@pytest.fixture()
 def txt_path(tmp_path, array_3d):
     """
     Return the path to a text file containing the paths of a series of 2D tiffs
@@ -76,7 +83,7 @@ def test_tiff_io(tmp_path, array_3d, use_path):
     save.to_tiff(array_3d, dest_path)
     reloaded = load.load_img_stack(dest_path, 1, 1, 1)
 
-    assert (reloaded == array_3d).all()
+    np.testing.assert_array_equal(reloaded, array_3d)
 
 
 @pytest.mark.parametrize(
@@ -103,7 +110,7 @@ def test_3d_tiff_scaling(
     assert reloaded.shape[2] == array_3d.shape[2] * x_scaling_factor
 
 
-@pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
+@pytest.mark.parametrize("use_str", [True, False], ids=["String", "Path"])
 @pytest.mark.parametrize(
     "load_parallel",
     [
@@ -111,26 +118,22 @@ def test_3d_tiff_scaling(
         pytest.param(False, id="no parallel loading"),
     ],
 )
-def test_tiff_sequence_io(tmp_path, array_3d, load_parallel, use_path):
+def test_tiff_sequence_io(
+    array_3d, array_3D_as_2d_tiffs_path, load_parallel, use_str
+):
     """
     Test that a 3D image can be written and read correctly as a sequence
     of 2D tiffs (with or without parallel loading). Tests using both
     string and pathlib.Path input.
     """
-    prefix = "image"
-    dest_path = tmp_path / prefix
-    dir_path = tmp_path
-    if not use_path:
-        dest_path = str(dest_path)
+    dir_path = array_3D_as_2d_tiffs_path
+    if use_str:
         dir_path = str(dir_path)
-
-    save.to_tiffs(array_3d, dest_path)
-    assert len(list(tmp_path.glob("*.tif"))) == array_3d.shape[0]
 
     reloaded_array = load.load_from_folder(
         dir_path, load_parallel=load_parallel
     )
-    assert (reloaded_array == array_3d).all()
+    np.testing.assert_array_equal(reloaded_array, array_3d)
 
 
 def test_2d_tiff(tmp_path, array_2d):
@@ -208,7 +211,7 @@ def test_load_img_sequence_from_txt(txt_path, array_3d, use_path):
         txt_path = str(txt_path)
 
     reloaded_array = load.load_img_sequence(txt_path)
-    assert (reloaded_array == array_3d).all()
+    np.testing.assert_array_equal(reloaded_array, array_3d)
 
 
 @pytest.mark.parametrize(
@@ -224,9 +227,9 @@ def test_sort_img_sequence_from_txt(shuffled_txt_path, array_3d, sort):
         shuffled_txt_path, 1, 1, 1, sort=sort
     )
     if sort:
-        assert (reloaded_array == array_3d).all()
+        np.testing.assert_array_equal(reloaded_array, array_3d)
     else:
-        assert not (reloaded_array == array_3d).all()
+        assert not np.array_equal(reloaded_array, array_3d)
 
 
 @pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
@@ -258,7 +261,7 @@ def test_nii_read_to_numpy(tmp_path, array_3d):
     save.save_any(array_3d, nii_path)
     reloaded_array = load.load_any(nii_path, as_numpy=True)
 
-    assert (reloaded_array == array_3d).all()
+    np.testing.assert_array_equal(reloaded_array, array_3d)
 
 
 @pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
@@ -389,3 +392,17 @@ def test_memory_error(monkeypatch):
 
     with pytest.raises(utils.ImageIOLoadException):
         utils.check_mem(8, 1000)
+
+
+def test_read_with_dask_txt(array_3D_as_2d_tiffs_path, array_3d):
+    """
+    Test that a series of images can be read correctly as a dask array
+    """
+    stack = load.read_with_dask(array_3D_as_2d_tiffs_path)
+    np.testing.assert_array_equal(stack, array_3d)
+
+
+def test_read_with_dask_glob_txt_equal(array_3D_as_2d_tiffs_path, txt_path):
+    glob_stack = load.read_with_dask(array_3D_as_2d_tiffs_path)
+    txt_stack = load.read_with_dask(txt_path)
+    np.testing.assert_array_equal(glob_stack, txt_stack)
