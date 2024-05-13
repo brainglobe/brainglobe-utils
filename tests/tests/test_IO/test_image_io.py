@@ -5,7 +5,7 @@ import numpy as np
 import psutil
 import pytest
 
-from brainglobe_utils.image_io import load, save, utils
+from brainglobe_utils.IO.image import load, save, utils
 
 
 @pytest.fixture()

@@ -15,7 +15,7 @@ from brainglobe_utils.general.system import (
     get_num_processes,
     get_sorted_file_paths,
 )
-from brainglobe_utils.image_io.utils import ImageIOLoadException
+from brainglobe_utils.IO.image.utils import ImageIOLoadException
 
 from .utils import check_mem, scale_z
 
@@ -90,11 +90,11 @@ def load_any(
     Raises
     ------
     ImageIOLoadException
-        If there was an issue loading the image with image_io.
+        If there was an issue loading the image with image.
 
     See Also
     ------
-    image_io.utils.ImageIOLoadException
+    image.utils.ImageIOLoadException
     """
     src_path = Path(src_path)
 

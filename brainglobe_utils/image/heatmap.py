@@ -9,7 +9,7 @@ from brainglobe_utils.general.system import ensure_directory_exists
 from brainglobe_utils.image.binning import get_bins
 from brainglobe_utils.image.masking import mask_image_threshold
 from brainglobe_utils.image.scale import scale_and_convert_to_16_bits
-from brainglobe_utils.image_io import to_tiff
+from brainglobe_utils.IO.image import to_tiff
 
 
 def rescale_array(source_array, target_array, order=1):

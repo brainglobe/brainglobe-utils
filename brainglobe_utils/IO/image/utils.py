@@ -5,7 +5,7 @@ from scipy.ndimage import zoom
 class ImageIOLoadException(Exception):
     """
     Custom exception class for errors found loading images with
-    image_io.load.
+    image.load.
 
     Alerts the user of: loading a directory containing only a single .tiff,
     loading a single 2D .tiff, loading an image sequence where all 2D images
@@ -45,9 +45,7 @@ class ImageIOLoadException(Exception):
                 )
 
         else:
-            self.message = (
-                "File failed to load with brainglobe_utils.image_io."
-            )
+            self.message = "File failed to load with brainglobe_utils.image."
 
         super().__init__(self.message)
 
