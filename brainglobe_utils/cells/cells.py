@@ -6,11 +6,24 @@ Christian Niedworok (https://github.com/cniedwor).
 import math
 import os
 import re
+import threading
 from collections import defaultdict
 from functools import total_ordering
-from typing import Any, DefaultDict, Dict, List, Tuple, Union
+from typing import (
+    Any,
+    DefaultDict,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element as EtElement
+
+import numpy as np
+from numba import njit, objmode
+from tqdm import tqdm
 
 
 @total_ordering
@@ -381,3 +394,336 @@ class MissingCellsError(Exception):
     """Custom exception class for when no cells are found in a file"""
 
     pass
+
+
+def to_numpy_pos(
+    cells: List[Cell], cell_type: Optional[int] = None
+) -> np.ndarray:
+    """
+    Takes a list of Cell objects, selects only cells of type `cell_type` (if
+    not None) and returns a single 2d array of shape Nx3 with the
+    positions of the cells.
+    """
+    # for large cell list, pre-compute size
+    n = len(cells)
+    if cell_type is not None:
+        n = sum([cell.type == cell_type for cell in cells])
+    np_cells = np.empty((n, 3), dtype=np.float_)
+
+    i = 0
+    for cell in cells:
+        if cell_type is not None and cell.type != cell_type:
+            continue
+        np_cells[i, :] = cell.x, cell.y, cell.z
+        i += 1
+
+    return np_cells
+
+
+def from_numpy_pos(pos: np.ndarray, cell_type: int) -> List[Cell]:
+    """
+    Takes a 2d numpy position array of shape Nx3 and returns a list of Cell
+    objects of given cell_type from those positions.
+    """
+    cells = []
+    for i in range(pos.shape[0]):
+        cell = Cell(pos=pos[i, :].tolist(), cell_type=cell_type)
+        cells.append(cell)
+
+    return cells
+
+
+def match_cells(
+    cells: List[Cell], other: List[Cell], threshold: float = np.inf
+) -> Tuple[List[int], List[Tuple[int, int]], List[int]]:
+    """
+    Given two lists of cells. It finds a pairing of cells from `cells` and
+    `other` such that the distance (euclidian) between the assigned matches
+    across all `cells` is minimized.
+
+    Remaining cells (e.g. if one list is longer or if there are matches
+    violating the threshold) are indicated as well.
+
+    E.g.::
+
+        >>> cells = [
+        >>>     Cell([20, 20, 20], Cell.UNKNOWN),
+        >>>     Cell([10, 10, 10], Cell.UNKNOWN),
+        >>>     Cell([40, 40, 40], Cell.UNKNOWN),
+        >>>     Cell([50, 50, 50], Cell.UNKNOWN),
+        >>> ]
+        >>> other = [
+        >>>     Cell([5, 5, 5], Cell.UNKNOWN),
+        >>>     Cell([15, 15, 15], Cell.UNKNOWN),
+        >>>     Cell([35, 35, 35], Cell.UNKNOWN),
+        >>>     Cell([100, 100, 100], Cell.UNKNOWN),
+        >>>     Cell([200, 200, 200], Cell.UNKNOWN),
+        >>> ]
+        >>> match_cells(cells, other, threshold=20)
+        ([3], [[0, 1], [1, 0], [2, 2]], [3, 4])
+
+    Parameters
+    ----------
+    cells : list of Cells.
+    other : Another list of Cells.
+    threshold : float, optional. Defaults to np.inf.
+        The threshold to use to remove bad matches. Any match pair whose
+        distance is greater than the threshold will be exluded from the
+        matching.
+
+    Returns
+    -------
+    tuple :
+        missing_cells: List of all the indices of `cells` that found no match
+            in `other` (sorted).
+        good_matches: List of tuples with all the (cells, other) indices pairs
+            that matched below the threshold. It's sorted by the `cells`
+            column.
+        missing_other: List of all the indices of `other` that found no match
+            in `cells` (sorted).
+    """
+    if __progress_update.updater is not None:
+        # I can't think of an instance where this will happen, but better safe
+        raise TypeError(
+            "An instance of match_cells is already running in this "
+            "thread. Try running again once it completes"
+        )
+    c1 = to_numpy_pos(cells)
+    c2 = to_numpy_pos(other)
+
+    # c1 must be smaller or equal in length than c2
+    flip = len(cells) > len(other)
+    if flip:
+        c1, c2 = c2, c1
+
+    progress = tqdm(desc="Matching cells", total=len(c1), unit="cells")
+    __progress_update.updater = progress.update
+    # for each index corresponding to c1, returns the index in c2 that matches
+    assignment = match_points(c1, c2)
+    progress.close()
+    __progress_update.updater = None
+
+    missing_c1, good_matches, missing_c2 = analyze_point_matches(
+        c1, c2, assignment, threshold
+    )
+    if flip:
+        missing_c1, missing_c2 = missing_c2, missing_c1
+        good_matches = np.flip(good_matches, axis=1)
+        good_matches = good_matches[good_matches[:, 0].argsort()]
+
+    return missing_c1.tolist(), good_matches.tolist(), missing_c2.tolist()
+
+
+# terrible hack. But you can't pass arbitrary objects to a njit function. But,
+# it can access global variables and run them in objmode. So pass the progress
+# updater to match_points via this global variable and function. We make it
+# thread safe nominally, but it's not safe to modify within a thread while
+# match_points is running
+
+__progress_update = threading.local()
+__progress_update.updater = None
+
+
+def __compare_progress():
+    if __progress_update.updater is not None:
+        __progress_update.updater()
+
+
+@njit
+def match_points(pos1: np.ndarray, pos2: np.ndarray) -> np.ndarray:
+    """
+    Given two arrays, each a list of position. For each point in `pos1` it
+    finds a point in `pos2` such that the distance between the assigned
+    matches across all `pos1` is minimized.
+
+    E.g.::
+
+        >>> pos1 = np.array([[20, 10, 30, 40]]).T
+        >>> pos2 = np.array([[5, 15, 25, 35, 50]]).T
+        >>> matches = match_points(pos1, pos2)
+        >>> matches
+        array([1, 0, 2, 3])
+
+    Parameters
+    ----------
+    pos1 : np.ndarray
+        2D array of NxK. Where N is number of positions and K is the number
+        of dimensions (e.g. 3 for x, y, z).
+    pos2 : np.ndarray
+        2D array of MxK. Where M is number of positions and K is the number
+        of dimensions (e.g. 3 for x, y, z).
+
+        The relationship N <= M must be true.
+
+    Returns
+    -------
+    matches : np.ndarray
+        1D array of length N. Each index i in matches corresponds
+        to index i in `pos1`. The value of index i in matches is the index
+        j in pos2 that is the best match for that pos1.
+
+        I.e. the match is (pos1[i], pos2[matches[i]]).
+    """
+    # based on https://en.wikipedia.org/wiki/Hungarian_algorithm
+    n_rows = pos1.shape[0]
+    n_cols = pos2.shape[0]
+    if n_rows > n_cols:
+        raise ValueError(
+            "The length of pos1 must be less than or equal to length of pos2"
+        )
+
+    potentials_rows = np.zeros(n_rows)
+    potentials_cols = np.zeros(n_cols + 1)
+    assignment_row = np.full(n_cols + 1, -1, dtype=np.int_)
+    min_to = np.empty(n_cols + 1, dtype=np.float_)
+    # previous worker on alternating path
+    prev_col_for_col = np.empty(n_cols + 1, dtype=np.int_)
+    # whether col is in use
+    col_used = np.zeros(n_cols + 1, dtype=np.bool_)
+
+    # assign row-th match
+    for row in range(n_rows):
+        col = n_cols
+        assignment_row[col] = row
+        # min reduced cost over edges from Z to worker w
+        min_to[:] = np.inf
+        prev_col_for_col[:] = -1
+
+        # runs at most row + 1 times
+        while assignment_row[col] != -1:
+            col_used[col] = True
+            row_cur = assignment_row[col]
+            delta = np.inf
+            col_next = -1
+
+            for col_i in range(n_cols):
+                if not col_used[col_i]:
+                    dist = np.sum(np.square(pos1[row_cur, :] - pos2[col_i, :]))
+                    if dist == np.inf:
+                        raise ValueError(
+                            "The distance between point is too large"
+                        )
+
+                    cur = (
+                        dist
+                        - potentials_rows[row_cur]
+                        - potentials_cols[col_i]
+                    )
+                    if cur < min_to[col_i]:
+                        min_to[col_i] = cur
+                        prev_col_for_col[col_i] = col
+
+                    if min_to[col_i] < delta:
+                        delta = min_to[col_i]
+                        col_next = col_i
+
+            # delta will always be non-negative,
+            # except possibly during the first time this loop runs
+            # if any entries of C[row] are negative
+            for col_i in range(n_cols + 1):
+                if col_used[col_i]:
+                    potentials_rows[assignment_row[col_i]] += delta
+                    potentials_cols[col_i] -= delta
+                else:
+                    min_to[col_i] -= delta
+            col = col_next
+
+        # update assignments along alternating path
+        while col != n_cols:
+            col_i = prev_col_for_col[col]
+            assignment_row[col] = assignment_row[col_i]
+            col = col_i
+
+        with objmode():
+            __compare_progress()
+
+    # compute match from assignment
+    matches = np.empty(n_rows, dtype=np.int_)
+    for i in range(n_cols):
+        if assignment_row[i] != -1:
+            matches[assignment_row[i]] = i
+
+    return matches
+
+
+@njit
+def analyze_point_matches(
+    pos1: np.ndarray,
+    pos2: np.ndarray,
+    matches: np.ndarray,
+    threshold: float = np.inf,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Given a matching found by `match_points`, it optionally applies a threshold
+    and splits the matched points from unmatched points in a friendlier way.
+
+    E.g.::
+
+        >>> pos1 = np.array([[20, 10, 30, 40, 50]]).T
+        >>> pos2 = np.array([[5, 15, 25, 35, 100, 200]]).T
+        >>> matches = match_points(pos1, pos2)
+        >>> matches
+        array([1, 0, 2, 3, 4])
+        >>> analyze_point_matches(pos1, pos2, matches)
+        (array([], dtype=int64),
+         array([[0, 1],
+                [1, 0],
+                [2, 2],
+                [3, 3],
+                [4, 4]], dtype=int64),
+         array([5], dtype=int64))
+         >>> analyze_point_matches(pos1, pos2, matches, threshold=10)
+        (array([4], dtype=int64),
+         array([[0, 1],
+                [1, 0],
+                [2, 2],
+                [3, 3]], dtype=int64),
+         array([4, 5], dtype=int64))
+
+    Parameters
+    ----------
+    pos1 : np.ndarray
+        Same as `match_points`.
+    pos2 : np.ndarray
+        Same as `match_points`.
+    matches : np.ndarray
+        The matches returned by `match_points`.
+    threshold : float, optional. Defaults to np.inf.
+        The threshold to use to remove bad matches. Any match pair whose
+        distance is greater than the threshold will be removed from the
+        matching and added to the missing_pos1 and missing_pos2 arrays.
+
+    Returns
+    -------
+    tuple : (np.ndarray, np.ndarray, np.ndarray)
+        missing_pos1: 1d array of all the indices of pos1 that found no match
+            in pos2 (sorted).
+        good_matches: 2d array with all the (pos1, pos2) indices that remained
+            in the matching. It's of size Rx2. It's sorted by the first column.
+        missing_pos2: 1d array of all the indices of pos2 that found no match
+            in pos1 (sorted).
+    """
+    # indices and mask on indices
+    pos2_n = len(pos2)
+    pos2_i = np.arange(pos2_n)
+    pos2_mask = np.ones(pos2_n, dtype=np.bool_)
+    # those in pos2 who have a match in pos1
+    pos2_mask[matches] = False
+    # all the pos2 that have no matches from pos1
+    missing_pos2 = pos2_i[pos2_mask]
+
+    # repackage matches so the first column is the pos1 idx and 2nd column is
+    # the corresponding pos2 index
+    matches_indices = np.stack((np.arange(len(pos1)), matches), axis=1)
+
+    dist = np.sqrt(np.sum(np.square(pos1 - pos2[matches]), axis=1))
+    too_large = dist >= threshold
+    bad_matches = matches_indices[too_large, :]
+    good_matches = matches_indices[np.logical_not(too_large), :]
+
+    missing_pos1 = bad_matches[:, 0]
+    # more missing for pos2 for those above threshold
+    missing_pos2 = np.concatenate((missing_pos2, bad_matches[:, 1]))
+    missing_pos2 = np.sort(missing_pos2)
+
+    return missing_pos1, good_matches, missing_pos2

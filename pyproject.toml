@@ -22,6 +22,7 @@ dependencies = [
     "configobj",
     "natsort",
     "nibabel >= 2.1.0",
+    "numba",
     "numpy",
     "pandas",
     "psutil",
