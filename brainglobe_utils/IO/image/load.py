@@ -777,10 +777,12 @@ def read_z_stack(path):
                 )
 
             axes = tiff.series[0].axes.lower()
-            if set(axes) != {"x", "y", "z"} or axes[0] != "z":
-                raise ValueError(
-                    f"Attempted to load {path} but didn't find a zyx or "
-                    f"zxy stack. Found {axes} axes"
+            if set(axes) != {"x", "y", "z"}:
+                # log that metadata does not specify expected axes
+                logging.debug(
+                    f"Axis metadata is {axes}, "
+                    "which is not the expected set of x,y,z in any order. "
+                    "Assume z,y,x"
                 )
 
         return tifffile.imread(path)
