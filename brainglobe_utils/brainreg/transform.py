@@ -8,7 +8,7 @@ import pandas as pd
 import tifffile
 from brainglobe_atlasapi import BrainGlobeAtlas
 
-from brainglobe_utils.image_io import get_size_image_from_file_paths
+from brainglobe_utils.IO.image import get_size_image_from_file_paths
 
 
 def transform_points_from_downsampled_to_atlas_space(

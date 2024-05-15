@@ -23,6 +23,7 @@ dependencies = [
     "natsort",
     "nibabel >= 2.1.0",
     "numpy",
+    "dask",
     "pandas",
     "psutil",
     "pyarrow",
