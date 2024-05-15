@@ -1,9 +1,11 @@
 import random
 from collections import namedtuple
+from unittest import mock
 
 import numpy as np
 import psutil
 import pytest
+import tifffile
 
 from brainglobe_utils.IO.image import load, save, utils
 
@@ -66,6 +68,16 @@ def shuffled_txt_path(txt_path):
         f.truncate()
 
     return txt_path
+
+
+@pytest.fixture
+def array3d_as_tiff_stack_with_missing_metadata(array_3d, tmp_path):
+    tiff_path = tmp_path / "test_missing_metadata.tif"
+    metadata = {"axes": ""}
+    tifffile.imwrite(
+        tiff_path, array_3d, photometric="minisblack", metadata=metadata
+    )
+    return tiff_path
 
 
 @pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
@@ -406,3 +418,25 @@ def test_read_with_dask_glob_txt_equal(array_3D_as_2d_tiffs_path, txt_path):
     glob_stack = load.read_with_dask(array_3D_as_2d_tiffs_path)
     txt_stack = load.read_with_dask(txt_path)
     np.testing.assert_array_equal(glob_stack, txt_stack)
+
+
+def test_read_z_stack_with_missing_metadata(
+    array3d_as_tiff_stack_with_missing_metadata,
+):
+    with mock.patch(
+        "brainglobe_utils.IO.image.load.logging.debug"
+    ) as mock_debug:
+        load.read_z_stack(str(array3d_as_tiff_stack_with_missing_metadata))
+        mock_debug.assert_called_once()
+
+
+def test_get_size_image_with_missing_metadata(
+    array3d_as_tiff_stack_with_missing_metadata,
+):
+    with mock.patch(
+        "brainglobe_utils.IO.image.load.logging.debug"
+    ) as mock_debug:
+        load.get_size_image_from_file_paths(
+            str(array3d_as_tiff_stack_with_missing_metadata)
+        )
+        mock_debug.assert_called_once()
