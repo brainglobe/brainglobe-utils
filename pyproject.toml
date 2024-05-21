@@ -136,9 +136,10 @@ python =
 extras =
     dev
 commands =
-    NUMBA_DISABLE_JIT=1 pytest -v --color=yes --cov=brainglobe_utils --cov-report=xml
+    pytest -v --color=yes --cov=brainglobe_utils --cov-report=xml
 passenv =
     CI
+    NUMBA_DISABLE_JIT
     GITHUB_ACTIONS
     DISPLAY
     XAUTHORITY
