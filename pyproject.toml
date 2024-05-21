@@ -136,7 +136,7 @@ python =
 extras =
     dev
 commands =
-    pytest -v --color=yes --cov=brainglobe_utils --cov-report=xml
+    NUMBA_DISABLE_JIT=1 pytest -v --color=yes --cov=brainglobe_utils --cov-report=xml
 passenv =
     CI
     GITHUB_ACTIONS

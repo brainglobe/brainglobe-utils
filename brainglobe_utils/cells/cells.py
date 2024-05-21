@@ -499,9 +499,11 @@ def match_cells(
     progress = tqdm(desc="Matching cells", total=len(c1), unit="cells")
     __progress_update.updater = progress.update
     # for each index corresponding to c1, returns the index in c2 that matches
-    assignment = match_points(c1, c2)
-    progress.close()
-    __progress_update.updater = None
+    try:
+        assignment = match_points(c1, c2, threshold)
+        progress.close()
+    finally:
+        __progress_update.updater = None
 
     missing_c1, good_matches, missing_c2 = analyze_point_matches(
         c1, c2, assignment, threshold
@@ -530,7 +532,9 @@ def __compare_progress():
 
 
 @njit
-def match_points(pos1: np.ndarray, pos2: np.ndarray) -> np.ndarray:
+def match_points(
+    pos1: np.ndarray, pos2: np.ndarray, threshold: float = np.inf
+) -> np.ndarray:
     """
     Given two arrays, each a list of position. For each point in `pos1` it
     finds a point in `pos2` such that the distance between the assigned
@@ -554,6 +558,16 @@ def match_points(pos1: np.ndarray, pos2: np.ndarray) -> np.ndarray:
         of dimensions (e.g. 3 for x, y, z).
 
         The relationship N <= M must be true.
+    threshold : float, optional. Defaults to np.inf.
+        The threshold to use to consider a pair a bad match. Any match pair
+        whose distance is greater or equal to the threshold will be considered
+        to be at great distance to each other.
+
+        It'll still show up in the matching, but it will have the least
+        priority for a match because that match will not reduce the overall
+        cost across all points.
+
+        Use `analyze_point_matches` subsequently to remove the "bad" matches.
 
     Returns
     -------
@@ -565,12 +579,35 @@ def match_points(pos1: np.ndarray, pos2: np.ndarray) -> np.ndarray:
         I.e. the match is (pos1[i], pos2[matches[i]]).
     """
     # based on https://en.wikipedia.org/wiki/Hungarian_algorithm
+    pos1 = pos1.astype(np.float64)
+    pos2 = pos2.astype(np.float64)
+
+    if len(pos1.shape) != 2 or len(pos2.shape) != 2:
+        raise ValueError("The input arrays must have exactly 2 dimensions")
+
     n_rows = pos1.shape[0]
     n_cols = pos2.shape[0]
     if n_rows > n_cols:
         raise ValueError(
             "The length of pos1 must be less than or equal to length of pos2"
         )
+    if pos1.shape[1] != pos2.shape[1]:
+        raise ValueError("The two inputs have different number of columns")
+
+    inf_dist = 0
+    have_threshold = threshold != np.inf
+    # If we use a threshold, find the largest enclosing (hyper) cube and use
+    # the distance between two opposing corners as the maximum distance we
+    # can ever see. Use that as dist of points further than threshold
+    if have_threshold:
+        # for each col, find the range of points and pick greatest col
+        largest_side = 0
+        for i in range(pos1.shape[1]):
+            bottom = min(np.min(pos1[:, i]), np.min(pos2[:, i]))
+            top = max(np.max(pos1[:, i]), np.max(pos2[:, i]))
+            largest_side = max(largest_side, top - bottom)
+        # make cube using the largest col range
+        inf_dist = math.sqrt(pos1.shape[1]) * (largest_side + 1)
 
     potentials_rows = np.zeros(n_rows)
     potentials_cols = np.zeros(n_cols + 1)
@@ -598,11 +635,16 @@ def match_points(pos1: np.ndarray, pos2: np.ndarray) -> np.ndarray:
 
             for col_i in range(n_cols):
                 if not col_used[col_i]:
-                    dist = np.sum(np.square(pos1[row_cur, :] - pos2[col_i, :]))
+                    # use sqrt to match threshold which is in actual distance
+                    dist = np.sqrt(
+                        np.sum(np.square(pos1[row_cur, :] - pos2[col_i, :]))
+                    )
                     if dist == np.inf:
                         raise ValueError(
                             "The distance between point is too large"
                         )
+                    if have_threshold and dist >= threshold:
+                        dist = inf_dist
 
                     cur = (
                         dist
@@ -693,6 +735,9 @@ def analyze_point_matches(
         distance is greater than the threshold will be removed from the
         matching and added to the missing_pos1 and missing_pos2 arrays.
 
+        To get a best global optimum, use the same threshold you used in
+        `match_points`.
+
     Returns
     -------
     tuple : (np.ndarray, np.ndarray, np.ndarray)
@@ -706,17 +751,17 @@ def analyze_point_matches(
     # indices and mask on indices
     pos2_n = len(pos2)
     pos2_i = np.arange(pos2_n)
-    pos2_mask = np.ones(pos2_n, dtype=np.bool_)
+    pos2_unmatched = np.ones(pos2_n, dtype=np.bool_)
     # those in pos2 who have a match in pos1
-    pos2_mask[matches] = False
+    pos2_unmatched[matches] = False
     # all the pos2 that have no matches from pos1
-    missing_pos2 = pos2_i[pos2_mask]
+    missing_pos2 = pos2_i[pos2_unmatched]
 
     # repackage matches so the first column is the pos1 idx and 2nd column is
     # the corresponding pos2 index
     matches_indices = np.stack((np.arange(len(pos1)), matches), axis=1)
 
-    dist = np.sqrt(np.sum(np.square(pos1 - pos2[matches]), axis=1))
+    dist = np.sqrt(np.sum(np.square(pos1 - pos2[matches, :]), axis=1))
     too_large = dist >= threshold
     bad_matches = matches_indices[too_large, :]
     good_matches = matches_indices[np.logical_not(too_large), :]
