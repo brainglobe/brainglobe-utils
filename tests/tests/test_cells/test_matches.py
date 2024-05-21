@@ -131,7 +131,12 @@ def test_unequal_inputs_shape():
 
 
 def test_bad_input_shape():
-    with pytest.raises(ValueError):
+    # we want to check that a 1-dim array is not accepted. But, numba checks
+    # the inputs for at least 2-dims because it knows we access the 2dn dim.
+    # So we have no chance to raise an error ourself. So check numba's error
+    import numba.core.errors
+
+    with pytest.raises(numba.core.errors.TypingError):
         match_points(np.zeros(5), np.zeros(5))
 
     with pytest.raises(ValueError):
