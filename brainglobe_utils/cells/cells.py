@@ -614,6 +614,7 @@ def match_points(
         # min reduced cost over edges from Z to worker w
         min_to[:] = np.inf
         prev_col_for_col[:] = -1
+        col_used[:] = False
 
         # runs at most row + 1 times
         while assignment_row[col] != -1:
