@@ -513,14 +513,20 @@ def match_cells(
     if flip:
         c1, c2 = c2, c1
 
-    progress = tqdm(desc="Matching cells", total=len(c1), unit="cells")
-    __progress_update.updater = progress.update
+    progress = None
+    if not use_scipy:
+        # with scipy we don't have callbacks so no updates
+        progress = tqdm(desc="Matching cells", total=len(c1), unit="cells")
+        __progress_update.updater = progress.update
+
     # for each index corresponding to c1, returns the index in c2 that matches
     try:
         assignment = match_points(c1, c2, threshold, pre_match, use_scipy)
-        progress.close()
     finally:
         __progress_update.updater = None
+
+    if progress is not None:
+        progress.close()
 
     missing_c1, good_matches, missing_c2 = analyze_point_matches(
         c1, c2, assignment, threshold
