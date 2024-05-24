@@ -38,3 +38,32 @@ def test_logo(qtbot):
 
     for docs_string in expected_strings_docs:
         assert docs_string in header.layout().itemAt(1).widget().text()
+
+
+def test_logo_list_of_links(qtbot):
+    package_name = "test"
+    package_tagline = "Tagline"
+
+    links = {
+        "Website": "https://brainglobe.info",
+        "Source": "https://github.com",
+        "Tutorial": "https://brainglobe.info/tutorials/test.html",
+    }
+
+    expected_string = (
+        f"<h3>\n<p>{package_tagline}</p>\n"
+        f"<p><a href='https://brainglobe.info' style='color:gray;'>"
+        f"Website</a></p>\n"
+        f"<p><a href='https://github.com' style='color:gray;'>"
+        f"Source</a></p>\n"
+        f"<p><a href='https://brainglobe.info/tutorials/test.html' "
+        f"style='color:gray;'>"
+        f"Tutorial</a></p>\n</h3>"
+    )
+
+    header = header_widget(package_name, package_tagline, links=links)
+
+    qtbot.addWidget(header)
+
+    # Check that the contents of the links are in the header
+    assert expected_string == header.layout().itemAt(1).widget().text()
