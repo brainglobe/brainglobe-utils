@@ -29,6 +29,7 @@ class CollapsibleWidget(QCollapsible):
         self,
         title: str = "",
         parent: Optional[QWidget] = None,
+        collapsed_icon: Optional[str] = "▶",
     ):
         """
         Initializes a new CollapsibleWidget instance.
@@ -40,7 +41,7 @@ class CollapsibleWidget(QCollapsible):
         parent : QWidget or None, optional
             The parent widget.
         """
-        super().__init__(title, parent)
+        super().__init__(title, parent, collapsedIcon=collapsed_icon)
         self.currently_expanded = False
 
         self.toggled.connect(self._on_toggle)
