@@ -18,6 +18,8 @@ def _docs_links_widget(
     lines = [
         "<h3>",
         f"<p>{package_tagline}</p>",
+        "<p><a href='https://brainglobe.info' style='color:gray;'>"
+        "Website</a></p>",
     ]
 
     if links:
