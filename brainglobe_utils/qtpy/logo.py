@@ -1,5 +1,5 @@
 from importlib.resources import files
-from typing import Optional
+from typing import Dict, Optional
 
 from qtpy.QtWidgets import QGroupBox, QHBoxLayout, QLabel, QWidget
 
@@ -7,6 +7,7 @@ from qtpy.QtWidgets import QGroupBox, QHBoxLayout, QLabel, QWidget
 def _docs_links_widget(
     package_name: str,
     package_tagline: str,
+    links: Optional[Dict[str, str]] = None,
     tutorial_file_name: Optional[str] = None,
     documentation_path: Optional[str] = None,
     citation_doi: Optional[str] = None,
@@ -17,35 +18,41 @@ def _docs_links_widget(
     lines = [
         "<h3>",
         f"<p>{package_tagline}</p>",
-        "<p><a href='https://brainglobe.info' style='color:gray;'>"
-        "Website</a></p>",
     ]
 
-    if tutorial_file_name:
+    if links:
+        for link in links:
+            lines.append(
+                f"<p><a href='{links[link]}' style='color:gray;'>"
+                f"{link}</a></p>"
+            )
+    else:
+        if tutorial_file_name:
+            lines.append(
+                f"<p>"
+                f"<a href='https://brainglobe.info/tutorials/{tutorial_file_name}'"
+                f" style='color:gray;'>Tutorial</a></p>"
+            )
+
+        if documentation_path:
+            lines.append(
+                f"<p><a href="
+                f"'https://brainglobe.info/documentation/{documentation_path}'"
+                f" style='color:gray;'>Documentation</a></p>"
+            )
+
+        if github_repo_name is None:
+            github_repo_name = package_name
         lines.append(
-            f"<p>"
-            f"<a href='https://brainglobe.info/tutorials/{tutorial_file_name}'"
-            f" style='color:gray;'>Tutorial</a></p>"
+            f"<p><a href='https://github.com/brainglobe/{github_repo_name}' "
+            f"style='color:gray;'>Source</a></p>"
         )
 
-    if documentation_path:
-        lines.append(
-            f"<p><a href="
-            f"'https://brainglobe.info/documentation/{documentation_path}' "
-            f"style='color:gray;'>Documentation</a></p>"
-        )
-
-    if github_repo_name is None:
-        github_repo_name = package_name
-    lines.append(
-        f"<p><a href='https://github.com/brainglobe/{github_repo_name}' "
-        f"style='color:gray;'>Source</a></p>"
-    )
-
-    if citation_doi:
-        lines.append(
-            f"<p><a href='{citation_doi}' style='color:gray;'>Citation</a></p>"
-        )
+        if citation_doi:
+            lines.append(
+                f"<p><a href='{citation_doi}' "
+                f"style='color:gray;'>Citation</a></p>"
+            )
 
     if help_text:
         lines.append(f"<p><small>{help_text}</small></p>")
@@ -78,6 +85,7 @@ def header_widget(
     github_repo_name: Optional[str] = None,
     help_text: Optional[str] = None,
     parent: Optional[QWidget] = None,
+    links: Optional[Dict[str, str]] = None,
 ) -> QGroupBox:
     """
     Render HTML in a QGroupBox with a BrainGlobe logo and links to the docs
@@ -107,6 +115,9 @@ def header_widget(
         "For help, hover the cursor over each parameter."
     parent : QWidget, optional
         The parent widget, defaults to None
+    links : Dict[str, str], optional
+        A dictionary of links to include in the header, by default None
+        the keys are the link names and the values are the URLs
 
     Returns
     -------
@@ -122,6 +133,7 @@ def header_widget(
         _docs_links_widget(
             package_name,
             package_tagline,
+            links,
             tutorial_file_name,
             documentation_path,
             citation_doi,
