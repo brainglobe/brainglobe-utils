@@ -476,7 +476,7 @@ def match_cells(
         distance is greater than the threshold will be exluded from the
         matching.
     pre_match : bool, optional. Defaults to True.
-        If True, we will (interenally) first efficiently find all the pairs of
+        If True, we will (internally) first efficiently find all the pairs of
         `cells` and `others` which are each at the same position in space. Then
         we run the optimization to find the best matching on the remaining.
 
@@ -769,7 +769,7 @@ def _optimize_pairs(
                     dist = math.sqrt(dist)
                     if dist == np.inf:
                         raise ValueError(
-                            "The distance between point is too large"
+                            "The distance between points is too large"
                         )
                     if have_threshold and dist > threshold:
                         dist = threshold
