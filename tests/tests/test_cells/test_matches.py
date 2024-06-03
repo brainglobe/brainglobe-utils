@@ -11,12 +11,49 @@ from brainglobe_utils.cells.cells import (
     match_cells,
     match_points,
 )
+from brainglobe_utils.IO.cells import get_cells
+
+
+@pytest.fixture
+def cells_and_other_cells(test_data_registry):
+    """
+    Provides real-life cell coordinates from a CFOS-labelled brain from
+    two different cellfinder versions (pre- and post cellfinder PR #398).
+    Intended to be used for regression testing our cell matching code.
+
+    Parameters
+    ----------
+    test_data_registry : Pooch.pooch
+        The BrainGlobe test data registry.
+
+    Returns
+    -------
+    cell_data : List[Cell]
+        The loaded cell data.
+
+    """
+    cell_data_path = test_data_registry.fetch(
+        "cellfinder/cells-z-1000-1050.xml"
+    )
+    other_cell_data_path = test_data_registry.fetch(
+        "cellfinder/other_cells-z-1000-1050.xml"
+    )
+    cell_data = get_cells(cell_data_path)
+    other_cell_data = get_cells(other_cell_data_path)
+    return cell_data, other_cell_data
 
 
 def as_cell(x: List[float]):
     d = np.tile(np.asarray([x]).T, (1, 3))
     cells = from_numpy_pos(d, Cell.UNKNOWN)
     return cells
+
+
+@pytest.mark.xfail
+def test_cell_matching_regression(cells_and_other_cells):
+    cells, other_cells = cells_and_other_cells
+    # TODO implement cell matching regression test here, then remove xfail
+    assert False
 
 
 @pytest.mark.parametrize("use_scipy", [True, False])
