@@ -7,7 +7,6 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Tuple
 
-import nrrd
 import numpy as np
 import tifffile
 from dask import array as da
@@ -50,7 +49,7 @@ def load_any(
     Parameters
     ----------
     src_path : str or pathlib.Path
-        Can be the path of a nifty file, nrrd file, tiff file, tiff files
+        Can be the path of a nifty file, tiff file, tiff files
         folder, or text file containing a list of paths.
 
     x_scaling_factor : float, optional
@@ -136,9 +135,6 @@ def load_any(
             z_scaling_factor,
             anti_aliasing=anti_aliasing,
         )
-    elif src_path.suffix == ".nrrd":
-        logging.debug("Data type is: nrrd")
-        img = load_nrrd(src_path)
     elif src_path.suffix in [".nii", ".nii.gz"]:
         logging.debug("Data type is: NifTI")
         img = load_nii(src_path, as_array=True, as_numpy=as_numpy)
@@ -148,27 +144,6 @@ def load_any(
         )
 
     return img
-
-
-def load_nrrd(src_path):
-    """
-    Load an .nrrd file as a numpy array.
-
-    Parameters
-    ----------
-    src_path : str or pathlib.Path
-        The path of the image to be loaded.
-
-    Returns
-    -------
-    np.ndarray
-        The loaded brain array.
-    """
-    if isinstance(src_path, Path):
-        src_path = str(src_path.resolve())
-
-    stack, _ = nrrd.read(src_path)
-    return stack
 
 
 def load_img_stack(
