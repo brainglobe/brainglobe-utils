@@ -4,7 +4,7 @@ authors = [{ name = "Adam Tyson", email = "code@adamltyson.com" }]
 description = "Shared general purpose tools for the BrainGlobe project"
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">=3.9.0"
+requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -12,9 +12,9 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
     "brainglobe-atlasapi >= 2.0.1",
@@ -83,7 +83,7 @@ exclude = ["tests", "docs*"]
 addopts = "--cov=brainglobe_utils"
 
 [tool.black]
-target-version = ['py39', 'py310', 'py311']
+target-version = ['py310','py311', 'py312']
 skip-string-normalization = false
 line-length = 79
 
@@ -103,14 +103,14 @@ ignore_errors = true
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py{39,310,311}
+envlist = py{310,311,312}
 isolated_build = True
 
 [gh-actions]
 python =
-    3.9: py39
     3.10: py310
     3.11: py311
+    3.12: py312
 
 [testenv]
 extras =
