@@ -66,6 +66,7 @@ dev = [
     "setuptools_scm",
     "superqt",
     "tox",
+    "pooch",
 ]
 
 
