@@ -1,7 +1,6 @@
 import warnings
 from pathlib import Path
 
-import nrrd
 import numpy as np
 import tifffile
 
@@ -99,24 +98,6 @@ def to_tiffs(img_volume, path_prefix, path_suffix="", extension=".tif"):
         tifffile.imwrite(dest_path, img)
 
 
-def to_nrrd(img_volume, dest_path):
-    """
-    Save the image volume (numpy array) as nrrd.
-
-    Parameters
-    ----------
-    img_volume : np.ndarray
-        The image to be saved.
-
-    dest_path : str or pathlib.Path
-        The file path where to save the nrrd image.
-    """
-    if isinstance(dest_path, Path):
-        dest_path = str(dest_path.resolve())
-
-    nrrd.write(dest_path, img_volume)
-
-
 def save_any(img_volume, dest_path):
     """
     Save the image volume (numpy array) to the given file path, using the save
@@ -130,7 +111,7 @@ def save_any(img_volume, dest_path):
     dest_path : str or pathlib.Path
         The file path to save the image to.
         Supports directories (will save a sequence of tiffs), .tif, .tiff,
-        .nrrd and .nii.
+        and .nii.
     """
     dest_path = Path(dest_path)
 
@@ -139,9 +120,6 @@ def save_any(img_volume, dest_path):
 
     elif dest_path.suffix in [".tif", ".tiff"]:
         to_tiff(img_volume, dest_path)
-
-    elif dest_path.suffix == ".nrrd":
-        to_nrrd(img_volume, dest_path)
 
     elif dest_path.suffix == ".nii":
         to_nii(img_volume, dest_path)

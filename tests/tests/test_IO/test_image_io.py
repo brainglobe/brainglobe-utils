@@ -277,28 +277,11 @@ def test_nii_read_to_numpy(tmp_path, array_3d):
 
 
 @pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
-def test_nrrd_io(tmp_path, array_3d, use_path):
-    """
-    Test that a 3D image can be written and read correctly as nrrd, using both
-    str and pathlib.Path input.
-    """
-    filename = "test_array.nrrd"
-    if use_path:
-        nrrd_path = tmp_path / filename
-    else:
-        nrrd_path = str(tmp_path / filename)
-
-    save.to_nrrd(array_3d, nrrd_path)
-    assert (load.load_nrrd(nrrd_path) == array_3d).all()
-
-
-@pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
 @pytest.mark.parametrize(
     "file_name",
     [
         "test_array.tiff",
         "test_array.tif",
-        "test_array.nrrd",
         "test_array.nii",
         pytest.param("", id="dir of tiffs"),
     ],
