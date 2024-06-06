@@ -27,8 +27,9 @@ jobs:
     name: ${{ matrix.os }} py${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     env:
-      # used on unix by pooch for cache dir
-      XDG_CACHE_HOME: "~/.pooch_cache"
+      # pooch cache dir
+      BRAINGLOBE_TEST_DATA_DIR: "~/.pooch_cache"
+
     strategy:
       matrix:
         # Run all supported Python versions on linux
@@ -71,8 +72,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NUMBA_DISABLE_JIT: "1"
-      # used on unix by pooch for cache dir
-      XDG_CACHE_HOME: "~/.pooch_cache"
+      # pooch cache dir
+      BRAINGLOBE_TEST_DATA_DIR: "~/.pooch_cache"
 
     steps:
       - name: Cache pooch data

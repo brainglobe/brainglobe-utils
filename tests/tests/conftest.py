@@ -26,5 +26,6 @@ def test_data_registry():
             "cellfinder/cells-z-1000-1050.xml": None,
             "cellfinder/other-cells-z-1000-1050.xml": None,
         },
+        env="BRAINGLOBE_TEST_DATA_DIR",
     )
     return registry
