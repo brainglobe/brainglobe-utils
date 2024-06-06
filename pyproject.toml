@@ -22,6 +22,7 @@ dependencies = [
     "configobj",
     "natsort",
     "nibabel >= 2.1.0",
+    "numba",
     "numpy",
     "dask",
     "pandas",
@@ -65,6 +66,7 @@ dev = [
     "setuptools_scm",
     "superqt",
     "tox",
+    "pooch",
 ]
 
 
@@ -119,8 +121,10 @@ commands =
     pytest -v --color=yes --cov=brainglobe_utils --cov-report=xml
 passenv =
     CI
+    NUMBA_DISABLE_JIT
     GITHUB_ACTIONS
     DISPLAY
     XAUTHORITY
     PYVISTA_OFF_SCREEN
+    BRAINGLOBE_TEST_DATA_DIR
 """

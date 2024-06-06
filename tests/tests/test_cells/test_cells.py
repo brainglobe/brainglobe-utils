@@ -214,3 +214,20 @@ def test_conversion_typed_and_untyped_cell():
 
     assert cells.UntypedCell.from_cell(typed_cell) == untyped_cell
     assert untyped_cell.to_cell() == typed_cell
+
+
+def test_cells_to_np_cell_type():
+    items = [
+        cells.Cell((0, 1, 2), cells.Cell.UNKNOWN),
+        cells.Cell((3, 4, 5), cells.Cell.CELL),
+    ]
+
+    assert np.array_equal(
+        cells.to_numpy_pos(items),
+        [[0, 1, 2], [3, 4, 5]],
+    )
+
+    assert np.array_equal(
+        cells.to_numpy_pos(items, cells.Cell.CELL),
+        [[3, 4, 5]],
+    )

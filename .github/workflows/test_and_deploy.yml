@@ -26,6 +26,10 @@ jobs:
     needs: [linting, manifest]
     name: ${{ matrix.os }} py${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
+    env:
+      # pooch cache dir
+      BRAINGLOBE_TEST_DATA_DIR: "~/.pooch_cache"
+
     strategy:
       matrix:
         # Run all supported Python versions on linux
@@ -41,6 +45,13 @@ jobs:
             python-version: "3.12"
 
     steps:
+      - name: Cache pooch data
+        uses: actions/cache@v4
+        with:
+          path: "~/.pooch_cache"
+          # hash on conftest in case url changes
+          key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/conftest.py') }}
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -54,6 +65,38 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           secret-codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+  test_numba_disabled:
+    needs: [ linting, manifest ]
+    name: Run tests with numba disabled
+    runs-on: ubuntu-latest
+    env:
+      NUMBA_DISABLE_JIT: "1"
+      # pooch cache dir
+      BRAINGLOBE_TEST_DATA_DIR: "~/.pooch_cache"
+
+    steps:
+      - name: Cache pooch data
+        uses: actions/cache@v4
+        with:
+          path: "~/.pooch_cache"
+          # hash on conftest in case url changes
+          key: ${{ runner.os }}-3.11-${{ hashFiles('**/conftest.py') }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      # these libraries enable testing on Qt on linux
+      - uses: pyvista/setup-headless-display-action@v2
+        with:
+          qt: true
+      # Run test suite with numba disabled
+      - uses: neuroinformatics-unit/actions/test@v2
+        with:
+          python-version: "3.11"
+          secret-codecov-token: ${{ secrets.CODECOV_TOKEN }}
+          codecov-flags: "numba"
 
   build_sdist_wheels:
     name: Build source distribution
