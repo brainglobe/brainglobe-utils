@@ -48,7 +48,7 @@ source_code = "https://github.com/brainglobe/brainglobe-utils"
 user_support = "https://github.com/brainglobe/brainglobe-utils/issues"
 
 [project.optional-dependencies]
-napari = ["napari>=0.4.18", "qtpy", "superqt"]
+qt = ["qtpy", "superqt"]
 
 dev = [
     "black",
@@ -60,13 +60,12 @@ dev = [
     "pytest-qt",
     "pytest-mock",
     "pytest",
-    "qtpy",
     "ruff",
     "scikit-image",
     "setuptools_scm",
-    "superqt",
     "tox",
     "pooch",
+    "brainglobe-utils[qt]",
 ]
 
 
@@ -85,7 +84,7 @@ exclude = ["tests", "docs*"]
 addopts = "--cov=brainglobe_utils"
 
 [tool.black]
-target-version = ['py310','py311', 'py312']
+target-version = ['py310', 'py311', 'py312']
 skip-string-normalization = false
 line-length = 79
 
