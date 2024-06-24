@@ -408,7 +408,7 @@ def to_numpy_pos(
     n = len(cells)
     if cell_type is not None:
         n = sum([cell.type == cell_type for cell in cells])
-    np_cells = np.empty((n, 3), dtype=np.float_)
+    np_cells = np.empty((n, 3), dtype=np.float64)
 
     i = 0
     for cell in cells:
@@ -728,7 +728,7 @@ def _optimize_pairs(
     potentials_rows = np.zeros(n_rows)
     potentials_cols = np.zeros(n_cols + 1)
     assignment_row = np.full(n_cols + 1, -1, dtype=np.int_)
-    min_to = np.empty(n_cols + 1, dtype=np.float_)
+    min_to = np.empty(n_cols + 1, dtype=np.float64)
     # previous worker on alternating path
     prev_col_for_col = np.empty(n_cols + 1, dtype=np.int_)
     # whether col is in use
