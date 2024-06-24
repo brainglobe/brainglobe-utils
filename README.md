@@ -8,17 +8,16 @@ Shared general purpose tools for the BrainGlobe project, including [citation gen
 pip install brainglobe-utils
 ```
 
-To also include the dependencies required for `napari`, use:
+To also include the dependencies required for Qt widgets, use:
 
 ```bash
-pip install brainglobe-utils[napari]
+pip install brainglobe-utils[qt]
 ```
 
-For development, clone this repository and install the dependencies with one of the following commands:
+For development, clone this repository and install the dependencies with:
 
 ```bash
 pip install -e .[dev]
-pip install -e .[dev,napari]
 ```
 
 ## Citations for BrainGlobe tools
