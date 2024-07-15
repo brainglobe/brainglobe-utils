@@ -47,6 +47,9 @@ bug_tracker = "https://github.com/brainglobe/brainglobe-utils/issues"
 source_code = "https://github.com/brainglobe/brainglobe-utils"
 user_support = "https://github.com/brainglobe/brainglobe-utils/issues"
 
+[project.entry-points."napari.manifest"]
+brainglobe-utils = "brainglobe_utils:napari.yaml"
+
 [project.optional-dependencies]
 qt = ["qtpy", "superqt"]
 
