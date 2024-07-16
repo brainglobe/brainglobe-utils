@@ -1,13 +1,14 @@
 import json
 from pathlib import Path
-from typing import List
+from typing import Any, Dict, List, Union
 
 import napari
+import pandas as pd
 import tifffile
 from brainglobe_atlasapi import BrainGlobeAtlas
+from brainglobe_atlasapi.list_atlases import get_downloaded_atlases
 from brainglobe_space import AnatomicalSpace
 from qtpy import QtCore
-from qtpy.QtCore import QAbstractTableModel, Qt
 from qtpy.QtWidgets import (
     QComboBox,
     QFileDialog,
@@ -23,9 +24,11 @@ from brainglobe_utils.brainmapper.analysis import (
 from brainglobe_utils.brainreg.transform import (
     transform_points_from_downsampled_to_atlas_space,
 )
+from brainglobe_utils.general.system import ensure_extension
 from brainglobe_utils.qtpy.dialog import display_info
 from brainglobe_utils.qtpy.interaction import add_button, add_combobox
 from brainglobe_utils.qtpy.logo import header_widget
+from brainglobe_utils.qtpy.table import DataFrameModel
 
 
 class TransformPoints(QWidget):
@@ -97,7 +100,6 @@ class TransformPoints(QWidget):
         self.add_points_combobox(row=1, column=0)
         self.add_raw_data_combobox(row=2, column=0)
         self.add_transform_button(row=3, column=0)
-        self.add_analyse_button(row=3, column=1)
 
         self.add_points_summary_table(row=4, column=0)
         self.add_save_all_points_button(row=6, column=0)
@@ -150,17 +152,6 @@ class TransformPoints(QWidget):
             column=column,
             visibility=True,
             tooltip="Transform points layer to atlas space",
-        )
-
-    def add_analyse_button(self, row, column):
-        self.analyse_button = add_button(
-            "Analyse points",
-            self.layout,
-            self.analyse_points,
-            row=row,
-            column=column,
-            visibility=False,
-            tooltip="Analyse distribution of points within the atlas",
         )
 
     def add_points_summary_table(self, row, column):
@@ -229,7 +220,9 @@ class TransformPoints(QWidget):
 
         self.run_transform_points_to_downsampled_space()
         self.run_transform_downsampled_points_to_atlas_space()
-        self.analyse_button.setVisible(True)
+
+        self.status_label.setText("Analysing point distribution ...")
+        self.analyse_points()
         self.status_label.setText("Ready")
 
     def check_layers(self):
@@ -279,7 +272,7 @@ class TransformPoints(QWidget):
         self.status_label.setText("Ready")
 
     def get_brainreg_paths(self):
-        self.paths = self.Paths(self.brainreg_directory)
+        self.paths = Paths(self.brainreg_directory)
 
     def check_brainreg_directory(self):
         try:
@@ -287,12 +280,12 @@ class TransformPoints(QWidget):
                 self.brainreg_metadata = json.load(json_file)
 
                 if not self.brainreg_metadata["atlas"]:
-                    self.display_directory_warning()
+                    self.display_brainreg_directory_warning()
 
         except FileNotFoundError:
-            self.display_directory_warning()
+            self.display_brainreg_directory_warning()
 
-    def display_directory_warning(self):
+    def display_brainreg_directory_warning(self):
         display_info(
             self,
             "Not a brainreg directory",
@@ -301,9 +294,17 @@ class TransformPoints(QWidget):
         )
 
     def get_registration_metadata(self):
-        self.metadata = self.Metadata(self.brainreg_metadata)
+        self.metadata = Metadata(self.brainreg_metadata)
 
     def load_atlas(self):
+        if not self.is_atlas_installed(self.metadata.atlas_string):
+            display_info(
+                self,
+                "Atlas not downloaded",
+                f"Atlas: {self.metadata.atlas_string} needs to be "
+                f"downloaded. This may take some time depending on "
+                f"the size of the atlas and your network speed.",
+            )
         self.atlas = BrainGlobeAtlas(self.metadata.atlas_string)
 
     def run_transform_points_to_downsampled_space(self):
@@ -396,88 +397,144 @@ class TransformPoints(QWidget):
         self.points_per_region_table.setVisible(True)
 
     def save_all_points_csv(self):
-        self.all_points_csv_path, _ = QFileDialog.getSaveFileName(
-            self,
-            "Choose filename",
-            "",
-            "CSV Files (*.csv)",
-        )
-        self.all_points_csv_path = ensure_extension(
-            self.all_points_csv_path, ".csv"
-        )
-        self.all_points_df.to_csv(self.all_points_csv_path, index=False)
+        self.save_df_to_csv(self.all_points_df)
 
     def save_points_summary_csv(self):
-        self.summary_points_csv_path, _ = QFileDialog.getSaveFileName(
+        self.save_df_to_csv(self.points_per_region_df)
+
+    def save_df_to_csv(self, df: pd.DataFrame) -> None:
+        """
+        Save the given DataFrame to a CSV file.
+
+        Prompts the user to choose a filename and ensures the file has a
+        .csv extension.
+        The DataFrame is then saved to the specified file.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            The DataFrame to be saved.
+
+        Returns
+        -------
+        None
+        """
+        path, _ = QFileDialog.getSaveFileName(
             self,
             "Choose filename",
             "",
             "CSV Files (*.csv)",
         )
-        self.summary_points_csv_path = ensure_extension(
-            self.summary_points_csv_path, ".csv"
+
+        if path:
+            path = ensure_extension(path, ".csv")
+            df.to_csv(path, index=False)
+
+    @staticmethod
+    def is_atlas_installed(atlas):
+        downloaded_atlases = get_downloaded_atlases()
+        if atlas in downloaded_atlases:
+            return True
+        else:
+            return False
+
+
+class Paths:
+    """
+    A class to hold all brainreg-related file paths.
+
+    N.B. this could be imported from brainreg, but it is copied here to
+    prevent a circular dependency
+
+    Attributes
+    ----------
+    brainreg_directory : Path
+        Path to brainreg output directory (or brainmapper
+        "registration" directory)
+    brainreg_metadata_file : Path
+        The path to the brainreg metadata (brainreg.json) file
+    deformation_field_0 : Path
+        The path to the deformation field (0th dimension)
+    deformation_field_1 : Path
+        The path to the deformation field (1st dimension)
+    deformation_field_2 : Path
+        The path to the deformation field (2nd dimension)
+    downsampled_image : Path
+        The path to the downsampled.tiff image file
+    volume_csv_path : Path
+        The path to the csv file containing region volumes
+
+    Parameters
+    ----------
+    brainreg_directory : Union[str, Path]
+        Path to brainreg output directory (or brainmapper
+        "registration" directory)
+    """
+
+    def __init__(self, brainreg_directory: Union[str, Path]) -> None:
+        self.brainreg_directory: Path = Path(brainreg_directory)
+        self.brainreg_metadata_file: Path = self.make_filepaths(
+            "brainreg.json"
         )
-        self.points_per_region_df.to_csv(
-            self.summary_points_csv_path, index=False
+        self.deformation_field_0: Path = self.make_filepaths(
+            "deformation_field_0.tiff"
         )
+        self.deformation_field_1: Path = self.make_filepaths(
+            "deformation_field_1.tiff"
+        )
+        self.deformation_field_2: Path = self.make_filepaths(
+            "deformation_field_2.tiff"
+        )
+        self.downsampled_image: Path = self.make_filepaths("downsampled.tiff")
+        self.volume_csv_path: Path = self.make_filepaths("volumes.csv")
 
-    class Paths:
+    def make_filepaths(self, filename: str) -> Path:
         """
-        A single class to hold all file paths that may be used.
+        Create a full file path by combining the directory with a filename.
+
+        Parameters
+        ----------
+        filename : str
+            The name of the file to create a path for.
+
+        Returns
+        -------
+        Path
+            The full path to the specified file.
         """
-
-        def __init__(self, brainreg_directory):
-            self.brainreg_directory = brainreg_directory
-            self.brainreg_metadata_file = self.make_filepaths("brainreg.json")
-            self.deformation_field_0 = self.make_filepaths(
-                "deformation_field_0.tiff"
-            )
-            self.deformation_field_1 = self.make_filepaths(
-                "deformation_field_1.tiff"
-            )
-            self.deformation_field_2 = self.make_filepaths(
-                "deformation_field_2.tiff"
-            )
-            self.downsampled_image = self.make_filepaths("downsampled.tiff")
-            self.volume_csv_path = self.make_filepaths("volumes.csv")
-
-        def make_filepaths(self, filename):
-            return self.brainreg_directory / filename
-
-    class Metadata:
-        def __init__(self, brainreg_metadata):
-            self.orientation = brainreg_metadata["orientation"]
-            self.atlas_string = brainreg_metadata["atlas"]
-            self.voxel_sizes = brainreg_metadata["voxel_sizes"]
+        return self.brainreg_directory / filename
 
 
-class DataFrameModel(QAbstractTableModel):
-    def __init__(self, df):
-        super().__init__()
-        self._df = df
+class Metadata:
+    """
+    A class to represent brainreg registration metadata
+    (loaded from brainreg.json)
 
-    def rowCount(self, parent=None):
-        return self._df.shape[0]
+    Attributes
+    ----------
+    orientation : str
+        The orientation of the input data (in brainglobe-space format)
+    atlas_string : str
+        The BrainGlobe atlas used for brain registration.
+    voxel_sizes : List[float]
+        The voxel sizes of the input data
 
-    def columnCount(self, parent=None):
-        return self._df.shape[1]
+    Parameters
+    ----------
+    brainreg_metadata : Dict[str, Any]
+        A dictionary containing metadata information,
+        loaded from brainreg.json
+    """
 
-    def data(self, index, role=Qt.DisplayRole):
-        if role == Qt.DisplayRole:
-            return str(self._df.iloc[index.row(), index.column()])
-        return None
+    def __init__(self, brainreg_metadata: Dict[str, Any]) -> None:
+        """
+        Initialize the Metadata instance with brainreg metadata.
 
-    def headerData(self, section, orientation, role=Qt.DisplayRole):
-        if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
-                return self._df.columns[section]
-            if orientation == Qt.Vertical:
-                return self._df.index[section]
-        return None
-
-
-def ensure_extension(file_path, extension):
-    path = Path(file_path)
-    if path.suffix != extension:
-        path = path.with_suffix(extension)
-    return path
+        Parameters
+        ----------
+        brainreg_metadata : Dict[str, Any]
+            A dictionary containing metadata information from brainreg.json
+        """
+        self.orientation: str = brainreg_metadata["orientation"]
+        self.atlas_string: str = brainreg_metadata["atlas"]
+        self.voxel_sizes: List[float] = brainreg_metadata["voxel_sizes"]

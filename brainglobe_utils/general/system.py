@@ -6,6 +6,7 @@ import shutil
 import subprocess
 from pathlib import Path
 from tempfile import gettempdir
+from typing import Union
 
 import psutil
 from natsort import natsorted
@@ -18,6 +19,33 @@ from brainglobe_utils.general.string import get_text_lines
 # On Windows, max_workers must be less than or equal to 61
 # https://docs.python.org/3/library/concurrent.futures.html#processpoolexecutor
 MAX_PROCESSES_WINDOWS = 61
+
+
+def ensure_extension(
+    file_path: Union[str, os.PathLike], extension: str
+) -> Path:
+    """
+    Ensure that the given file path has the specified extension.
+
+    If the file path does not already have the specified extension,
+    it changes the file path to have that extension.
+
+    Parameters
+    ----------
+    file_path : Union[str, os.PathLike]
+        The path to the file.
+    extension : str
+        The desired file extension (should include the dot, e.g., '.txt').
+
+    Returns
+    -------
+    Path
+        The Path object with the ensured extension.
+    """
+    path = Path(file_path)
+    if path.suffix != extension:
+        path = path.with_suffix(extension)
+    return path
 
 
 def replace_extension(file, new_extension, check_leading_period=True):
