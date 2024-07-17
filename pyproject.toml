@@ -52,6 +52,7 @@ brainglobe-utils = "brainglobe_utils:napari.yaml"
 
 [project.optional-dependencies]
 qt = ["qtpy", "superqt"]
+napari = ["brainglobe-utils[qt]", "napari[all]"]
 
 dev = [
     "black",
@@ -68,7 +69,7 @@ dev = [
     "setuptools_scm",
     "tox",
     "pooch",
-    "brainglobe-utils[qt]",
+    "brainglobe-utils[napari]",
 ]
 
 
