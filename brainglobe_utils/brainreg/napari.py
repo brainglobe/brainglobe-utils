@@ -265,11 +265,14 @@ class TransformPoints(QWidget):
         else:
             self.brainreg_directory = Path(brainreg_directory)
 
+        self.initialise_brainreg_data()
+        self.status_label.setText("Ready")
+
+    def initialise_brainreg_data(self):
         self.get_brainreg_paths()
         self.check_brainreg_directory()
         self.get_registration_metadata()
         self.load_atlas()
-        self.status_label.setText("Ready")
 
     def get_brainreg_paths(self):
         self.paths = Paths(self.brainreg_directory)
@@ -309,8 +312,8 @@ class TransformPoints(QWidget):
 
     def run_transform_points_to_downsampled_space(self):
         downsampled_space = self.get_downsampled_space()
-        source_space = self.get_source_space()
-        self.points_in_downsampled_space = source_space.map_points_to(
+        raw_data_space = self.get_raw_data_space()
+        self.points_in_downsampled_space = raw_data_space.map_points_to(
             downsampled_space, self.points_layer.data
         )
         self.viewer.add_points(
@@ -356,13 +359,13 @@ class TransformPoints(QWidget):
         )
         return downsampled_space
 
-    def get_source_space(self):
-        source_space = AnatomicalSpace(
+    def get_raw_data_space(self):
+        raw_data_space = AnatomicalSpace(
             self.metadata.orientation,
             shape=self.raw_data.data.shape,
             resolution=[float(i) for i in self.metadata.voxel_sizes],
         )
-        return source_space
+        return raw_data_space
 
     def analyse_points(self):
         self.all_points_df, self.points_per_region_df = (
