@@ -2,10 +2,15 @@ from pathlib import Path
 from typing import Any, Dict
 
 import numpy as np
+import pandas as pd
 import pooch
 import pytest
 
-from brainglobe_utils.brainmapper.transform_widget import Metadata, Paths, TransformPoints
+from brainglobe_utils.brainmapper.transform_widget import (
+    Metadata,
+    Paths,
+    TransformPoints,
+)
 
 RAW_DATA_ORIENTATION = ATLAS_ORIENTATION = "asr"
 points = np.array(
@@ -226,6 +231,80 @@ def test_analysis(transformation_widget_with_transformed_points):
             "left_cells_per_mm3",
         ].values[0]
         == 0
+    )
+
+
+@pytest.fixture
+def sample_dataframe():
+    return pd.DataFrame({"column1": [1, 2, 3], "column2": ["a", "b", "c"]})
+
+
+def test_save_df_to_csv(
+    mocker,
+    transformation_widget_with_transformed_points,
+    sample_dataframe,
+    tmp_path,
+):
+    # Mock dialog to avoid need for UI
+    mock_get_save_file_name = mocker.patch(
+        "brainglobe_utils.brainmapper.transform_widget.QFileDialog.getSaveFileName"
+    )
+
+    save_path = tmp_path / "test.csv"
+    mock_get_save_file_name.return_value = (save_path, "CSV Files (*.csv)")
+
+    transformation_widget_with_transformed_points.save_df_to_csv(
+        sample_dataframe
+    )
+
+    # Ensure the file dialog was called
+    mock_get_save_file_name.assert_called_once_with(
+        transformation_widget_with_transformed_points,
+        "Choose filename",
+        "",
+        "CSV Files (*.csv)",
+    )
+
+    assert save_path.exists()
+
+
+def test_save_all_points_and_summary_csv(
+    mocker,
+    transformation_widget_with_transformed_points,
+    tmp_path,
+):
+    transformation_widget_with_transformed_points.analyse_points()
+
+    # Mock dialog to avoid need for UI
+    mock_get_save_file_name = mocker.patch(
+        "brainglobe_utils.brainmapper.transform_widget.QFileDialog.getSaveFileName"
+    )
+
+    save_path = tmp_path / "all_points.csv"
+    mock_get_save_file_name.return_value = (save_path, "CSV Files (*.csv)")
+    transformation_widget_with_transformed_points.save_all_points_csv()
+    assert save_path.exists()
+
+    save_path = tmp_path / "points_per_region.csv"
+    mock_get_save_file_name.return_value = (save_path, "CSV Files (*.csv)")
+    transformation_widget_with_transformed_points.save_points_summary_csv()
+    assert save_path.exists()
+
+
+def test_is_atlas_installed(mocker, transformation_widget_with_napari_layers):
+    mock_get_downloaded_atlases = mocker.patch(
+        "brainglobe_utils.brainmapper.transform_widget.get_downloaded_atlases"
+    )
+    mock_get_downloaded_atlases.return_value = [
+        "allen_mouse_10um",
+        "allen_mouse_50um",
+    ]
+
+    assert transformation_widget_with_napari_layers.is_atlas_installed(
+        "allen_mouse_10um"
+    )
+    assert not transformation_widget_with_napari_layers.is_atlas_installed(
+        "allen_mouse_25um"
     )
 
 
