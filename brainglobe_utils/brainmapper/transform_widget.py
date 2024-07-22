@@ -282,7 +282,7 @@ class TransformPoints(QWidget):
             with open(self.paths.brainreg_metadata_file) as json_file:
                 self.brainreg_metadata = json.load(json_file)
 
-                if not self.brainreg_metadata["atlas"]:
+                if "atlas" not in self.brainreg_metadata:
                     self.display_brainreg_directory_warning()
 
         except FileNotFoundError:

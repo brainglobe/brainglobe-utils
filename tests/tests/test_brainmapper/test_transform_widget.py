@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Any, Dict
 
@@ -207,6 +208,73 @@ def test_transform_points_to_atlas_space(
             "Points in atlas space"
         ].data,
         points_in_atlas_space,
+    )
+
+
+@pytest.fixture
+def random_json_path(tmp_path):
+    json_path = tmp_path / "random_json.json"
+    content = {
+        "name": "Pooh Bear",
+        "location": "100 acre wood",
+        "food": "Honey",
+    }
+    with open(json_path, "w") as f:
+        json.dump(content, f)
+
+    return json_path
+
+
+def test_check_brainreg_directory_correct_metadata(
+    mocker, transformation_widget_with_data
+):
+    mock_method = mocker.patch.object(
+        transformation_widget_with_data, "display_brainreg_directory_warning"
+    )
+
+    transformation_widget_with_data.check_brainreg_directory()
+    mock_method.assert_not_called()
+
+
+def test_check_brainreg_directory_random_data(
+    mocker, transformation_widget_with_data, random_json_path
+):
+    mock_method = mocker.patch.object(
+        transformation_widget_with_data, "display_brainreg_directory_warning"
+    )
+    transformation_widget_with_data.paths.brainreg_metadata_file = (
+        random_json_path
+    )
+    transformation_widget_with_data.check_brainreg_directory()
+    mock_method.assert_called_once()
+
+
+def test_check_brainreg_directory_false_path(
+    mocker, transformation_widget_with_data
+):
+    mock_method = mocker.patch.object(
+        transformation_widget_with_data, "display_brainreg_directory_warning"
+    )
+
+    transformation_widget_with_data.paths.brainreg_metadata_file = "/some/file"
+    transformation_widget_with_data.check_brainreg_directory()
+    mock_method.assert_called_once()
+
+
+def test_display_brainreg_directory_warning_calls_display_info(
+    mocker, transformation_widget_with_napari_layers
+):
+    mock_display_info = mocker.patch(
+        "brainglobe_utils.brainmapper.transform_widget.display_info"
+    )
+    transformation_widget_with_napari_layers.display_brainreg_directory_warning()
+
+    # Assert display_info was called once with the expected arguments
+    mock_display_info.assert_called_once_with(
+        transformation_widget_with_napari_layers,
+        "Not a brainreg directory",
+        "This directory does not appear to be a valid brainreg directory. "
+        "Please try loading another brainreg output directory.",
     )
 
 
