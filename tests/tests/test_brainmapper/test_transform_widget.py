@@ -194,6 +194,31 @@ def test_get_raw_data_space(transformation_widget_with_data):
     assert raw_data_space.origin_string == RAW_DATA_ORIENTATION
 
 
+def test_call_transform_points_to_atlas_space(
+    mocker, transformation_widget_with_data
+):
+    mock_load_brainreg = mocker.patch.object(
+        transformation_widget_with_data, "load_brainreg_directory"
+    )
+    mock_transform_downsampled = mocker.patch.object(
+        transformation_widget_with_data,
+        "run_transform_points_to_downsampled_space",
+    )
+    mock_transform_atlas = mocker.patch.object(
+        transformation_widget_with_data,
+        "run_transform_downsampled_points_to_atlas_space",
+    )
+    mock_analyse_points = mocker.patch.object(
+        transformation_widget_with_data, "analyse_points"
+    )
+
+    transformation_widget_with_data.transform_points_to_atlas_space()
+    mock_load_brainreg.assert_called_once()
+    mock_transform_downsampled.assert_called_once()
+    mock_transform_atlas.assert_called_once()
+    mock_analyse_points.assert_called_once()
+
+
 def test_transform_points_to_atlas_space(
     transformation_widget_with_transformed_points,
 ):
