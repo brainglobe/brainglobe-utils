@@ -122,19 +122,24 @@ def transformation_widget_with_data(
 
 
 @pytest.fixture(scope="function")
-def transformation_widget_with_napari_layers(
-    make_napari_viewer, brainreg_directory
-):
+def transformation_widget(make_napari_viewer):
     viewer = make_napari_viewer()
     widget = TransformPoints(viewer)
     viewer.window.add_dock_widget(widget)
-    points_layer = viewer.add_points(points)
-    widget.points_layer = points_layer
+    return widget
+
+
+@pytest.fixture(scope="function")
+def transformation_widget_with_napari_layers(
+    transformation_widget, brainreg_directory
+):
+    points_layer = transformation_widget.viewer.add_points(points)
+    transformation_widget.points_layer = points_layer
 
     raw_data = brainreg_directory / "downsampled.tiff"
-    raw_data_layer = viewer.open(raw_data)
-    widget.raw_data = raw_data_layer[0]
-    return widget
+    raw_data_layer = transformation_widget.viewer.open(raw_data)
+    transformation_widget.raw_data = raw_data_layer[0]
+    return transformation_widget
 
 
 @pytest.fixture
@@ -291,7 +296,7 @@ def test_save_all_points_and_summary_csv(
     assert save_path.exists()
 
 
-def test_is_atlas_installed(mocker, transformation_widget_with_napari_layers):
+def test_is_atlas_installed(mocker, transformation_widget):
     mock_get_downloaded_atlases = mocker.patch(
         "brainglobe_utils.brainmapper.transform_widget.get_downloaded_atlases"
     )
@@ -300,12 +305,8 @@ def test_is_atlas_installed(mocker, transformation_widget_with_napari_layers):
         "allen_mouse_50um",
     ]
 
-    assert transformation_widget_with_napari_layers.is_atlas_installed(
-        "allen_mouse_10um"
-    )
-    assert not transformation_widget_with_napari_layers.is_atlas_installed(
-        "allen_mouse_25um"
-    )
+    assert transformation_widget.is_atlas_installed("allen_mouse_10um")
+    assert not transformation_widget.is_atlas_installed("allen_mouse_25um")
 
 
 def test_paths_initialisation(
