@@ -5,7 +5,7 @@ import numpy as np
 import pooch
 import pytest
 
-from brainglobe_utils.brainreg.napari import Metadata, Paths, TransformPoints
+from brainglobe_utils.brainmapper.transform_widget import Metadata, Paths, TransformPoints
 
 RAW_DATA_ORIENTATION = ATLAS_ORIENTATION = "asr"
 points = np.array(
