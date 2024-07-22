@@ -151,7 +151,7 @@ def brainreg_directory() -> Path:
         known_hash="a1997f61a5efa752584ea91b7c479506343215bb91f5be09a72349f24e21fc54",
         path=download_path,
         progressbar=True,
-        processor=pooch.Unzip(extract_dir="../test_brainreg"),
+        processor=pooch.Unzip(extract_dir="."),
     )
     return download_path / "points_transform_brainreg_directory"
 
