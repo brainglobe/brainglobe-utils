@@ -352,7 +352,8 @@ class TransformPoints(QWidget):
             display_info(
                 self,
                 "Points outside atlas",
-                f"{len(points_out_of_bounds)} fell outside the atlas space",
+                f"{len(points_out_of_bounds)} "
+                f"points fell outside the atlas space",
             )
 
     def get_downsampled_space(self):

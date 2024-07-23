@@ -43,6 +43,14 @@ points = np.array(
     ]
 )
 
+points_outside_brain = np.array(
+    [
+        [10000, 10000, 10000],
+        [100001, 100001, 100001],
+    ]
+)
+
+
 points_in_downsampled_space = np.array(
     [
         [10.0, 68.0, 105.0],
@@ -261,6 +269,22 @@ def test_transform_points_to_atlas_space(
             "Points in atlas space"
         ].data,
         points_in_atlas_space,
+    )
+
+
+def test_transformation_raises_info_points_out_of_bounds(
+    transformation_widget_with_data, mock_display_info
+):
+    points_layer = transformation_widget_with_data.viewer.add_points(
+        points_outside_brain
+    )
+    transformation_widget_with_data.points_layer = points_layer
+    transformation_widget_with_data.run_transform_points_to_downsampled_space()
+    transformation_widget_with_data.run_transform_downsampled_points_to_atlas_space()
+    mock_display_info.assert_called_once_with(
+        transformation_widget_with_data,
+        "Points outside atlas",
+        "2 points fell outside the atlas space",
     )
 
 
