@@ -103,6 +103,11 @@ points_in_atlas_space = np.array(
 
 
 @pytest.fixture
+def sample_dataframe():
+    return pd.DataFrame({"column1": [1, 2, 3], "column2": ["a", "b", "c"]})
+
+
+@pytest.fixture
 def random_json_path(tmp_path):
     json_path = tmp_path / "random_json.json"
     content = {
@@ -123,7 +128,7 @@ def mock_display_info(mocker):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def transformation_widget_with_transformed_points(
     transformation_widget_with_data,
 ):
@@ -413,11 +418,6 @@ def test_analysis(transformation_widget_with_transformed_points):
         ].values[0]
         == 0
     )
-
-
-@pytest.fixture
-def sample_dataframe():
-    return pd.DataFrame({"column1": [1, 2, 3], "column2": ["a", "b", "c"]})
 
 
 def test_save_df_to_csv(
