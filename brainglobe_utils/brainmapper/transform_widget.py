@@ -215,7 +215,12 @@ class TransformPoints(QWidget):
             return
 
         self.status_label.setText("Loading brainreg data ...")
-        self.load_brainreg_directory()
+        data_loaded = self.load_brainreg_directory()
+
+        if not data_loaded:
+            self.status_label.setText("Ready")
+            return
+
         self.status_label.setText("Transforming points ...")
 
         self.run_transform_points_to_downsampled_space()
@@ -260,13 +265,14 @@ class TransformPoints(QWidget):
             self,
             "Select brainreg directory",
         )
-        if not brainreg_directory:
-            return
+        if brainreg_directory == "":
+            return False
         else:
             self.brainreg_directory = Path(brainreg_directory)
 
         self.initialise_brainreg_data()
         self.status_label.setText("Ready")
+        return True
 
     def initialise_brainreg_data(self):
         self.get_brainreg_paths()

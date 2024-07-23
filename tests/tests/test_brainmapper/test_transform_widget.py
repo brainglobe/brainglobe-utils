@@ -103,6 +103,27 @@ points_in_atlas_space = np.array(
 
 
 @pytest.fixture
+def random_json_path(tmp_path):
+    json_path = tmp_path / "random_json.json"
+    content = {
+        "name": "Pooh Bear",
+        "location": "100 acre wood",
+        "food": "Honey",
+    }
+    with open(json_path, "w") as f:
+        json.dump(content, f)
+
+    return json_path
+
+
+@pytest.fixture
+def mock_display_info(mocker):
+    return mocker.patch(
+        "brainglobe_utils.brainmapper.transform_widget.display_info"
+    )
+
+
+@pytest.fixture
 def transformation_widget_with_transformed_points(
     transformation_widget_with_data,
 ):
@@ -236,18 +257,81 @@ def test_transform_points_to_atlas_space(
     )
 
 
-@pytest.fixture
-def random_json_path(tmp_path):
-    json_path = tmp_path / "random_json.json"
-    content = {
-        "name": "Pooh Bear",
-        "location": "100 acre wood",
-        "food": "Honey",
-    }
-    with open(json_path, "w") as f:
-        json.dump(content, f)
+def test_check_layers(transformation_widget_with_data):
+    assert transformation_widget_with_data.check_layers()
 
-    return json_path
+
+def test_check_layers_no_layers(transformation_widget, mock_display_info):
+    transformation_widget.check_layers()
+
+    mock_display_info.assert_called_once_with(
+        transformation_widget,
+        "No layers selected",
+        "Please select the layers corresponding to the points "
+        "you would like to transform and the raw data (registered by "
+        "brainreg)",
+    )
+
+
+def test_check_layers_no_raw_data(transformation_widget, mock_display_info):
+    points_layer = transformation_widget.viewer.add_points(points)
+    transformation_widget.points_layer = points_layer
+
+    transformation_widget.check_layers()
+
+    mock_display_info.assert_called_once_with(
+        transformation_widget,
+        "No raw data layer selected",
+        "Please select a layer that corresponds to the raw "
+        "data (registered by brainreg)",
+    )
+
+
+def test_check_layers_no_points_data(
+    transformation_widget, brainreg_directory, mock_display_info
+):
+    raw_data = brainreg_directory / "downsampled.tiff"
+    raw_data_layer = transformation_widget.viewer.open(raw_data)
+    transformation_widget.raw_data = raw_data_layer[0]
+
+    transformation_widget.check_layers()
+
+    mock_display_info.assert_called_once_with(
+        transformation_widget,
+        "No points layer selected",
+        "Please select a points layer you would like to transform",
+    )
+
+
+def test_load_brainreg_directory(
+    transformation_widget_with_napari_layers, brainreg_directory, mocker
+):
+    # Mock dialog to avoid need for UI
+    mock_get_save_file_name = mocker.patch(
+        "brainglobe_utils.brainmapper.transform_widget.QFileDialog.getExistingDirectory"
+    )
+    mock_get_save_file_name.return_value = brainreg_directory
+
+    transformation_widget_with_napari_layers.load_brainreg_directory()
+    assert (
+        transformation_widget_with_napari_layers.atlas.atlas_name
+        == "allen_mouse_50um"
+    )
+
+
+def test_load_brainreg_directory_no_input(
+    transformation_widget_with_napari_layers, mocker
+):
+    # Mock dialog to avoid need for UI
+    mock_get_save_file_name = mocker.patch(
+        "brainglobe_utils.brainmapper.transform_widget.QFileDialog.getExistingDirectory"
+    )
+    mock_get_save_file_name.return_value = ""
+
+    transformation_widget_with_napari_layers.load_brainreg_directory()
+    assert not hasattr(
+        transformation_widget_with_napari_layers.atlas, "atlas_name"
+    )
 
 
 def test_check_brainreg_directory_correct_metadata(
@@ -287,11 +371,8 @@ def test_check_brainreg_directory_false_path(
 
 
 def test_display_brainreg_directory_warning_calls_display_info(
-    mocker, transformation_widget_with_napari_layers
+    transformation_widget_with_napari_layers, mock_display_info
 ):
-    mock_display_info = mocker.patch(
-        "brainglobe_utils.brainmapper.transform_widget.display_info"
-    )
     transformation_widget_with_napari_layers.display_brainreg_directory_warning()
 
     # Assert display_info was called once with the expected arguments

@@ -5,7 +5,7 @@ contributions:
   commands:
   - id: brainglobe-utils.TransformPoints
     title: Open points transformation widget
-    python_name: brainglobe_utils.brainreg.napari:TransformPoints
+    python_name: brainglobe_utils.brainmapper.transform_widget:TransformPoints
 
   widgets:
   - command: brainglobe-utils.TransformPoints
