@@ -47,7 +47,7 @@ jobs:
         with:
           path: "~/.brainglobe"
           # hash on conftest in case url changes
-          key: brainglobe_dir-${{ hashFiles('package-lock.json') }}
+          key: brainglobe_dir${{ hashFiles('package-lock.json') }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
