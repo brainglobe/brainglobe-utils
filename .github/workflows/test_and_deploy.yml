@@ -26,9 +26,6 @@ jobs:
     needs: [linting, manifest]
     name: ${{ matrix.os }} py${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
-    env:
-      # pooch cache dir
-      BRAINGLOBE_TEST_DATA_DIR: "~/.pooch_cache"
 
     strategy:
       matrix:
@@ -45,18 +42,10 @@ jobs:
             python-version: "3.12"
 
     steps:
-      - name: Cache brainglobe directory
+      - name: Cache data
         uses: actions/cache@v4
         with:
-          path: | # ensure we don't cache any interrupted atlas download and extraction, if e.g. we cancel the workflow manually
-            ~/.brainglobe
-            !~/.brainglobe/atlas.tar.gz
-            key: atlases
-
-      - name: Cache pooch data
-        uses: actions/cache@v4
-        with:
-          path: "~/.pooch_cache"
+          path: "~/.brainglobe"
           # hash on conftest in case url changes
           key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/conftest.py') }}
 
@@ -80,8 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NUMBA_DISABLE_JIT: "1"
-      # pooch cache dir
-      BRAINGLOBE_TEST_DATA_DIR: "~/.pooch_cache"
+
 
     steps:
       - name: Cache pooch data
@@ -89,7 +77,7 @@ jobs:
         with:
           path: "~/.pooch_cache"
           # hash on conftest in case url changes
-          key: ${{ runner.os }}-3.11-${{ hashFiles('**/conftest.py') }}
+          key: ${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/conftest.py') }}
 
       - name: Set up Python
         uses: actions/setup-python@v4

@@ -165,17 +165,19 @@ def transformation_widget_with_napari_layers(
 
 
 @pytest.fixture
-def brainreg_directory() -> Path:
-    download_path = Path.home() / ".brainglobe" / "test_data"
-    _ = pooch.retrieve(
-        url="https://gin.g-node.org/BrainGlobe/test-data/raw/master/"
+def brainreg_directory(test_data_registry) -> Path:
+    _ = test_data_registry.fetch(
         "brainglobe-utils/points_transform_brainreg_directory.zip",
-        known_hash="a1997f61a5efa752584ea91b7c479506343215bb91f5be09a72349f24e21fc54",
-        path=download_path,
         progressbar=True,
-        processor=pooch.Unzip(extract_dir="."),
+        processor=pooch.Unzip(extract_dir=""),
     )
-    return download_path / "points_transform_brainreg_directory"
+    return (
+        Path.home()
+        / ".brainglobe"
+        / "test_data"
+        / "brainglobe-utils"
+        / "points_transform_brainreg_directory"
+    )
 
 
 @pytest.fixture
