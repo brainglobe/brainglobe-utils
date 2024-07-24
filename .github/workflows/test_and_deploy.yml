@@ -42,13 +42,6 @@ jobs:
             python-version: "3.12"
 
     steps:
-      - name: Cache data
-        uses: actions/cache@v4
-        with:
-          path: "~/.brainglobe"
-          # hash on conftest in case url changes
-          key: brainglobe_dir${{ hashFiles('package-lock.json') }}
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
