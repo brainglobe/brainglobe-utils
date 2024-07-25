@@ -35,6 +35,7 @@ def test_data(model):
 
     assert model.data(index, Qt.EditRole) is None
 
+
 def test_header_data(model, sample_df):
     assert (
         model.headerData(0, Qt.Vertical, Qt.DisplayRole) == sample_df.index[0]
@@ -45,5 +46,3 @@ def test_header_data(model, sample_df):
     assert (
         model.headerData(2, Qt.Vertical, Qt.DisplayRole) == sample_df.index[2]
     )
-
-

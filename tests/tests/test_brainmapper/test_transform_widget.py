@@ -443,6 +443,7 @@ def test_warn_user_about_atlas_download(
         "the size of the atlas and your network speed.",
     )
 
+
 def test_layers_not_in_place_return(mocker, transformation_widget):
     mock_is_atlas_installed = mocker.patch(
         "brainglobe_utils.brainmapper.transform_widget.TransformPoints.check_layers"
@@ -450,12 +451,20 @@ def test_layers_not_in_place_return(mocker, transformation_widget):
     mock_is_atlas_installed.return_value = False
     assert transformation_widget.transform_points_to_atlas_space() is None
 
-def test_transform_points_return_if_no_brainreg(mocker, transformation_widget_with_data):
+
+def test_transform_points_return_if_no_brainreg(
+    mocker, transformation_widget_with_data
+):
     mock_is_atlas_installed = mocker.patch(
         "brainglobe_utils.brainmapper.transform_widget.TransformPoints.load_brainreg_directory"
     )
     mock_is_atlas_installed.return_value = False
-    assert transformation_widget_with_data.transform_points_to_atlas_space() is None
+    assert (
+        transformation_widget_with_data.transform_points_to_atlas_space()
+        is None
+    )
+
+
 def test_analysis(transformation_widget_with_transformed_points):
     transformation_widget_with_transformed_points.analyse_points()
 
