@@ -426,6 +426,36 @@ def test_display_brainreg_directory_warning_calls_display_info(
     )
 
 
+def test_warn_user_about_atlas_download(
+    transformation_widget_with_data, mocker, mock_display_info
+):
+    mock_is_atlas_installed = mocker.patch(
+        "brainglobe_utils.brainmapper.transform_widget.TransformPoints.is_atlas_installed"
+    )
+    mock_is_atlas_installed.return_value = False
+
+    transformation_widget_with_data.load_atlas()
+    mock_display_info.assert_called_once_with(
+        transformation_widget_with_data,
+        "Atlas not downloaded",
+        "Atlas: allen_mouse_50um needs to be "
+        "downloaded. This may take some time depending on "
+        "the size of the atlas and your network speed.",
+    )
+
+def test_layers_not_in_place_return(mocker, transformation_widget):
+    mock_is_atlas_installed = mocker.patch(
+        "brainglobe_utils.brainmapper.transform_widget.TransformPoints.check_layers"
+    )
+    mock_is_atlas_installed.return_value = False
+    assert transformation_widget.transform_points_to_atlas_space() is None
+
+def test_transform_points_return_if_no_brainreg(mocker, transformation_widget_with_data):
+    mock_is_atlas_installed = mocker.patch(
+        "brainglobe_utils.brainmapper.transform_widget.TransformPoints.load_brainreg_directory"
+    )
+    mock_is_atlas_installed.return_value = False
+    assert transformation_widget_with_data.transform_points_to_atlas_space() is None
 def test_analysis(transformation_widget_with_transformed_points):
     transformation_widget_with_transformed_points.analyse_points()
 
