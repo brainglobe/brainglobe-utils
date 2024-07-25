@@ -3,9 +3,10 @@ Parts based on https://github.com/SainsburyWellcomeCentre/cell_count_analysis
 by Charly Rousseau (https://github.com/crousseau).
 """
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Set, Union
+from typing import List, Optional, Set, Union
 
 import numpy as np
 import pandas as pd
@@ -104,15 +105,10 @@ def combine_df_hemispheres(df: pd.DataFrame) -> pd.DataFrame:
     return both
 
 
-def create_all_cell_csv(
-    points: List[Point], output_filename: Union[str, Path]
-) -> None:
+def create_all_cell_df(points: List[Point]) -> None:
     """
-    Create a CSV file with cell data from a list of Point objects.
-
     This function takes a list of Point objects, each representing cell
     coordinates and brain region and converts this into a pandas DataFrame.
-    The DataFrame is then saved to a CSV file at the specified filename.
 
     Parameters
     ----------
@@ -120,16 +116,12 @@ def create_all_cell_csv(
         A list of Point objects, each containing cell data such as
         raw and atlas coordinates,
         structure name, and hemisphere information.
-    output_filename : Union[str, Path]
-        The filename (including path) where the CSV file will be saved.
-        Can be a string or a Path object.
 
     Returns
     -------
-    None
+    df: pd.DataFrame
     """
 
-    ensure_directory_exists(Path(output_filename).parent)
     df = pd.DataFrame(
         columns=(
             "coordinate_raw_axis_0",
@@ -155,14 +147,13 @@ def create_all_cell_csv(
         temp_matrix[i].append(point.hemisphere)
 
     df = pd.DataFrame(temp_matrix, columns=df.columns, index=None)
-    df.to_csv(output_filename, index=False)
+    return df
 
 
 def count_points_per_brain_region(
     points: List[Point],
     structures_with_points: Set[str],
     brainreg_volume_csv_path: Union[str, Path],
-    output_filename: Union[str, Path],
 ) -> None:
     """
     Count the number of points per brain region.
@@ -177,12 +168,11 @@ def count_points_per_brain_region(
     brainreg_volume_csv_path : Union[str, Path]
         The path to the CSV file containing volume information from the
         brainreg registration.
-    output_filename : Union[str, Path]
-        The path where the summary of points by atlas region will be saved.
+
 
     Returns
     -------
-    None
+    df: pd.DataFrame
     """
 
     structures_with_points = list(structures_with_points)
@@ -219,17 +209,16 @@ def count_points_per_brain_region(
     combined_hemispheres = combine_df_hemispheres(sorted_point_numbers)
     df = calculate_densities(combined_hemispheres, brainreg_volume_csv_path)
     df = sanitise_df(df)
-
-    df.to_csv(output_filename, index=False)
+    return df
 
 
 def summarise_points_by_atlas_region(
     points_in_raw_data_space: np.ndarray,
     points_in_atlas_space: np.ndarray,
     atlas: BrainGlobeAtlas,
-    brainreg_volume_csv_path: Union[str, Path],
-    points_list_output_filename: Union[str, Path],
-    summary_filename: Union[str, Path],
+    brainreg_volume_csv_path: Optional[os.PathLike] = None,
+    points_list_output_filename: Optional[os.PathLike] = None,
+    summary_filename: Optional[os.PathLike] = None,
 ) -> None:
     """
     Summarise points data by atlas region.
@@ -282,11 +271,19 @@ def summarise_points_by_atlas_region(
         except Exception:
             continue
 
-    create_all_cell_csv(points, points_list_output_filename)
+    all_cell_df = create_all_cell_df(points)
 
-    count_points_per_brain_region(
+    if points_list_output_filename is not None:
+        ensure_directory_exists(Path(points_list_output_filename).parent)
+        all_cell_df.to_csv(points_list_output_filename, index=False)
+
+    points_per_region_df = count_points_per_brain_region(
         points,
         structures_with_points,
         brainreg_volume_csv_path,
-        summary_filename,
     )
+
+    if summary_filename is not None:
+        points_per_region_df.to_csv(summary_filename, index=False)
+
+    return all_cell_df, points_per_region_df

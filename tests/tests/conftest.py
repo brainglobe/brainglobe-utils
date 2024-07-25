@@ -20,12 +20,12 @@ def test_data_registry():
 
     """
     registry = pooch.create(
-        path=pooch.os_cache("brainglobe_test_data"),
+        path=Path.home() / ".brainglobe" / "test_data",
         base_url="https://gin.g-node.org/BrainGlobe/test-data/raw/master/",
         registry={
             "cellfinder/cells-z-1000-1050.xml": None,
             "cellfinder/other-cells-z-1000-1050.xml": None,
+            "brainglobe-utils/points_transform_brainreg_directory.zip": "a1997f61a5efa752584ea91b7c479506343215bb91f5be09a72349f24e21fc54",  # noqa: E501
         },
-        env="BRAINGLOBE_TEST_DATA_DIR",
     )
     return registry

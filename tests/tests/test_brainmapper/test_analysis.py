@@ -169,9 +169,12 @@ def test_get_region_totals(
     )
 
     output_path = Path(tmp_path / "tmp_region_totals.csv")
-    count_points_per_brain_region(
-        points, structures_with_points, volumes_path, output_path
+    points_per_region_df = count_points_per_brain_region(
+        points,
+        structures_with_points,
+        volumes_path,
     )
+    points_per_region_df.to_csv(output_path, index=False)
     assert output_path.exists()
 
     # Read data back in, and sort rows by the structures for comparison.
