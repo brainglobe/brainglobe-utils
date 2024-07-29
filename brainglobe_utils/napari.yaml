@@ -3,10 +3,10 @@ display_name: BrainGlobe
 
 contributions:
   commands:
-  - id: brainglobe-utils.TransformPoints
+  - id: brainglobe-utils.brainmapper
     title: Open points transformation widget
     python_name: brainglobe_utils.brainmapper.transform_widget:TransformPoints
 
   widgets:
-  - command: brainglobe-utils.TransformPoints
+  - command: brainglobe-utils.brainmapper
     display_name: Transform points to a BrainGlobe atlas
