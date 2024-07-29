@@ -159,7 +159,6 @@ class TransformPoints(QWidget):
             package_tagline="Transform points to atlas space",
             github_repo_name="brainglobe-utils",
             citation_doi="https://doi.org/10.1371/journal.pcbi.1009074",
-            help_text="For help, hover the cursor over each parameter.",
         )
         self.layout.addWidget(header, 0, 0, 1, 2)
 
