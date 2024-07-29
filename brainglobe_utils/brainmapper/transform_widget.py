@@ -33,6 +33,15 @@ from brainglobe_utils.qtpy.table import DataFrameModel
 
 class TransformPoints(QWidget):
     def __init__(self, viewer: napari.viewer.Viewer):
+        """
+        Initialize the TransformPoints widget.
+
+        Parameters
+        ----------
+        viewer : napari.viewer.Viewer
+            The napari viewer instance.
+            This will be passed when opening the widget.
+        """
         super(TransformPoints, self).__init__()
         self.viewer = viewer
         self.raw_data = None
@@ -47,10 +56,15 @@ class TransformPoints(QWidget):
         self.setup_main_layout()
 
         @self.viewer.layers.events.connect
-        def update_layer_list(v: napari.viewer.Viewer):
+        def update_layer_list(v: napari.viewer.Viewer) -> None:
             """
             Update internal list of layers whenever the napari layers list
             is updated.
+
+            Parameters
+            ----------
+            v : napari.viewer.Viewer
+                The napari viewer instance.
             """
             self.image_layer_names = self._get_layer_names()
             self.points_layer_names = self._get_layer_names(
@@ -66,7 +80,20 @@ class TransformPoints(QWidget):
             )
 
     @staticmethod
-    def _update_combobox_options(combobox: QComboBox, options_list: List[str]):
+    def _update_combobox_options(
+        combobox: QComboBox, options_list: List[str]
+    ) -> None:
+        """
+        Update the options in a QComboBox.
+
+        Parameters
+        ----------
+        combobox : QComboBox
+            The combobox to update.
+        options_list : List[str]
+            The list of options to set in the combobox.
+        """
+
         original_text = combobox.currentText()
         combobox.clear()
         combobox.addItems(options_list)
@@ -79,6 +106,18 @@ class TransformPoints(QWidget):
     ) -> List[str]:
         """
         Get list of layer names of a given layer type.
+
+        Parameters
+        ----------
+        layer_type : napari.layers.Layer, optional
+            The type of layer to get names for. Default is napari.layers.Image.
+        default : str, optional
+            Default values to include in the list. Default is an empty string.
+
+        Returns
+        -------
+        List[str]
+            A list of layer names.
         """
         layer_names = [
             layer.name
@@ -91,7 +130,10 @@ class TransformPoints(QWidget):
         else:
             return [default]
 
-    def setup_main_layout(self):
+    def setup_main_layout(self) -> None:
+        """
+        Set up the main layout of the widget.
+        """
         self.layout = QGridLayout()
         self.layout.setContentsMargins(10, 10, 10, 10)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
@@ -108,12 +150,10 @@ class TransformPoints(QWidget):
 
         self.setLayout(self.layout)
 
-    def add_header(self):
+    def add_header(self) -> None:
         """
         Header including brainglobe logo and documentation links.
         """
-        # <br> is included in the package_name to make the label under the logo
-        # more compact, by splitting it onto two lines
         header = header_widget(
             package_name="brainmapper",
             package_tagline="Transform points to atlas space",
@@ -123,7 +163,18 @@ class TransformPoints(QWidget):
         )
         self.layout.addWidget(header, 0, 0, 1, 2)
 
-    def add_points_combobox(self, row, column):
+    def add_points_combobox(self, row: int, column: int) -> None:
+        """
+        Add a combobox for selecting the points layer containing
+        the points (e.g. cells) to transform to a BrainGlobe atlas.
+
+        Parameters
+        ----------
+        row : int
+            Row in the grid layout.
+        column : int
+            Column in the grid layout.
+        """
         self.points_layer_choice, _ = add_combobox(
             self.layout,
             "Points layer",
@@ -133,7 +184,18 @@ class TransformPoints(QWidget):
             callback=self.set_points_layer,
         )
 
-    def add_raw_data_combobox(self, row, column):
+    def add_raw_data_combobox(self, row: int, column: int) -> None:
+        """
+        Add a combobox for selecting the raw data layer. This defines
+        the coordinate space for transforming points to a BrainGlobe atlas.
+
+        Parameters
+        ----------
+        row : int
+            Row in the grid layout.
+        column : int
+            Column in the grid layout.
+        """
         self.raw_data_choice, _ = add_combobox(
             self.layout,
             "Raw data layer",
@@ -143,7 +205,17 @@ class TransformPoints(QWidget):
             callback=self.set_raw_data_layer,
         )
 
-    def add_transform_button(self, row, column):
+    def add_transform_button(self, row: int, column: int) -> None:
+        """
+        Add a button to begin the transformation of points to atlas space.
+
+        Parameters
+        ----------
+        row : int
+            Row in the grid layout.
+        column : int
+            Column in the grid layout.
+        """
         self.transform_button = add_button(
             "Transform points",
             self.layout,
@@ -154,7 +226,17 @@ class TransformPoints(QWidget):
             tooltip="Transform points layer to atlas space",
         )
 
-    def add_points_summary_table(self, row, column):
+    def add_points_summary_table(self, row: int, column: int) -> None:
+        """
+        Add a table to display the summary of points per atlas region.
+
+        Parameters
+        ----------
+        row : int
+            Row in the grid layout.
+        column : int
+            Column in the grid layout.
+        """
         self.points_per_region_table_title = QLabel(
             "Points distribution summary"
         )
@@ -164,7 +246,19 @@ class TransformPoints(QWidget):
         self.points_per_region_table.setVisible(False)
         self.layout.addWidget(self.points_per_region_table, row + 1, column)
 
-    def add_save_all_points_button(self, row, column):
+    def add_save_all_points_button(self, row: int, column: int) -> None:
+        """
+        Add a button to save all points information (i.e. the list of
+        all points, and their coordinates in raw data and atlas
+        space, alongside assigned atlas region).
+
+        Parameters
+        ----------
+        row : int
+            Row in the grid layout.
+        column : int
+            Column in the grid layout.
+        """
         self.save_all_points_button = add_button(
             "Save all points information",
             self.layout,
@@ -175,7 +269,17 @@ class TransformPoints(QWidget):
             tooltip="Save all points information as a csv file",
         )
 
-    def add_save_points_summary_button(self, row, column):
+    def add_save_points_summary_button(self, row: int, column: int) -> None:
+        """
+        Add a button to save points summary (i.e. points per atlas region).
+
+        Parameters
+        ----------
+        row : int
+            Row in the grid layout.
+        column : int
+            Column in the grid layout.
+        """
         self.save_points_summary_button = add_button(
             "Save points summary",
             self.layout,
@@ -186,12 +290,22 @@ class TransformPoints(QWidget):
             tooltip="Save points summary as a csv file",
         )
 
-    def add_status_label(self, row, column):
+    def add_status_label(self, row: int, column: int) -> None:
+        """
+        Add a status label to inform the user of progress.
+
+        Parameters
+        ----------
+        row : int
+            Row in the grid layout.
+        column : int
+            Column in the grid layout.
+        """
         self.status_label = QLabel()
         self.status_label.setText("Ready")
         self.layout.addWidget(self.status_label, row, column)
 
-    def set_raw_data_layer(self):
+    def set_raw_data_layer(self) -> None:
         """
         Set background layer from current background text box selection.
         """
@@ -200,7 +314,7 @@ class TransformPoints(QWidget):
                 self.raw_data_choice.currentText()
             ]
 
-    def set_points_layer(self):
+    def set_points_layer(self) -> None:
         """
         Set background layer from current background text box selection.
         """
@@ -209,7 +323,10 @@ class TransformPoints(QWidget):
                 self.points_layer_choice.currentText()
             ]
 
-    def transform_points_to_atlas_space(self):
+    def transform_points_to_atlas_space(self) -> None:
+        """
+        Transform points layer to atlas space.
+        """
         layers_in_place = self.check_layers()
         if not layers_in_place:
             return
@@ -230,7 +347,17 @@ class TransformPoints(QWidget):
         self.analyse_points()
         self.status_label.setText("Ready")
 
-    def check_layers(self):
+    def check_layers(self) -> bool:
+        """
+        Check if the layers needed to begin the transformation
+        have been selected by the user.
+
+        Returns
+        -------
+        bool
+            True if both raw data and points layers are selected,
+            False otherwise.
+        """
         if self.raw_data is None and self.points_layer is None:
             display_info(
                 self,
@@ -260,7 +387,16 @@ class TransformPoints(QWidget):
 
         return True
 
-    def load_brainreg_directory(self):
+    def load_brainreg_directory(self) -> bool:
+        """
+        Load the brainreg directory selected by the user.
+        Returns false if not selected, to abort analysis.
+
+        Returns
+        -------
+        bool
+            True if a directory was selected, False otherwise.
+        """
         brainreg_directory = QFileDialog.getExistingDirectory(
             self,
             "Select brainreg directory",
@@ -274,16 +410,28 @@ class TransformPoints(QWidget):
         self.status_label.setText("Ready")
         return True
 
-    def initialise_brainreg_data(self):
+    def initialise_brainreg_data(self) -> None:
+        """
+        Initialize brainreg data by defining the paths,
+        then loading the brainreg metadata, and then the atlas.
+        """
         self.get_brainreg_paths()
         self.check_brainreg_directory()
         self.get_registration_metadata()
         self.load_atlas()
 
-    def get_brainreg_paths(self):
+    def get_brainreg_paths(self) -> None:
+        """
+        Get the relevant file paths from the brainreg
+        output directory chosen by the user
+        """
         self.paths = Paths(self.brainreg_directory)
 
-    def check_brainreg_directory(self):
+    def check_brainreg_directory(self) -> None:
+        """
+        Check if the selected directory is a valid brainreg directory
+        by checking for the existence of an "atlas" entry in the json
+        """
         try:
             with open(self.paths.brainreg_metadata_file) as json_file:
                 self.brainreg_metadata = json.load(json_file)
@@ -294,7 +442,11 @@ class TransformPoints(QWidget):
         except FileNotFoundError:
             self.display_brainreg_directory_warning()
 
-    def display_brainreg_directory_warning(self):
+    def display_brainreg_directory_warning(self) -> None:
+        """
+        Display a warning to the user if the selected directory
+        is not a valid brainreg directory.
+        """
         display_info(
             self,
             "Not a brainreg directory",
@@ -302,10 +454,17 @@ class TransformPoints(QWidget):
             "directory. Please try loading another brainreg output directory.",
         )
 
-    def get_registration_metadata(self):
+    def get_registration_metadata(self) -> None:
+        """
+        Load registration metadata (atlas, orientation, voxel sizes)
+        from the brainreg directory.
+        """
         self.metadata = Metadata(self.brainreg_metadata)
 
-    def load_atlas(self):
+    def load_atlas(self) -> None:
+        """
+        Load the BrainGlobe atlas used for the initial brainreg registration.
+        """
         if not self.is_atlas_installed(self.metadata.atlas_string):
             display_info(
                 self,
@@ -316,7 +475,13 @@ class TransformPoints(QWidget):
             )
         self.atlas = BrainGlobeAtlas(self.metadata.atlas_string)
 
-    def run_transform_points_to_downsampled_space(self):
+    def run_transform_points_to_downsampled_space(self) -> None:
+        """
+        Transform points fromm the raw data space (in which points
+        were detected) to the downsampled space defined by brainreg.
+        This space is the same as the raw data, but downsampled and realigned
+        to match the orientation and resolution of the atlas.
+        """
         downsampled_space = self.get_downsampled_space()
         raw_data_space = self.get_raw_data_space()
         self.points_in_downsampled_space = raw_data_space.map_points_to(
@@ -328,7 +493,11 @@ class TransformPoints(QWidget):
             visible=False,
         )
 
-    def run_transform_downsampled_points_to_atlas_space(self):
+    def run_transform_downsampled_points_to_atlas_space(self) -> None:
+        """
+        Transform points from the downsampled space to atlas space. Uses
+        the deformation fields output by NiftyReg (via brainreg) as a look up.
+        """
         deformation_field_paths = [
             self.paths.deformation_field_0,
             self.paths.deformation_field_1,
@@ -356,7 +525,16 @@ class TransformPoints(QWidget):
                 f"points fell outside the atlas space",
             )
 
-    def get_downsampled_space(self):
+    def get_downsampled_space(self) -> AnatomicalSpace:
+        """
+        Get the anatomical space (as defined by brainglobe-space)
+        for the downsampled data.
+
+        Returns
+        -------
+        AnatomicalSpace
+            The downsampled anatomical space (as defined by brainglobe-space).
+        """
         target_shape = tifffile.imread(self.paths.downsampled_image).shape
 
         downsampled_space = AnatomicalSpace(
@@ -366,7 +544,16 @@ class TransformPoints(QWidget):
         )
         return downsampled_space
 
-    def get_raw_data_space(self):
+    def get_raw_data_space(self) -> AnatomicalSpace:
+        """
+        Get the anatomical space (as defined by brainglobe-space)
+        for the raw data.
+
+        Returns
+        -------
+        AnatomicalSpace
+            The raw data anatomical space (as defined by brainglobe-space).
+        """
         raw_data_space = AnatomicalSpace(
             self.metadata.orientation,
             shape=self.raw_data.data.shape,
@@ -374,7 +561,11 @@ class TransformPoints(QWidget):
         )
         return raw_data_space
 
-    def analyse_points(self):
+    def analyse_points(self) -> None:
+        """
+        Analyse the distribution of points in the space
+        of the BrainGlobe Atlas.
+        """
         self.all_points_df, self.points_per_region_df = (
             summarise_points_by_atlas_region(
                 self.points_layer.data,
@@ -392,12 +583,22 @@ class TransformPoints(QWidget):
 
     def populate_summary_table(
         self,
-        columns_to_keep=[
+        columns_to_keep: List[str] = [
             "structure_name",
             "left_cell_count",
             "right_cell_count",
         ],
-    ):
+    ) -> None:
+        """
+        Populate the table with the summary of points per atlas region.
+
+        Parameters
+        ----------
+        columns_to_keep : List[str], optional
+            Columns to keep in the summary table.
+            Default columns are ["structure_name", "left_cell_count",
+            "right_cell_count"].
+        """
         summary_df = self.points_per_region_df[columns_to_keep]
         self.points_per_region_table_model = DataFrameModel(summary_df)
         self.points_per_region_table.setModel(
@@ -406,10 +607,18 @@ class TransformPoints(QWidget):
         self.points_per_region_table_title.setVisible(True)
         self.points_per_region_table.setVisible(True)
 
-    def save_all_points_csv(self):
+    def save_all_points_csv(self) -> None:
+        """
+        Save the coordinate and atlas region
+        information for all points to a CSV file.
+        """
         self.save_df_to_csv(self.all_points_df)
 
-    def save_points_summary_csv(self):
+    def save_points_summary_csv(self) -> None:
+        """
+        Save the summary of the distribution of points
+        in the atlas space to a CSV file.
+        """
         self.save_df_to_csv(self.points_per_region_df)
 
     def save_df_to_csv(self, df: pd.DataFrame) -> None:
@@ -441,7 +650,20 @@ class TransformPoints(QWidget):
             df.to_csv(path, index=False)
 
     @staticmethod
-    def is_atlas_installed(atlas):
+    def is_atlas_installed(atlas: str) -> bool:
+        """
+        Check if the specified BrainGlobe atlas is installed.
+
+        Parameters
+        ----------
+        atlas : str
+            The atlas name to check.
+
+        Returns
+        -------
+        bool
+            True if the atlas is installed, False otherwise.
+        """
         downloaded_atlases = get_downloaded_atlases()
         if atlas in downloaded_atlases:
             return True
@@ -482,6 +704,15 @@ class Paths:
     """
 
     def __init__(self, brainreg_directory: Union[str, Path]) -> None:
+        """
+        Set the paths based on the given brainreg directory
+
+        Parameters
+        ----------
+        brainreg_directory : Union[str, Path]
+            Path to brainreg output directory
+            (or brainmapper "registration" directory).
+        """
         self.brainreg_directory: Path = Path(brainreg_directory)
         self.brainreg_metadata_file: Path = self.make_filepaths(
             "brainreg.json"
