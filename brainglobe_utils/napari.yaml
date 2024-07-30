@@ -9,4 +9,4 @@ contributions:
 
   widgets:
   - command: brainglobe-utils.brainmapper
-    display_name: Transform points to a BrainGlobe atlas
+    display_name: brainmapper
