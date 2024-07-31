@@ -64,6 +64,22 @@ def mock_statvfs():
     return mock_stats
 
 
+def test_ensure_extension():
+    assert system.ensure_extension("example.txt", ".txt") == Path(
+        "example.txt"
+    )
+    assert system.ensure_extension(Path("example.txt"), ".txt") == Path(
+        "example.txt"
+    )
+
+    assert system.ensure_extension("example.md", ".txt") == Path("example.txt")
+    assert system.ensure_extension(Path("example.md"), ".txt") == Path(
+        "example.txt"
+    )
+
+    assert system.ensure_extension("example", ".txt") == Path("example.txt")
+
+
 def test_replace_extension():
     test_file = "test_file.sh"
     test_ext = "txt"

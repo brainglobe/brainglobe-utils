@@ -5,6 +5,7 @@ include LICENSE
 include README.md
 
 graft brainglobe_utils *.py
+include brainglobe_utils/napari.yaml
 include brainglobe_utils/qtpy/brainglobe.png
 
 prune tests

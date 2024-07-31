@@ -7,6 +7,7 @@ license = { file = "LICENSE" }
 requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "Framework :: napari",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
@@ -47,8 +48,12 @@ bug_tracker = "https://github.com/brainglobe/brainglobe-utils/issues"
 source_code = "https://github.com/brainglobe/brainglobe-utils"
 user_support = "https://github.com/brainglobe/brainglobe-utils/issues"
 
+[project.entry-points."napari.manifest"]
+brainglobe-utils = "brainglobe_utils:napari.yaml"
+
 [project.optional-dependencies]
 qt = ["qtpy", "superqt"]
+napari = ["brainglobe-utils[qt]", "napari[all]"]
 
 dev = [
     "black",
@@ -65,7 +70,7 @@ dev = [
     "setuptools_scm",
     "tox",
     "pooch",
-    "brainglobe-utils[qt]",
+    "brainglobe-utils[napari]",
 ]
 
 
@@ -125,5 +130,4 @@ passenv =
     DISPLAY
     XAUTHORITY
     PYVISTA_OFF_SCREEN
-    BRAINGLOBE_TEST_DATA_DIR
 """

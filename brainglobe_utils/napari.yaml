@@ -1,0 +1,12 @@
+name: brainglobe-utils
+display_name: BrainGlobe
+
+contributions:
+  commands:
+  - id: brainglobe-utils.brainmapper
+    title: Open points transformation widget
+    python_name: brainglobe_utils.brainmapper.transform_widget:TransformPoints
+
+  widgets:
+  - command: brainglobe-utils.brainmapper
+    display_name: brainmapper
