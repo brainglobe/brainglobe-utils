@@ -49,7 +49,9 @@ class TransformPoints(QWidget):
         self.atlas = None
         self.transformed_points = None
 
-        self.image_layer_names = self._get_layer_names()
+        self.image_layer_names = self._get_layer_names(
+            layer_type=napari.layers.Image
+        )
         self.points_layer_names = self._get_layer_names(
             layer_type=napari.layers.Points
         )
@@ -66,7 +68,9 @@ class TransformPoints(QWidget):
             v : napari.viewer.Viewer
                 The napari viewer instance.
             """
-            self.image_layer_names = self._get_layer_names()
+            self.image_layer_names = self._get_layer_names(
+                layer_type=napari.layers.Image
+            )
             self.points_layer_names = self._get_layer_names(
                 layer_type=napari.layers.Points
             )
@@ -101,7 +105,7 @@ class TransformPoints(QWidget):
 
     def _get_layer_names(
         self,
-        layer_type: napari.layers.Layer = napari.layers.Image,
+        layer_type: napari.layers.Layer,
         default: str = "",
     ) -> List[str]:
         """
@@ -110,7 +114,7 @@ class TransformPoints(QWidget):
         Parameters
         ----------
         layer_type : napari.layers.Layer, optional
-            The type of layer to get names for. Default is napari.layers.Image.
+            The type of layer to get names for.
         default : str, optional
             Default values to include in the list. Default is an empty string.
 
