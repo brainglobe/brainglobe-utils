@@ -414,17 +414,10 @@ class TransformPoints(QWidget):
         Initialize brainreg data by defining the paths,
         then loading the brainreg metadata, and then the atlas.
         """
-        self.get_brainreg_paths()
-        self.check_brainreg_directory()
-        self.get_registration_metadata()
-        self.load_atlas()
-
-    def get_brainreg_paths(self) -> None:
-        """
-        Get the relevant file paths from the brainreg
-        output directory chosen by the user
-        """
         self.paths = Paths(self.brainreg_directory)
+        self.check_brainreg_directory()
+        self.metadata = Metadata(self.brainreg_metadata)
+        self.load_atlas()
 
     def check_brainreg_directory(self) -> None:
         """
@@ -452,13 +445,6 @@ class TransformPoints(QWidget):
             "This directory does not appear to be a valid brainreg "
             "directory. Please try loading another brainreg output directory.",
         )
-
-    def get_registration_metadata(self) -> None:
-        """
-        Load registration metadata (atlas, orientation, voxel sizes)
-        from the brainreg directory.
-        """
-        self.metadata = Metadata(self.brainreg_metadata)
 
     def load_atlas(self) -> None:
         """
