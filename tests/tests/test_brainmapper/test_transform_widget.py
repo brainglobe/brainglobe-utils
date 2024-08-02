@@ -494,6 +494,31 @@ def test_analysis(transformation_widget_with_transformed_points):
     )
 
 
+def test_export_to_brainmapper(
+    mocker,
+    transformation_widget_with_transformed_points,
+    tmp_path,
+):
+    mock_get_save_file_name = mocker.patch(
+        "brainglobe_utils.brainmapper.transform_widget.QFileDialog.getSaveFileName"
+    )
+
+    save_path = tmp_path / "points.npy"
+    mock_get_save_file_name.return_value = (save_path, "NumPy Files (*.npy)")
+
+    transformation_widget_with_transformed_points.export_points_to_brainrender()
+
+    # Ensure the file dialog was called
+    mock_get_save_file_name.assert_called_once_with(
+        transformation_widget_with_transformed_points,
+        "Choose filename",
+        "",
+        "NumPy Files (*.npy)",
+    )
+
+    assert save_path.exists()
+
+
 def test_save_df_to_csv(
     mocker,
     transformation_widget_with_transformed_points,
