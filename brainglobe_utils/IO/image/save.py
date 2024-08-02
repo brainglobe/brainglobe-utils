@@ -121,7 +121,7 @@ def save_any(img_volume, dest_path):
     elif dest_path.suffix in [".tif", ".tiff"]:
         to_tiff(img_volume, dest_path)
 
-    elif dest_path.suffix == ".nii":
+    elif dest_path.suffix == ".nii" or str(dest_path).endswith(".nii.gz"):
         to_nii(img_volume, dest_path)
 
     else:

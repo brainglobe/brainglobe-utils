@@ -245,7 +245,10 @@ def test_sort_img_sequence_from_txt(shuffled_txt_path, array_3d, sort):
 
 
 @pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
-def test_nii_io(tmp_path, array_3d, use_path):
+@pytest.mark.parametrize(
+    "nifti_suffix", [".nii.gz", ".nii"], ids=["compressed", "uncompressed"]
+)
+def test_nii_io(tmp_path, array_3d, use_path, nifti_suffix):
     """
     Test that a 3D image can be written and read correctly as nii with scale
     (keeping it as a nifty object with no numpy conversion on loading).
@@ -265,11 +268,14 @@ def test_nii_io(tmp_path, array_3d, use_path):
     assert reloaded.header.get_zooms() == scale
 
 
-def test_nii_read_to_numpy(tmp_path, array_3d):
+@pytest.mark.parametrize(
+    "nifti_suffix", [".nii.gz", ".nii"], ids=["compressed", "uncompressed"]
+)
+def test_nii_read_to_numpy(tmp_path, array_3d, nifti_suffix):
     """
     Test that conversion of loaded nii image to an in-memory numpy array works
     """
-    nii_path = tmp_path / "test_array.nii"
+    nii_path = tmp_path / f"test_array{nifti_suffix}"
     save.save_any(array_3d, nii_path)
     reloaded_array = load.load_any(nii_path, as_numpy=True)
 
