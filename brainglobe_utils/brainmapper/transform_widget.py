@@ -21,6 +21,7 @@ from qtpy.QtWidgets import (
 from brainglobe_utils.brainmapper.analysis import (
     summarise_points_by_atlas_region,
 )
+from brainglobe_utils.brainmapper.export import export_points_to_brainrender
 from brainglobe_utils.brainreg.transform import (
     transform_points_from_downsampled_to_atlas_space,
 )
@@ -146,7 +147,7 @@ class TransformPoints(QWidget):
         self.add_points_combobox(row=1, column=0)
         self.add_raw_data_combobox(row=2, column=0)
         self.add_transform_button(row=3, column=0)
-
+        self.add_brainrender_export_button(row=3, column=1)
         self.add_points_summary_table(row=4, column=0)
         self.add_save_all_points_button(row=6, column=0)
         self.add_save_points_summary_button(row=6, column=1)
@@ -227,6 +228,28 @@ class TransformPoints(QWidget):
             column=column,
             visibility=True,
             tooltip="Transform points layer to atlas space",
+        )
+
+    def add_brainrender_export_button(self, row: int, column: int) -> None:
+        """
+        Add a button to export the points in atlas space in the brainrender
+        format.
+
+        Parameters
+        ----------
+        row : int
+            Row in the grid layout.
+        column : int
+            Column in the grid layout.
+        """
+        self.brainrender_export_button = add_button(
+            "Export to brainrender",
+            self.layout,
+            self.export_points_to_brainrender,
+            row=row,
+            column=column,
+            visibility=False,
+            tooltip="Export points in atlas space to brainrender",
         )
 
     def add_points_summary_table(self, row: int, column: int) -> None:
@@ -565,6 +588,7 @@ class TransformPoints(QWidget):
         )
 
         self.populate_summary_table()
+        self.brainrender_export_button.setVisible(True)
         self.save_all_points_button.setVisible(True)
         self.save_points_summary_button.setVisible(True)
 
@@ -595,6 +619,24 @@ class TransformPoints(QWidget):
         )
         self.points_per_region_table_title.setVisible(True)
         self.points_per_region_table.setVisible(True)
+
+    def export_points_to_brainrender(self) -> None:
+        """
+        Export points in the format required for brainrender
+        N.B. assumes atlas is isotropic
+        """
+        path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Choose filename",
+            "",
+            "NumPy Files (*.npy)",
+        )
+
+        if path:
+            path = ensure_extension(path, ".npy")
+        export_points_to_brainrender(
+            self.points_in_atlas_space, self.atlas.resolution[0], path
+        )
 
     def save_all_points_csv(self) -> None:
         """
