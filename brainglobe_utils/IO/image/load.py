@@ -135,7 +135,7 @@ def load_any(
             z_scaling_factor,
             anti_aliasing=anti_aliasing,
         )
-    elif src_path.suffix in [".nii", ".nii.gz"]:
+    elif src_path.suffix == ".nii" or str(src_path).endswith(".nii.gz"):
         logging.debug("Data type is: NifTI")
         img = load_nii(src_path, as_array=True, as_numpy=as_numpy)
     else:
