@@ -127,7 +127,7 @@ class TransformPoints(QWidget):
         layer_names = [
             layer.name
             for layer in self.viewer.layers
-            if type(layer) == layer_type
+            if isinstance(layer, layer_type)
         ]
 
         if layer_names:
