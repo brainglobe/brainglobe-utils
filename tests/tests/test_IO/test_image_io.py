@@ -1,8 +1,10 @@
 import random
 from collections import namedtuple
+from pathlib import Path
 from unittest import mock
 
 import numpy as np
+import pooch
 import psutil
 import pytest
 import tifffile
@@ -407,6 +409,28 @@ def test_read_with_dask_glob_txt_equal(array_3D_as_2d_tiffs_path, txt_path):
     glob_stack = load.read_with_dask(array_3D_as_2d_tiffs_path)
     txt_stack = load.read_with_dask(txt_path)
     np.testing.assert_array_equal(glob_stack, txt_stack)
+
+
+@pytest.fixture
+def ome_4D_stack_path():
+    tiff_paths = []
+    for i in range(1, 6):
+        tiff_path = pooch.retrieve(
+            url=f"https://downloads.openmicroscopy.org/images/OME-TIFF/2016-06/binaryonly/multifile-Z{i}.ome.tiff",
+            known_hash=None,
+            progressbar=True,
+            path=pooch.os_cache("pooch") / "ome-tiffs",
+            fname=f"multifile-Z{i}.ome.tif",
+        )
+        tiff_paths.append(tiff_path)
+
+    return str(Path(pooch.os_cache("pooch") / "ome-tiffs/"))
+
+
+def test_read_with_dask_ignores_OME_metadata(ome_4D_stack_path):
+    stack = load.read_z_stack(ome_4D_stack_path)
+    slice = stack[0, :, :]
+    assert len(slice.shape) == len(stack.shape)
 
 
 def test_read_z_stack_with_missing_metadata(
