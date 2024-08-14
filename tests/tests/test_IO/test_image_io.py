@@ -80,6 +80,7 @@ def array3d_as_tiff_stack_with_missing_metadata(array_3d, tmp_path):
     return tiff_path
 
 
+@pytest.mark.parametrize("use_path", [True, False], ids=["Path", "String"])
 def test_tiff_io(tmp_path, array_3d, use_path):
     """
     Test that a 3D tiff can be written and read correctly, using string
