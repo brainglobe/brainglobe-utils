@@ -768,10 +768,12 @@ def read_z_stack(path):
 def read_with_dask(path):
     """
     Based on https://github.com/tlambert03/napari-ndtiffs
-
     Reads a folder of tiffs lazily.
 
-    Note that it will ignore OME metadata, because this causes issues.
+    Note that it will make tifffile.imread ignore OME metadata,
+    because this can cause issues with correct metadata reading.
+    See https://forum.image.sc/t/tifffile-opening-individual-ome-tiff-files-as-single-huge-array-even-when-isolated/77701
+
     :param path: folder with tifs.
     :return: dask array containing stack of tifs
     """
