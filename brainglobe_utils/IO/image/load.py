@@ -768,8 +768,12 @@ def read_z_stack(path):
 def read_with_dask(path):
     """
     Based on https://github.com/tlambert03/napari-ndtiffs
-    :param path:
-    :return:
+
+    Reads a folder of tiffs lazily.
+
+    Note that it will ignore OME metadata, because this causes issues.
+    :param path: folder with tifs.
+    :return: dask array containing stack of tifs
     """
     path = str(path)
     if path.endswith(".txt"):
@@ -780,7 +784,10 @@ def read_with_dask(path):
         filenames = glob.glob(os.path.join(path, "*.tif"))
 
     shape, dtype = get_tiff_meta(filenames[0])
-    lazy_arrays = [lazy_imread(fn) for fn in get_sorted_file_paths(filenames)]
+    lazy_arrays = [
+        lazy_imread(fn, is_ome=False)
+        for fn in get_sorted_file_paths(filenames)
+    ]
     dask_arrays = [
         da.from_delayed(delayed_reader, shape=shape, dtype=dtype)
         for delayed_reader in lazy_arrays
