@@ -781,7 +781,18 @@ def read_with_dask(path):
             filenames = [line.rstrip() for line in f.readlines()]
 
     else:
-        filenames = glob.glob(os.path.join(path, "*.tif"))
+        filenames_tif = glob.glob(os.path.join(path, "*.tif"))
+        filenames_tiff = glob.glob(os.path.join(path, "*.tiff"))
+        if filenames_tif:
+            filenames = filenames_tif
+        elif filenames_tiff:
+            filenames = filenames_tiff
+        else:
+            raise (
+                ValueError(
+                    f"Folder {path} does not contain any .tif or .tiff files"
+                )
+            )
 
     shape, dtype = get_tiff_meta(filenames[0])
     lazy_arrays = [
