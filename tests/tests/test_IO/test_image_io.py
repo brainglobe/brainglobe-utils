@@ -429,3 +429,9 @@ def test_get_size_image_with_missing_metadata(
             str(array3d_as_tiff_stack_with_missing_metadata)
         )
         mock_debug.assert_called_once()
+
+
+def test_read_with_dask_raises(tmp_path):
+    with pytest.raises(ValueError) as e:
+        load.read_with_dask(tmp_path)
+    assert e.match("not contain any .tif or .tiff files")
