@@ -78,7 +78,9 @@ jobs:
       - name: Cache data
         uses: actions/cache@v4
         with:
-          path: "$HOME/.brainglobe"
+          path: | # ensure we don't cache any interrupted atlas download and extraction, if e.g. we cancel the workflow manually
+            ~/.brainglobe
+            !~/.brainglobe/atlas.tar.gz
           # hash on conftest in case url changes
           key: brainglobe-dir-${{ runner.os }}${{ hashFiles('**/conftest.py') }}
 
