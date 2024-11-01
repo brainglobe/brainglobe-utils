@@ -7,7 +7,7 @@ import psutil
 import pytest
 import tifffile
 
-from brainglobe_utils.IO.image import load, save, utils
+from brainglobe_utils.IO.image import load, save, to_tiffs, utils
 
 
 @pytest.fixture()
@@ -435,3 +435,16 @@ def test_read_with_dask_raises(tmp_path):
     with pytest.raises(ValueError) as e:
         load.read_with_dask(tmp_path)
     assert e.match("not contain any .tif or .tiff files")
+
+
+@pytest.mark.parametrize(
+    "z_size, expected_length",
+    [(10000, 5), (9999, 4), (1, 1)],
+)
+def test_to_tiffs_padwidth(tmp_path, z_size, expected_length):
+    volume = np.ones((z_size, 1, 1))
+    prefix = "test"
+    to_tiffs(volume, tmp_path / prefix)
+    image_path = list(tmp_path.glob("*.tif"))[0]
+    assert str(image_path.stem).split("_")[0] == prefix
+    assert len(str(image_path.stem).split("_")[1]) == expected_length
