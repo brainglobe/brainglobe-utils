@@ -89,7 +89,7 @@ def to_tiffs(img_volume, path_prefix, path_suffix="", extension=".tif"):
         path_prefix = str(path_prefix.resolve())
 
     z_size = img_volume.shape[0]
-    pad_width = int(round(z_size / 10)) + 1
+    pad_width = int(np.floor(np.log10(z_size)) + 1)
     for i in range(z_size):
         img = img_volume[i, :, :]
         dest_path = (
