@@ -110,7 +110,7 @@ def load_any(
             y_scaling_factor,
             z_scaling_factor,
             anti_aliasing=anti_aliasing,
-            file_extension=".tif",
+            file_extension=".tif*",
             load_parallel=load_parallel,
             n_free_cpus=n_free_cpus,
         )
