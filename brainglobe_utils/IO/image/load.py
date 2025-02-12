@@ -191,7 +191,10 @@ def load_img_stack(
     """
     stack_path = Path(stack_path)
     logging.debug(f"Loading: {stack_path}")
-    stack = tifffile.imread(stack_path)
+    try:
+        stack = tifffile.memmap(stack_path, mode="r")
+    except ValueError:
+        stack = tifffile.imread(stack_path)
 
     if stack.ndim != 3:
         raise ImageIOLoadException(error_type="2D tiff")
@@ -733,8 +736,9 @@ def read_z_stack(path):
     """
     Reads z-stack, lazily, if possible.
 
-    If it's a text file or folder with 2D tiff files use dask to read lazily,
-    otherwise it's a single file tiff stack and is read into memory.
+    If it's a text file or folder with 2D tiff files use dask to read lazily.
+    Otherwise, it's a single file tiff stack and is memory-mapped if possible,
+    otherwise read into memory.
 
     :param path: Filename of text file listing 2D tiffs, folder of 2D tiffs,
         or single file tiff z-stack.
@@ -760,7 +764,10 @@ def read_z_stack(path):
                     "Assume z,y,x"
                 )
 
-        return tifffile.imread(path)
+        try:
+            return tifffile.memmap(path, mode="r")
+        except ValueError:
+            return tifffile.imread(path)
 
     return read_with_dask(path)
 

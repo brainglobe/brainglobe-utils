@@ -98,6 +98,30 @@ def test_tiff_io(tmp_path, array_3d, use_path):
     np.testing.assert_array_equal(reloaded, array_3d)
 
 
+@pytest.mark.parametrize("memmap", [True, False])
+def test_3d_tiff_load_img_stack_memmap_io(tmp_path, array_3d, memmap):
+    """
+    Test that a 3D tiff file can be properly memmapped or loaded using
+    load_img_stack.
+    """
+    filename = str(tmp_path / "image_array.tiff")
+    # compression disables ability to memmap tiff file
+    compression = None if memmap else "zlib"
+
+    tifffile.imwrite(
+        filename, array_3d, metadata={"axes": "ZYX"}, compression=compression
+    )
+
+    reloaded = load.load_img_stack(filename, 1, 1, 1)
+    np.testing.assert_array_equal(reloaded, array_3d)
+    assert isinstance(reloaded, np.ndarray)
+
+    if memmap:
+        assert isinstance(reloaded, np.memmap)
+    else:
+        assert not isinstance(reloaded, np.memmap)
+
+
 @pytest.mark.parametrize(
     "x_scaling_factor, y_scaling_factor, z_scaling_factor",
     [(1, 1, 1), (0.5, 0.5, 1), (0.25, 0.25, 0.25)],
@@ -417,6 +441,30 @@ def test_read_z_stack_with_missing_metadata(
     ) as mock_debug:
         load.read_z_stack(str(array3d_as_tiff_stack_with_missing_metadata))
         mock_debug.assert_called_once()
+
+
+@pytest.mark.parametrize("memmap", [True, False])
+def test_3d_tiff_read_z_stack_memmap_io(tmp_path, array_3d, memmap):
+    """
+    Test that a 3D tiff file can be properly memmapped or loaded using
+    read_z_stack.
+    """
+    filename = str(tmp_path / "image_array.tiff")
+    # compression disables ability to memmap tiff file
+    compression = None if memmap else "zlib"
+
+    tifffile.imwrite(
+        filename, array_3d, metadata={"axes": "ZYX"}, compression=compression
+    )
+
+    reloaded = load.read_z_stack(filename)
+    np.testing.assert_array_equal(reloaded, array_3d)
+    assert isinstance(reloaded, np.ndarray)
+
+    if memmap:
+        assert isinstance(reloaded, np.memmap)
+    else:
+        assert not isinstance(reloaded, np.memmap)
 
 
 def test_get_size_image_with_missing_metadata(
