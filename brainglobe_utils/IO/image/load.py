@@ -88,7 +88,7 @@ def load_any(
 
     Returns
     -------
-    np.ndarray
+    np.ndarray or Dask array
         The loaded brain.
 
     Raises
@@ -181,7 +181,7 @@ def load_img_stack(
 
     Returns
     -------
-    np.ndarray
+    np.ndarray or Dask array
         The loaded brain array.
 
     Raises
@@ -194,7 +194,11 @@ def load_img_stack(
     try:
         stack = tifffile.memmap(stack_path, mode="r")
     except ValueError:
-        stack = tifffile.imread(stack_path)
+        try:
+            store = tifffile.imread(stack_path, aszarr=True)
+            stack = da.from_zarr(store)
+        except (ModuleNotFoundError, TypeError):
+            stack = tifffile.imread(stack_path)
 
     if stack.ndim != 3:
         raise ImageIOLoadException(error_type="2D tiff")
@@ -767,7 +771,11 @@ def read_z_stack(path):
         try:
             return tifffile.memmap(path, mode="r")
         except ValueError:
-            return tifffile.imread(path)
+            try:
+                store = tifffile.imread(path, aszarr=True)
+                return da.from_zarr(store)
+            except (ModuleNotFoundError, TypeError):
+                return tifffile.imread(path)
 
     return read_with_dask(path)
 
