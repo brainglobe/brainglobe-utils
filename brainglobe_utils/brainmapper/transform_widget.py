@@ -8,6 +8,9 @@ import tifffile
 from brainglobe_atlasapi import BrainGlobeAtlas
 from brainglobe_atlasapi.list_atlases import get_downloaded_atlases
 from brainglobe_space import AnatomicalSpace
+from qt_niu.dialog import display_info
+from qt_niu.interaction import add_button, add_combobox
+from qt_niu.table import DataFrameModel
 from qtpy import QtCore
 from qtpy.QtWidgets import (
     QComboBox,
@@ -26,10 +29,7 @@ from brainglobe_utils.brainreg.transform import (
     transform_points_from_downsampled_to_atlas_space,
 )
 from brainglobe_utils.general.system import ensure_extension
-from brainglobe_utils.qtpy.dialog import display_info
-from brainglobe_utils.qtpy.interaction import add_button, add_combobox
 from brainglobe_utils.qtpy.logo import header_widget
-from brainglobe_utils.qtpy.table import DataFrameModel
 
 
 class TransformPoints(QWidget):
