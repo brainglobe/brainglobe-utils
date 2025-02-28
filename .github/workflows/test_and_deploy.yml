@@ -34,15 +34,13 @@ jobs:
       matrix:
         # Run all supported Python versions on linux
         os: [ubuntu-latest]
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.11", "3.12", "3.13"]
         # Include one windows and two macOS (intel based and arm based) runs
         include:
-          - os: macos-13
-            python-version: "3.12"
           - os: macos-latest
-            python-version: "3.12"
+            python-version: "3.13"
           - os: windows-latest
-            python-version: "3.12"
+            python-version: "3.13"
 
     steps:
       - name: Cache data
@@ -90,7 +88,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.13"
       # these libraries enable testing on Qt on linux
       - uses: pyvista/setup-headless-display-action@v3
         with:
@@ -98,7 +96,7 @@ jobs:
       # Run test suite with numba disabled
       - uses: neuroinformatics-unit/actions/test@v2
         with:
-          python-version: "3.11"
+          python-version: "3.13"
           secret-codecov-token: ${{ secrets.CODECOV_TOKEN }}
           codecov-flags: "numba"
 
