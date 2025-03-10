@@ -64,12 +64,12 @@ def test_transform_points_from_downsampled_to_atlas_space(
 @pytest.mark.parametrize(
     "source_image_plane," "orientation," "expected_transformed_points,",
     [
-        (np.ones((100, 100, 100)), "asr", [[10, 5, 5], [12, 6, 6]]),
-        (np.ones((100, 100, 100)), "psr", [[40, 5, 5], [38, 6, 6]]),
+        (np.ones((200, 100, 100)), "asr", [[10, 5, 5], [12, 6, 6]]),
+        (np.ones((200, 100, 100)), "psr", [[90, 5, 5], [88, 6, 6]]),
         (Path.home() / "test.tiff", "asr", [[10, 5, 5], [12, 6, 6]]),
-        (Path.home() / "test", "psr", [[40, 5, 5], [38, 6, 6]]),
+        (Path.home() / "test", "psr", [[90, 5, 5], [88, 6, 6]]),
         (str(Path.home() / "test.tiff"), "asr", [[10, 5, 5], [12, 6, 6]]),
-        (str(Path.home() / "test"), "psr", [[40, 5, 5], [38, 6, 6]]),
+        (str(Path.home() / "test"), "psr", [[90, 5, 5], [88, 6, 6]]),
     ],
 )
 def test_transform_points_from_raw_to_downsampled_space_array(
@@ -78,7 +78,7 @@ def test_transform_points_from_raw_to_downsampled_space_array(
     if isinstance(source_image_plane, (str, Path)):
         mocker.patch(
             "brainglobe_utils.brainreg.transform.get_size_image_from_file_paths",
-            return_value={"z": 100, "y": 100, "x": 100},
+            return_value={"z": 200, "y": 100, "x": 100},
         )
 
     target_space = bgs.AnatomicalSpace(
