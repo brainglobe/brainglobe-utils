@@ -1,6 +1,7 @@
 import logging
 import os
-from typing import List, Optional, Tuple
+from pathlib import Path
+from typing import List, Optional, Tuple, Union
 
 import brainglobe_space as bgs
 import numpy as np
@@ -103,20 +104,51 @@ def get_anatomical_space_from_image_planes(
         An object representing the anatomical space.
 
     """
-
-    shape = tuple(get_size_image_from_file_paths(image_plane).values())
-
+    # Assume the planes are in the z, y, x order
     space = bgs.AnatomicalSpace(
         orientation,
-        shape=(shape[2], shape[1], shape[0]),
+        shape=image_plane.shape,
         resolution=[float(i) for i in voxel_sizes],
     )
     return space
 
 
+def get_anatomical_space_from_image_path(
+    image_path: Union[str, Path], orientation: str, voxel_sizes: List[float]
+) -> bgs.AnatomicalSpace:
+    """
+    Determine the brainglobe anatomical space from an image path.
+
+    Parameters
+    ----------
+    image_path : os.PathLike
+        Path to the image file.
+    orientation : str
+        The orientation of the image following the brainglobe-space
+        three-letter convention (e.g., 'asr', 'psl').
+    voxel_sizes : List[float]
+        A list of floats representing the voxel sizes (e.g., [5, 2, 2]).
+
+    Returns
+    -------
+    bgs.AnatomicalSpace
+        An object representing the anatomical space.
+
+    """
+    shape_dict = get_size_image_from_file_paths(image_path)
+
+    space = bgs.AnatomicalSpace(
+        orientation,
+        shape=tuple([shape_dict["z"], shape_dict["y"], shape_dict["x"]]),
+        resolution=[float(i) for i in voxel_sizes],
+    )
+
+    return space
+
+
 def transform_points_from_raw_to_downsampled_space(
     points: np.ndarray,
-    source_image_plane: np.ndarray,
+    source_image_plane: Union[np.ndarray, str, Path],
     orientation: str,
     voxel_sizes: List[float],
     downsampled_space: bgs.AnatomicalSpace,
@@ -130,8 +162,8 @@ def transform_points_from_raw_to_downsampled_space(
     ----------
     points : np.ndarray
         Points in the original space.
-    source_image_plane : np.ndarray
-        A numpy-like array representing a single image.
+    source_image_plane : Union[np.ndarray, str, Path]
+        A numpy-like array representing a single image or a path to the source.
     orientation : str
         The orientation of the image following the brainglobe-space
     three letter convention (e.g. 'asr', 'psl')
@@ -149,9 +181,15 @@ def transform_points_from_raw_to_downsampled_space(
         Points transformed to the downsampled space.
 
     """
-    source_space = get_anatomical_space_from_image_planes(
-        source_image_plane, orientation, voxel_sizes
-    )
+    if isinstance(source_image_plane, (str, Path)):
+        source_space = get_anatomical_space_from_image_path(
+            source_image_plane, orientation, voxel_sizes
+        )
+    else:
+        source_space = get_anatomical_space_from_image_planes(
+            source_image_plane, orientation, voxel_sizes
+        )
+
     points = source_space.map_points_to(downsampled_space, points)
     if output_filename is not None:
         df = pd.DataFrame(points)
