@@ -419,6 +419,44 @@ def test_read_z_stack_with_missing_metadata(
         mock_debug.assert_called_once()
 
 
+@pytest.mark.parametrize("reader", ["memmap", "zarr", "memory"])
+def test_3d_tiff_read_z_stack_io(tmp_path, array_3d, reader):
+    """
+    Test that a 3D tiff file can be properly memmapped, read with zarr or
+    loaded using read_z_stack.
+    """
+    filename = str(tmp_path / "image_array.tiff")
+    # compression disables ability to memmap tiff file
+    compression = None if reader == "memmap" else "zlib"
+
+    tifffile.imwrite(
+        filename, array_3d, metadata={"axes": "ZYX"}, compression=compression
+    )
+
+    if reader == "memory":
+        with mock.patch("dask.array.from_zarr") as mock_from_zarr:
+            mock_from_zarr.side_effect = ModuleNotFoundError()
+
+            reloaded = load.read_z_stack(filename)
+    else:
+        reloaded = load.read_z_stack(filename)
+
+    np.testing.assert_array_equal(reloaded, array_3d)
+
+    match reader:
+        case "memmap":
+            assert isinstance(reloaded, np.memmap)
+        case "zarr":
+            from dask import array as da
+
+            assert not isinstance(reloaded, np.memmap)
+            assert isinstance(reloaded, (np.ndarray, da.Array))
+        case "memory":
+            assert isinstance(reloaded, np.ndarray)
+        case _:
+            assert False
+
+
 def test_get_size_image_with_missing_metadata(
     array3d_as_tiff_stack_with_missing_metadata,
 ):
