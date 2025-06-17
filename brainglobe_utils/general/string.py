@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 from typing import Optional
 
@@ -53,3 +54,36 @@ def get_text_lines(
     if return_lines is not None:
         lines = lines[return_lines]
     return lines
+
+
+def check_str(value, none_allowed=True):
+    """
+    Used in argparse to enforce str input.
+
+    Parameters
+    ----------
+    value : str or None
+        Input value.
+
+    none_allowed : bool, optional
+        If False, throw an error for None values.
+
+    Returns
+    -------
+    str or None
+        Input value, if it's str, or None.
+
+    Raises
+    ------
+    argparse.ArgumentTypeError
+        If input value is invalid.
+    """
+    ivalue = value
+    if value in (None, "None", "none"):
+        if not none_allowed:
+            raise argparse.ArgumentTypeError(f"{ivalue} is an invalid value.")
+        value = None
+    else:
+        value = str(value)
+
+    return value
