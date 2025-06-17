@@ -360,6 +360,16 @@ def pos_from_xml_marker(element: ElementTree.Element) -> List[float]:
     return [float(num) for num in pos if num is not None]
 
 
+def file_name_from_cell(
+    cell: Cell, prefix: str = "", channel: int | None = None
+) -> str:
+    name = prefix
+    name += f"x{int(cell.x)}_y{int(cell.y)}_z{int(cell.z)}"
+    if channel is not None:
+        name += f"Ch{channel}"
+    return f"{name}.tif"
+
+
 def pos_from_file_name(file_name: str) -> List[float]:
     """Return [x, y, z] position from filename. For example,
     'pCellz10y522x392Ch0.tif' would return [392, 522, 10]"""

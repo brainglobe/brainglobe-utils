@@ -367,7 +367,7 @@ def pretty_xml(elem, indentation_str="  "):
     return md_parsed.toprettyxml(indent=indentation_str, encoding="UTF-8")
 
 
-def find_relevant_tiffs(tiffs, cell_def):
+def find_relevant_tiffs(tiffs: list[str], cell_def: str):
     """
     Find tiffs that match those read from cell_def.
 
