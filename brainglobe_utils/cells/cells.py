@@ -8,6 +8,7 @@ import os
 import re
 import threading
 from collections import defaultdict
+from collections.abc import Sequence
 from functools import total_ordering
 from typing import (
     Any,
@@ -83,10 +84,15 @@ class Cell:
     # for classification compatibility
     NO_CELL = 1
 
+    metadata: dict
+
     def __init__(
         self,
-        pos: Union[str, ElementTree.Element, Dict[str, float], List[float]],
+        pos: Union[
+            str, ElementTree.Element, Dict[str, float], Sequence[float]
+        ],
         cell_type: int,
+        metadata: dict = None,
     ):
         if isinstance(pos, str):
             pos = pos_from_file_name(os.path.basename(pos))
@@ -116,6 +122,10 @@ class Cell:
             self.type = Cell.ARTIFACT
         else:
             self.type = int(cell_type)
+
+        if metadata is None:
+            metadata = {}
+        self.metadata = metadata
 
     def _sanitize_position(
         self, pos: List[float], verbose: bool = True
@@ -303,7 +313,13 @@ class Cell:
         )
 
     def to_dict(self) -> Dict[str, float]:
-        return {"x": self.x, "y": self.y, "z": self.z, "type": self.type}
+        return {
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
+            "type": self.type,
+            "metadata": self.metadata,
+        }
 
     def __hash__(self) -> int:
         return hash(str(self))

@@ -5,8 +5,10 @@ Based on https://github.com/SainsburyWellcomeCentre/niftynet_cell_count by
 Christian Niedworok (https://github.com/cniedwor).
 """
 
+import json
 import logging
 import os
+import re
 from pathlib import Path
 from typing import List, Optional, Union
 from xml.dom import minidom
@@ -14,8 +16,9 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element as EtElement
 
 import pandas as pd
-import yaml
+import ryml
 
+import brainglobe_utils
 from brainglobe_utils.cells.cells import (
     Cell,
     MissingCellsError,
@@ -57,8 +60,8 @@ def get_cells(
     """
     if cells_file_path.endswith(".xml"):
         return get_cells_xml(cells_file_path, cells_only=cells_only)
-    elif cells_file_path.endswith(".yml"):
-        return get_cells_yml(cells_file_path, ignore_type=True)
+    elif cells_file_path.endswith(".yml") or cells_file_path.endswith(".yaml"):
+        return get_cells_yml(cells_file_path, cells_only=cells_only)
     elif os.path.isdir(cells_file_path):
         try:
             return get_cells_dir(cells_file_path, cell_type=cell_type)
@@ -124,9 +127,8 @@ def get_cells_xml(
 
 
 def get_cells_yml(
-    cells_file_path: Union[str, Path],
-    ignore_type: Optional[bool] = False,
-    marker: Optional[str] = "markers",
+    yaml_file_path: Union[str, Path],
+    cells_only: Optional[bool] = False,
 ):
     """
     Read cells from a yml file.
@@ -135,32 +137,33 @@ def get_cells_yml(
     ----------
     cells_file_path : str or pathlib.Path
         Path to yml file to read from.
-    ignore_type : bool, optional
-        Whether to ignore the type of cells - all will be assigned type
-        Cell.UNKNOWN. Currently only True is supported.
-    marker : str, optional
-        Yaml key under which cells information is stored.
 
     Returns
     -------
     list of Cell
         A list of the cells contained in the file.
     """
-    if not ignore_type:
-        raise NotImplementedError(
-            "Parsing cell types is not yet implemented for YAML files. "
-            "Currently the only option is to merge them. Please try again with"
-            " 'ignore_type=True'."
+    with open(yaml_file_path, "rb") as yaml_file:
+        data = json.loads(
+            ryml.emit_json(ryml.parse_in_arena(yaml_file.read()))
         )
-    else:
-        with open(cells_file_path, "r") as yml_file:
-            data = yaml.safe_load(yml_file)
-        cells = []
-        for cell_type in list(data.keys()):
-            type_dict = data[cell_type]
-            if marker in type_dict.keys():
-                for cell in type_dict[marker]:
-                    cells.append(Cell(cell, Cell.UNKNOWN))
+
+    cell_data = data["candidate_cells"]
+    cells = []
+    for item in cell_data:
+        cell = Cell(
+            (item["x"], item["y"], item["z"]),
+            cell_type=item["type"],
+            metadata=item["metadata"],
+        )
+        cells.append(cell)
+
+    if not cells:
+        raise MissingCellsError(
+            "No cells found in file {}".format(yaml_file_path)
+        )
+    if cells_only:
+        cells = [c for c in cells if c.is_cell()]
     return cells
 
 
@@ -225,12 +228,19 @@ def save_cells(
         are removed.
     """
     # Assume always save xml file, and maybe save other formats
-    cells_to_xml(
-        cells,
-        xml_file_path,
-        indentation_str=indentation_str,
-        artifact_keep=artifact_keep,
-    )
+    if xml_file_path.endswith(".xml"):
+        cells_to_xml(
+            cells,
+            xml_file_path,
+            indentation_str=indentation_str,
+            artifact_keep=artifact_keep,
+        )
+    elif xml_file_path.endswith(".yml") or xml_file_path.endswith(".yaml"):
+        cells_to_yml(
+            cells,
+            xml_file_path,
+            artifact_keep=artifact_keep,
+        )
 
     if save_csv:
         csv_file_path = replace_extension(xml_file_path, "csv")
@@ -262,6 +272,40 @@ def cells_to_xml(
     xml_data = make_xml(cells, indentation_str, artifact_keep=artifact_keep)
     with open(xml_file_path, "w") as xml_file:
         xml_file.write(str(xml_data, "UTF-8"))
+
+
+def cells_to_yml(
+    cells: List[Cell],
+    yml_file_path: Union[str, Path],
+    artifact_keep: Optional[bool] = True,
+):
+    """
+    Save cells to an xml file.
+
+    Parameters
+    ----------
+    cells : list of Cell
+        Cells to save to file.
+    yml_file_path : str or pathlib.Path
+        Yaml file path to write cells to.
+    artifact_keep : bool, optional
+        Whether to keep cells with type Cell.ARTIFACT. If True, they
+        are kept but their type is changed to Cell.UNKNOWN. If False, they are
+        removed.
+    """
+    if not artifact_keep:
+        cells = [c for c in cells if c.type != Cell.ARTIFACT]
+
+    data = {
+        "brainglobe_utils_version": brainglobe_utils.__version__,
+        "CellCounter_Marker_File": True,
+        "num_candidates": len(cells),
+        "candidate_cells": [c.to_dict() for c in cells],
+        "source": "",
+    }
+    yml_data = _dict_to_yaml_string(data)
+    with open(yml_file_path, "w") as yml_file:
+        yml_file.write(yml_data)
 
 
 def cells_xml_to_df(xml_file_path):
@@ -402,3 +446,57 @@ def find_relevant_tiffs(tiffs, cell_def):
         for (pos, cell) in enumerate(cells)
         if cell in relevant_cells
     ]
+
+
+def _dict_to_yaml_string(data: dict) -> str:
+    """Dump dict as yaml.
+
+    Args:
+        data: Data to dump.
+    """
+    # Convert dictionary into a ryml tree
+    tree = ryml.parse_in_arena(json.dumps(data).encode("utf8"))
+
+    # remove all style bits to enable a YAML style output
+    # see https://github.com/biojppm/rapidyaml/issues/520
+    for node_id, _ in ryml.walk(tree):
+        if tree.is_map(node_id) or tree.is_seq(node_id):
+            tree.set_container_style(node_id, ryml.NOTYPE)
+
+        if tree.has_key(node_id):
+            tree.set_key_style(node_id, ryml.NOTYPE)
+
+        if tree.has_val(node_id):
+            tree.set_val_style(node_id, ryml.NOTYPE)
+
+    return ryml.emit_yaml(tree)
+
+
+def is_brainglobe_xml(path: str | Path) -> bool:
+    path = Path(path).resolve()
+
+    try:
+        with open(path, "r") as xml_file:
+            while line := xml_file.readline():
+                if line.strip() == "<CellCounter_Marker_File>":
+                    return True
+    except Exception:
+        pass
+
+    return False
+
+
+def is_brainglobe_yaml(path):
+    pat = re.compile("^CellCounter_Marker_File *: *true")
+    match = re.match
+    path = Path(path).resolve()
+
+    try:
+        with open(path, "r") as yml_file:
+            while line := yml_file.readline():
+                if match(pat, line) is not None:
+                    return True
+    except Exception:
+        pass
+
+    return False
