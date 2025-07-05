@@ -144,9 +144,13 @@ def get_cells_yml(
         A list of the cells contained in the file.
     """
     with open(yaml_file_path, "rb") as yaml_file:
-        data = json.loads(
-            ryml.emit_json(ryml.parse_in_arena(yaml_file.read()))
-        )
+        tree = ryml.parse_in_arena(yaml_file.read())
+
+        n = ryml.compute_emit_json_length(tree)
+        buffer = bytearray(n)
+        res = ryml.emit_json_in_place(tree, buffer)
+        assert res.nbytes == n
+        data = json.loads(buffer)
 
     cell_data = data["candidate_cells"]
     cells = []
@@ -304,7 +308,7 @@ def cells_to_yml(
         "source": "",
     }
     yml_data = _dict_to_yaml_string(data)
-    with open(yml_file_path, "w") as yml_file:
+    with open(yml_file_path, "wb") as yml_file:
         yml_file.write(yml_data)
 
 
@@ -448,7 +452,7 @@ def find_relevant_tiffs(tiffs, cell_def):
     ]
 
 
-def _dict_to_yaml_string(data: dict) -> str:
+def _dict_to_yaml_string(data: dict) -> bytearray:
     """Dump dict as yaml.
 
     Args:
@@ -469,7 +473,11 @@ def _dict_to_yaml_string(data: dict) -> str:
         if tree.has_val(node_id):
             tree.set_val_style(node_id, ryml.NOTYPE)
 
-    return ryml.emit_yaml(tree)
+    n = ryml.compute_emit_yaml_length(tree)
+    buffer = bytearray(n)
+    res = ryml.emit_yaml_in_place(tree, buffer)
+    assert res.nbytes == n
+    return buffer
 
 
 def is_brainglobe_xml(path: str | Path) -> bool:
