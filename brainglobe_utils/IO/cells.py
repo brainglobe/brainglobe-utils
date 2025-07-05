@@ -10,13 +10,14 @@ import logging
 import os
 import re
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, NoReturn, Optional, Union
 from xml.dom import minidom
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element as EtElement
 
 import pandas as pd
 import ryml
+import yaml
 
 import brainglobe_utils
 from brainglobe_utils.cells.cells import (
@@ -25,23 +26,23 @@ from brainglobe_utils.cells.cells import (
     UntypedCell,
     pos_from_file_name,
 )
-from brainglobe_utils.general.system import replace_extension
 
 
 def get_cells(
-    cells_file_path: str,
+    cells_file_path: str | Path,
     cells_only: bool = False,
     cell_type: Optional[int] = None,
-):
+) -> list[Cell]:
     """
     Read cells from a file or directory.
 
     Parameters
     ----------
     cells_file_path : str
-        Path to cells file to read. Can be .xml, .yml, or a directory.
+        Path to cells file to read. Can be .xml, .yml, .yaml, or a directory,
+        which will be parsed accordingly.
     cells_only : bool, optional
-        Only relevant for .xml files. If True, will only read Cells with
+        Only relevant for XML/YAML files. If True, will only read Cells with
         type Cell.CELL i.e. exclude all Cell.ARTIFACT, Cell.UNKNOWN, and
         Cell.NO_CELL.
     cell_type : int, optional
@@ -58,11 +59,12 @@ def get_cells(
     --------
     Cell : For full description of cell_type parameter.
     """
-    if cells_file_path.endswith(".xml"):
+    path = Path(cells_file_path).resolve()
+    if path.suffix == ".xml":
         return get_cells_xml(cells_file_path, cells_only=cells_only)
-    elif cells_file_path.endswith(".yml") or cells_file_path.endswith(".yaml"):
+    elif path.suffix in (".yaml", ".yml"):
         return get_cells_yml(cells_file_path, cells_only=cells_only)
-    elif os.path.isdir(cells_file_path):
+    elif path.is_dir():
         try:
             return get_cells_dir(cells_file_path, cell_type=cell_type)
         except IndexError:
@@ -74,28 +76,28 @@ def get_cells(
         raise_cell_read_error(cells_file_path)
 
 
-def raise_cell_read_error(cells_file_path):
+def raise_cell_read_error(cells_file_path: str | Path) -> NoReturn:
     """Raise a NotImplementedError, with an informative message including the
     cells file path"""
     logging.error(
         "File format of: {} is not supported or contains errors. Please "
-        "supply an xml file, or a directory of files with positions in the "
-        "filenames."
+        "supply an XML or YAML file, or a directory of files with positions "
+        "in the filenames."
         "".format(cells_file_path)
     )
     raise NotImplementedError(
         "File format of: {} is not supported or contains errors. Please "
-        "supply an xml file, or a directory of files with positions in the "
-        "filenames."
+        "supply an XML or YAML file, or a directory of files with positions "
+        "in the filenames."
         "".format(cells_file_path)
     )
 
 
 def get_cells_xml(
     xml_file_path: Union[str, Path], cells_only: Optional[bool] = False
-):
+) -> list[Cell]:
     """
-    Read cells from an xml file.
+    Read cells from an XML file.
 
     Parameters
     ----------
@@ -129,28 +131,47 @@ def get_cells_xml(
 def get_cells_yml(
     yaml_file_path: Union[str, Path],
     cells_only: Optional[bool] = False,
-):
+) -> list[Cell]:
     """
-    Read cells from a yml file.
+    Read cells from a YAML file.
 
     Parameters
     ----------
-    cells_file_path : str or pathlib.Path
-        Path to yml file to read from.
+    yaml_file_path : str or pathlib.Path
+        Path to xml file to read from.
+    cells_only : bool, optional
+        Whether to only read Cells with type Cell.CELL i.e. exclude all
+        Cell.ARTIFACT, Cell.UNKNOWN, and Cell.NO_CELL.
 
     Returns
     -------
     list of Cell
         A list of the cells contained in the file.
     """
+    # approach is based on https://github.com/4C-multiphysics/fourcipp/blob
+    # /8d9b5b76320643b54e797224d2dffc3984a3e961/src/fourcipp/utils/yaml_io.py
+    # rapdiyaml doesn't directly output python objects. But it can output json.
+    # So generate json from the file and use python json to return python
+    # objects. This is still orders of mag faster than other yaml libraries
     with open(yaml_file_path, "rb") as yaml_file:
         tree = ryml.parse_in_arena(yaml_file.read())
 
+        # ryml can return the buffer, but due to a bug in Swig, it can't handle
+        # giant buffers. So instead pass buffer to be filled in.
+        # Calculate size of the emitted json and create buffer
         n = ryml.compute_emit_json_length(tree)
         buffer = bytearray(n)
+        # generate json into buffer
         res = ryml.emit_json_in_place(tree, buffer)
         assert res.nbytes == n
+        # get objects from json
         data = json.loads(buffer)
+
+    if "Type1" in data:
+        return get_cells_yml_legacy(yaml_file_path)
+
+    if not data.get("CellCounter_Marker_File"):
+        raise_cell_read_error(yaml_file_path)
 
     cell_data = data["candidate_cells"]
     cells = []
@@ -171,9 +192,50 @@ def get_cells_yml(
     return cells
 
 
+def get_cells_yml_legacy(
+    cells_file_path: Union[str, Path],
+    ignore_type: Optional[bool] = False,
+    marker: Optional[str] = "markers",
+) -> list[Cell]:
+    """
+    Read cells from a yml file.
+
+    Parameters
+    ----------
+    cells_file_path : str or pathlib.Path
+        Path to yml file to read from.
+    ignore_type : bool, optional
+        Whether to ignore the type of cells - all will be assigned type
+        Cell.UNKNOWN. Currently only True is supported.
+    marker : str, optional
+        Yaml key under which cells information is stored.
+
+    Returns
+    -------
+    list of Cell
+        A list of the cells contained in the file.
+    """
+    if not ignore_type:
+        raise NotImplementedError(
+            "Parsing cell types is not yet implemented for YAML files. "
+            "Currently the only option is to merge them. Please try again with"
+            " 'ignore_type=True'."
+        )
+    else:
+        with open(cells_file_path, "r") as yml_file:
+            data = yaml.safe_load(yml_file)
+        cells = []
+        for cell_type in list(data.keys()):
+            type_dict = data[cell_type]
+            if marker in type_dict.keys():
+                for cell in type_dict[marker]:
+                    cells.append(Cell(cell, Cell.UNKNOWN))
+    return cells
+
+
 def get_cells_dir(
     cells_file_path: Union[str, Path], cell_type: Optional[bool] = None
-):
+) -> list[Cell]:
     """
     Read cells from a directory. Cells will be created based on the filenames
     of files in the directory, one cell per file.
@@ -206,12 +268,12 @@ def get_cells_dir(
 
 
 def save_cells(
-    cells,
-    xml_file_path,
-    save_csv=False,
-    indentation_str="  ",
-    artifact_keep=True,
-):
+    cells: list[Cell],
+    xml_file_path: Path | str,
+    save_csv: bool = False,
+    indentation_str: str = "  ",
+    artifact_keep: bool = True,
+) -> None:
     """
     Save cells to a file.
 
@@ -219,8 +281,9 @@ def save_cells(
     ----------
     cells : list of Cell
         Cells to save to file.
-    xml_file_path : str
-        File path of xml file to save cells to.
+    xml_file_path : str or Path
+        File path of XML or YAML file to save cells to (based on the
+        extension - XML for .xml, YAML for .yml or .yaml).
     save_csv : bool, optional
         If True, will save cells to a csv file (rather than xml). This will use
         the given xml_file_path with the .xml extension replaced with .csv.
@@ -231,23 +294,24 @@ def save_cells(
         they are kept but their type is changed to Cell.UNKNOWN. If False, they
         are removed.
     """
-    # Assume always save xml file, and maybe save other formats
-    if xml_file_path.endswith(".xml"):
+    # Assume always save xml/yaml file, and maybe save other formats
+    path = Path(xml_file_path)
+    if path.suffix == ".xml":
         cells_to_xml(
             cells,
-            xml_file_path,
+            path,
             indentation_str=indentation_str,
             artifact_keep=artifact_keep,
         )
-    elif xml_file_path.endswith(".yml") or xml_file_path.endswith(".yaml"):
+    elif path.suffix in (".yaml", ".yml"):
         cells_to_yml(
             cells,
-            xml_file_path,
+            path,
             artifact_keep=artifact_keep,
         )
 
     if save_csv:
-        csv_file_path = replace_extension(xml_file_path, "csv")
+        csv_file_path = path.with_suffix(".csv")
         cells_to_csv(cells, csv_file_path)
 
 
@@ -256,9 +320,9 @@ def cells_to_xml(
     xml_file_path: Union[str, Path],
     indentation_str: Optional[str] = "  ",
     artifact_keep: Optional[bool] = True,
-):
+) -> None:
     """
-    Save cells to an xml file.
+    Save cells to an XML file.
 
     Parameters
     ----------
@@ -282,9 +346,9 @@ def cells_to_yml(
     cells: List[Cell],
     yml_file_path: Union[str, Path],
     artifact_keep: Optional[bool] = True,
-):
+) -> None:
     """
-    Save cells to an xml file.
+    Save cells to a YAML file.
 
     Parameters
     ----------
@@ -305,7 +369,6 @@ def cells_to_yml(
         "CellCounter_Marker_File": True,
         "num_candidates": len(cells),
         "candidate_cells": [c.to_dict() for c in cells],
-        "source": "",
     }
     yml_data = _dict_to_yaml_string(data)
     with open(yml_file_path, "wb") as yml_file:
@@ -318,11 +381,24 @@ def cells_xml_to_df(xml_file_path):
     return cells_to_dataframe(cells)
 
 
-def cells_to_dataframe(cells: List[Cell]) -> pd.DataFrame:
-    return pd.DataFrame([c.to_dict() for c in cells])
+def cells_to_dataframe(cells: list[Cell]) -> pd.DataFrame:
+    """
+    Takes a list of Cells and returns it as a dataframe.
+
+    The dataframe includes all the items from the Cell's metadata dict as well
+    as everything returned by Cell.to_dict(), excluding the metadata keyword.
+    I.e. the items in metadata gets promoted to be columns in the dataframe.
+    """
+    dicts = []
+    for c in cells:
+        d = c.metadata.copy()
+        d.update({k: v for k, v in c.to_dict().items() if k != "metadata"})
+        dicts.append(d)
+
+    return pd.DataFrame(dicts)
 
 
-def cells_to_csv(cells: List[Cell], csv_file_path: Union[str, Path]):
+def cells_to_csv(cells: list[Cell], csv_file_path: Union[str, Path]) -> None:
     """Save cells to csv file"""
     df = cells_to_dataframe(cells)
     df.to_csv(csv_file_path)
@@ -453,12 +529,15 @@ def find_relevant_tiffs(tiffs, cell_def):
 
 
 def _dict_to_yaml_string(data: dict) -> bytearray:
-    """Dump dict as yaml.
+    """Dump dict to yaml and returns it as a buffer.
 
     Args:
         data: Data to dump.
     """
-    # Convert dictionary into a ryml tree
+    # based on https://github.com/4C-multiphysics/fourcipp/blob/
+    # 8d9b5b76320643b54e797224d2dffc3984a3e961/src/fourcipp/utils/yaml_io.py
+    # see get_cells_yml for the approach
+    # convert data to json encoded text. And then convert into a ryml tree
     tree = ryml.parse_in_arena(json.dumps(data).encode("utf8"))
 
     # remove all style bits to enable a YAML style output
@@ -473,14 +552,26 @@ def _dict_to_yaml_string(data: dict) -> bytearray:
         if tree.has_val(node_id):
             tree.set_val_style(node_id, ryml.NOTYPE)
 
+    # ryml can return the buffer, but due to a bug in Swig, it can't handle
+    # giant buffers. So instead pass buffer to be filled in.
+    # Calculate size of the emitted yaml and create buffer
     n = ryml.compute_emit_yaml_length(tree)
     buffer = bytearray(n)
+    # generate yaml into buffer
     res = ryml.emit_yaml_in_place(tree, buffer)
     assert res.nbytes == n
+
     return buffer
 
 
 def is_brainglobe_xml(path: str | Path) -> bool:
+    """
+    Takes a potential brainglobe generated XML file and inspects it and returns
+    whether this is indeed a brainglobe XML file.
+
+    Note: it does not validate the file for valid XML, only that it contains
+    a marker emitted by brainglobe for XML files.
+    """
     path = Path(path).resolve()
 
     try:
@@ -495,6 +586,13 @@ def is_brainglobe_xml(path: str | Path) -> bool:
 
 
 def is_brainglobe_yaml(path):
+    """
+    Takes a potential brainglobe generated YAML file and inspects it and
+    returns whether this is indeed a brainglobe YAML file.
+
+    Note: it does not validate the file for valid YAML, only that it contains
+    a marker emitted by brainglobe for YAML files.
+    """
     pat = re.compile("^CellCounter_Marker_File *: *true")
     match = re.match
     path = Path(path).resolve()
