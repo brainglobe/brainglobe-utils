@@ -67,16 +67,18 @@ def get_cells(
     elif path.is_dir():
         try:
             return get_cells_dir(cells_file_path, cell_type=cell_type)
-        except IndexError:
+        except IndexError as e:
             # if a directory is given, but it contains
             # files that can't be read. Usually if the user gives the wrong
             # directory as input to `cellfinder_gen_cubes`
-            raise_cell_read_error(cells_file_path)
+            raise_cell_read_error(cells_file_path, e)
     else:
         raise_cell_read_error(cells_file_path)
 
 
-def raise_cell_read_error(cells_file_path: str | Path) -> NoReturn:
+def raise_cell_read_error(
+    cells_file_path: str | Path, e: Exception | None = None
+) -> NoReturn:
     """Raise a NotImplementedError, with an informative message including the
     cells file path"""
     logging.error(
@@ -85,12 +87,16 @@ def raise_cell_read_error(cells_file_path: str | Path) -> NoReturn:
         "in the filenames."
         "".format(cells_file_path)
     )
-    raise NotImplementedError(
+    exc = NotImplementedError(
         "File format of: {} is not supported or contains errors. Please "
         "supply an XML or YAML file, or a directory of files with positions "
         "in the filenames."
         "".format(cells_file_path)
     )
+
+    if e is None:
+        raise exc
+    raise exc from e
 
 
 def get_cells_xml(
@@ -135,6 +141,9 @@ def get_cells_yml(
     """
     Read cells from a YAML file.
 
+    Note: due to how we convert from yaml, json limitations are applied to the
+    data. Specifically, any dictionary keys will become strings.
+
     Parameters
     ----------
     yaml_file_path : str or pathlib.Path
@@ -157,7 +166,7 @@ def get_cells_yml(
         tree = ryml.parse_in_arena(yaml_file.read())
 
         # ryml can return the buffer, but due to a bug in Swig, it can't handle
-        # giant buffers. So instead pass buffer to be filled in.
+        # giant buffers. So instead pass buffer to be filled in. rapidyaml#526
         # Calculate size of the emitted json and create buffer
         n = ryml.compute_emit_json_length(tree)
         buffer = bytearray(n)
@@ -167,10 +176,10 @@ def get_cells_yml(
         # get objects from json
         data = json.loads(buffer)
 
-    if "Type1" in data:
-        return get_cells_yml_legacy(yaml_file_path)
+    if data and "Type1" in data:
+        return get_cells_yml_legacy(yaml_file_path, ignore_type=True)
 
-    if not data.get("CellCounter_Marker_File"):
+    if not data or not data.get("CellCounter_Marker_File"):
         raise_cell_read_error(yaml_file_path)
 
     cell_data = data["candidate_cells"]
@@ -187,6 +196,7 @@ def get_cells_yml(
         raise MissingCellsError(
             "No cells found in file {}".format(yaml_file_path)
         )
+
     if cells_only:
         cells = [c for c in cells if c.is_cell()]
     return cells
@@ -350,6 +360,9 @@ def cells_to_yml(
     """
     Save cells to a YAML file.
 
+    Note: due to how we convert to yaml, json limitations are applied to the
+    data. Specifically, any dictionary keys will become strings.
+
     Parameters
     ----------
     cells : list of Cell
@@ -361,14 +374,23 @@ def cells_to_yml(
         are kept but their type is changed to Cell.UNKNOWN. If False, they are
         removed.
     """
-    if not artifact_keep:
-        cells = [c for c in cells if c.type != Cell.ARTIFACT]
+    dicts = [c.to_dict() for c in cells]
+    artifact = Cell.ARTIFACT
+    unknown = Cell.UNKNOWN
+
+    if artifact_keep:
+        # replace artifact as unknown
+        for d in dicts:
+            if d.get("type") == artifact:
+                d["type"] = unknown
+    else:
+        dicts = [d for d in dicts if d["type"] != artifact]
 
     data = {
         "brainglobe_utils_version": brainglobe_utils.__version__,
         "CellCounter_Marker_File": True,
-        "num_candidates": len(cells),
-        "candidate_cells": [c.to_dict() for c in cells],
+        "num_candidates": len(dicts),
+        "candidate_cells": dicts,
     }
     yml_data = _dict_to_yaml_string(data)
     with open(yml_file_path, "wb") as yml_file:
@@ -528,11 +550,13 @@ def find_relevant_tiffs(tiffs, cell_def):
     ]
 
 
-def _dict_to_yaml_string(data: dict) -> bytearray:
-    """Dump dict to yaml and returns it as a buffer.
+def _dict_to_yaml_string(data: dict) -> bytearray | bytes:
+    """
+    Dump dict to yaml and returns it as a buffer.
 
-    Args:
-        data: Data to dump.
+    :param data: dict
+        Data to dump.
+    :return: A bytes/bytearray with the encoded data.
     """
     # based on https://github.com/4C-multiphysics/fourcipp/blob/
     # 8d9b5b76320643b54e797224d2dffc3984a3e961/src/fourcipp/utils/yaml_io.py
@@ -553,7 +577,7 @@ def _dict_to_yaml_string(data: dict) -> bytearray:
             tree.set_val_style(node_id, ryml.NOTYPE)
 
     # ryml can return the buffer, but due to a bug in Swig, it can't handle
-    # giant buffers. So instead pass buffer to be filled in.
+    # giant buffers. So instead pass buffer to be filled in. rapidyaml#526
     # Calculate size of the emitted yaml and create buffer
     n = ryml.compute_emit_yaml_length(tree)
     buffer = bytearray(n)

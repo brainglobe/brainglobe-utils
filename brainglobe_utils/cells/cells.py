@@ -51,6 +51,9 @@ class Cell:
         is included when cells are saved / loaded from yaml files. If None,
         an empty dict is saved to `metadata`.
 
+        When saving to/from yaml, all dict keys saved via `metadata` will
+        become strings.
+
     Attributes
     ----------
     x : float
@@ -278,11 +281,12 @@ class Cell:
         """Return true if position and type of the cells are equal"""
         if not isinstance(other, self.__class__):
             return False
-        return (self.x, self.y, self.z, self.type) == (
+        return (self.x, self.y, self.z, self.type, self.metadata) == (
             other.x,
             other.y,
             other.z,
             other.type,
+            other.metadata,
         )
 
     def __ne__(self, other: Any) -> bool:
@@ -312,13 +316,20 @@ class Cell:
             )
 
     def __str__(self) -> str:
-        return "Cell: x: {}, y: {}, z: {}, type: {}".format(
-            int(self.x), int(self.y), int(self.z), self.type
+        return "Cell: x: {}, y: {}, z: {}, type: {}, metadata: {}".format(
+            int(self.x),
+            int(self.y),
+            int(self.z),
+            self.type,
+            self.metadata,
         )
 
     def __repr__(self) -> str:
-        return "{}, ({}, {})".format(
-            self.__class__, [self.x, self.y, self.z], self.type
+        return "{}, ({}, {}, {})".format(
+            self.__class__,
+            [self.x, self.y, self.z],
+            self.type,
+            self.metadata,
         )
 
     def to_dict(self) -> Dict[str, float]:
