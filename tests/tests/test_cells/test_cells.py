@@ -184,11 +184,11 @@ def test_cell_string_output():
     cell_type = 2
     cell = cells.Cell(start_pos, cell_type)
 
-    assert str(cell) == "Cell: x: 2, y: 3, z: 4, type: 2"
+    assert str(cell) == "Cell: x: 2, y: 3, z: 4, type: 2, metadata: {}"
 
     assert (
         repr(cell)
-        == "<class 'brainglobe_utils.cells.cells.Cell'>, ([2, 3, 4], 2)"
+        == "<class 'brainglobe_utils.cells.cells.Cell'>, ([2, 3, 4], 2, {})"
     )
 
 
@@ -231,3 +231,25 @@ def test_cells_to_np_cell_type():
         cells.to_numpy_pos(items, cells.Cell.CELL),
         [[3, 4, 5]],
     )
+
+
+def test_cells_metadata():
+    a = cells.Cell((0, 1, 2), cells.Cell.UNKNOWN, metadata={"1": 2})
+    b = cells.Cell((0, 1, 2), cells.Cell.UNKNOWN, metadata={"1": 3})
+    c = cells.Cell((0, 1, 2), cells.Cell.UNKNOWN, metadata={"1": 2})
+
+    # equality is affected by metadata
+    assert a == c
+    assert a != b
+
+    # comparison should work no matter the metadata
+    b_plus = cells.Cell((0, 1, 3), cells.Cell.UNKNOWN, metadata={"1": 3})
+    assert a < b_plus
+
+    assert a.to_dict() == {
+        "x": 0,
+        "y": 1,
+        "z": 2,
+        "type": cells.Cell.UNKNOWN,
+        "metadata": {"1": 2},
+    }
