@@ -35,7 +35,8 @@ dependencies = [
     "slurmio",
     "tifffile",
     "tqdm",
-    "qt-niu"
+    "qt-niu",
+    "rapidyaml"
 ]
 dynamic = ["version"]
 
