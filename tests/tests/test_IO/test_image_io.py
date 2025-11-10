@@ -200,7 +200,7 @@ def test_tiff_sequence_one_tiff(tmp_path):
         pytest.param(False, id="no parallel loading"),
     ],
 )
-def test_tiff_sequence_diff_shape(tmp_path, array_3d, load_parallel):
+def test_tiff_sequence_diff_shape(tmp_path, load_parallel):
     """
     Test that an error is thrown when trying to load a tiff sequence where
     individual 2D tiffs have different shapes
@@ -254,7 +254,7 @@ def test_nii_io(tmp_path, array_3d, use_path, nifti_suffix):
     (keeping it as a nifty object with no numpy conversion on loading).
     Tests using both str and pathlib.Path input.
     """
-    filename = "test_array.nii"
+    filename = f"test_array{nifti_suffix}"
     if use_path:
         nii_path = tmp_path / filename
     else:
