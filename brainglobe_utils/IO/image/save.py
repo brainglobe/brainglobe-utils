@@ -128,3 +128,62 @@ def save_any(img_volume, dest_path):
         raise NotImplementedError(
             f"Could not guess data type for path {dest_path}"
         )
+
+
+def save_as_asr_nii(
+    stack: np.ndarray,
+    vox_sizes: list,
+    dest_path: Path,
+):
+    """
+    Save 3D image stack to dest_path as a nifti image.
+
+    This function assumes that the image is in the ASR orientation
+    and sets the qform and sform of the nifti header accordingly
+    (so that the image is displayed correctly in nifti viewers like ITK-SNAP).
+
+    Parameters
+    ----------
+    stack : np.ndarray
+        3D image stack
+    vox_sizes : list
+        list of voxel dimensions in mm. The order is 'x', 'y', 'z'
+    dest_path : pathlib.Path
+        path to save the nifti image
+    """
+    affine = _get_transf_matrix_from_res(vox_sizes)
+    nii_img = nib.Nifti1Image(stack, affine, dtype=stack.dtype)
+    # Set qform and sform to match axes orientation, assuming ASR
+    reorient = np.array(
+        [
+            [0, 0, -1, 0],
+            [-1, 0, 0, 0],
+            [0, -1, 0, 0],
+            [0, 0, 0, 1],
+        ]
+    )
+    new_form = reorient @ affine
+    nii_img.set_qform(new_form, code=3)
+    nii_img.set_sform(new_form, code=3)
+    # save the nifti image
+    nib.save(nii_img, dest_path.as_posix())
+
+
+def _get_transf_matrix_from_res(vox_sizes: list) -> np.ndarray:
+    """Create transformation matrix from a dictionary of voxel dimensions.
+
+    Parameters
+    ----------
+    vox_sizes : list
+        list of voxel dimensions in mm. The order is 'x', 'y', 'z'
+
+    Returns
+    -------
+    np.ndarray
+        A (4, 4) transformation matrix with the voxel dimensions
+        on the first 3 diagonal entries.
+    """
+    transformation_matrix = np.eye(4)
+    for i in range(3):
+        transformation_matrix[i, i] = vox_sizes[i]
+    return transformation_matrix
