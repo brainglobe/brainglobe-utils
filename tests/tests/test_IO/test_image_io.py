@@ -401,6 +401,7 @@ def test_read_tiff_folder_with_dask(array_3D_as_2d_tiffs_path, array_3d):
     """
     stack = load.read_with_dask(array_3D_as_2d_tiffs_path)
     np.testing.assert_array_equal(stack, array_3d)
+    assert stack.chunksize == (1, 4, 4)
 
 
 def test_read_with_dask_glob_txt_equal(array_3D_as_2d_tiffs_path, txt_path):
@@ -411,6 +412,19 @@ def test_read_with_dask_glob_txt_equal(array_3D_as_2d_tiffs_path, txt_path):
     glob_stack = load.read_with_dask(array_3D_as_2d_tiffs_path)
     txt_stack = load.read_with_dask(txt_path)
     np.testing.assert_array_equal(glob_stack, txt_stack)
+    assert txt_stack.chunksize == (1, 4, 4)
+
+
+def test_read_3D_tiff_with_dask(tmp_path, array_3d):
+    """
+    Test that a single 3D tiff file can be read correctly as a dask array.
+    """
+    tiff_path = tmp_path / "test.tiff"
+    save.to_tiff(array_3d, tiff_path)
+
+    stack = load.read_with_dask(tiff_path)
+    np.testing.assert_array_equal(stack, array_3d)
+    assert stack.chunksize == (1, 4, 4)
 
 
 def test_read_with_dask_raises(tmp_path):
