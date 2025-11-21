@@ -411,8 +411,3 @@ def test_no_cells(tmp_path, suffix):
     cell_io.save_cells([], fname)
     with pytest.raises(cell_io.MissingCellsError):
         cell_io.get_cells(fname)
-
-
-def test_get_cells_yml_legacy_type():
-    with pytest.raises(NotImplementedError):
-        cell_io.get_cells_yml_legacy("", ignore_type=False)

@@ -17,7 +17,6 @@ from xml.etree.ElementTree import Element as EtElement
 
 import pandas as pd
 import ryml
-import yaml
 
 import brainglobe_utils
 from brainglobe_utils.cells.cells import (
@@ -176,9 +175,6 @@ def get_cells_yaml(
         # get objects from json
         data = json.loads(buffer)
 
-    if data and "Type1" in data:
-        return get_cells_yml_legacy(yaml_file_path, ignore_type=True)
-
     if not data or not data.get("CellCounter_Marker_File"):
         raise_cell_read_error(yaml_file_path)
 
@@ -199,47 +195,6 @@ def get_cells_yaml(
 
     if cells_only:
         cells = [c for c in cells if c.is_cell()]
-    return cells
-
-
-def get_cells_yml_legacy(
-    cells_file_path: Union[str, Path],
-    ignore_type: Optional[bool] = False,
-    marker: Optional[str] = "markers",
-) -> list[Cell]:
-    """
-    Read cells from a yml file.
-
-    Parameters
-    ----------
-    cells_file_path : str or pathlib.Path
-        Path to yml file to read from.
-    ignore_type : bool, optional
-        Whether to ignore the type of cells - all will be assigned type
-        Cell.UNKNOWN. Currently only True is supported.
-    marker : str, optional
-        Yaml key under which cells information is stored.
-
-    Returns
-    -------
-    list of Cell
-        A list of the cells contained in the file.
-    """
-    if not ignore_type:
-        raise NotImplementedError(
-            "Parsing cell types is not yet implemented for YAML files. "
-            "Currently the only option is to merge them. Please try again with"
-            " 'ignore_type=True'."
-        )
-    else:
-        with open(cells_file_path, "r") as yml_file:
-            data = yaml.safe_load(yml_file)
-        cells = []
-        for cell_type in list(data.keys()):
-            type_dict = data[cell_type]
-            if marker in type_dict.keys():
-                for cell in type_dict[marker]:
-                    cells.append(Cell(cell, Cell.UNKNOWN))
     return cells
 
 
