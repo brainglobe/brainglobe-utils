@@ -63,7 +63,7 @@ def get_cells(
     if path.suffix == ".xml":
         return get_cells_xml(cells_file_path, cells_only=cells_only)
     elif path.suffix in (".yaml", ".yml"):
-        return get_cells_yml(cells_file_path, cells_only=cells_only)
+        return get_cells_yaml(cells_file_path, cells_only=cells_only)
     elif path.is_dir():
         try:
             return get_cells_dir(cells_file_path, cell_type=cell_type)
@@ -134,7 +134,7 @@ def get_cells_xml(
     return cells
 
 
-def get_cells_yml(
+def get_cells_yaml(
     yaml_file_path: Union[str, Path],
     cells_only: Optional[bool] = False,
 ) -> list[Cell]:
@@ -405,7 +405,7 @@ def cells_xml_to_df(xml_file_path):
 
 def cells_to_dataframe(cells: list[Cell]) -> pd.DataFrame:
     """
-    Takes a list of Cells and returns it as a dataframe.
+    Takes a list of Cells and return it as a dataframe.
 
     The dataframe includes all the items from the Cell's metadata dict as well
     as everything returned by Cell.to_dict(), excluding the metadata keyword.
@@ -552,7 +552,7 @@ def find_relevant_tiffs(tiffs, cell_def):
 
 def _dict_to_yaml_string(data: dict) -> bytearray | bytes:
     """
-    Dump dict to yaml and returns it as a buffer.
+    Dump dict to yaml and return it as a buffer.
 
     :param data: dict
         Data to dump.
@@ -560,7 +560,7 @@ def _dict_to_yaml_string(data: dict) -> bytearray | bytes:
     """
     # based on https://github.com/4C-multiphysics/fourcipp/blob/
     # 8d9b5b76320643b54e797224d2dffc3984a3e961/src/fourcipp/utils/yaml_io.py
-    # see get_cells_yml for the approach
+    # see get_cells_yaml for the approach
     # convert data to json encoded text. And then convert into a ryml tree
     tree = ryml.parse_in_arena(json.dumps(data).encode("utf8"))
 

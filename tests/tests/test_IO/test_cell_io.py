@@ -105,7 +105,7 @@ def test_get_cells_xml_cells_only(cells_only, tmp_path, cells_with_artifacts):
 
 
 @pytest.mark.parametrize("cells_only", [True, False])
-def test_get_cells_yml_cells_only(cells_only, tmp_path, cells_with_artifacts):
+def test_get_cells_yaml_cells_only(cells_only, tmp_path, cells_with_artifacts):
     """
     Test that cells not of type Cell.CELL (type 2) are correctly removed or
     kept when reading from xml with the cells_only option.
