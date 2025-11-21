@@ -17,11 +17,6 @@ def xml_path(data_path):
 
 
 @pytest.fixture
-def yml_legacy_path(data_path):
-    return str(data_path / "cells" / "cells_legacy.yml")
-
-
-@pytest.fixture
 def yml_path(data_path):
     return str(data_path / "cells" / "cells.yml")
 
@@ -116,15 +111,6 @@ def test_get_cells_yaml_cells_only(cells_only, tmp_path, cells_with_artifacts):
     )
     cells = cell_io.get_cells(str(tmp_cells_out_path), cells_only=cells_only)
     check_artifacts_get(cells_only, cells, cells_with_artifacts)
-
-
-def test_get_cells_legacy_yml(yml_legacy_path):
-    """
-    Test that cells can be read from a yml file.
-    """
-    cells = cell_io.get_cells(yml_legacy_path)
-    assert len(cells) == 250
-    assert Cell([9170, 2537, 311], 1) == cells[194]
 
 
 @pytest.mark.parametrize(
