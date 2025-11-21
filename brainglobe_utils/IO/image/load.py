@@ -790,9 +790,8 @@ def read_with_dask(path: str | Path) -> da.Array:
     Parameters
     ----------
     path : str | Path
-        Can be the path of a single tiff file containing a 3D stack, a
-        folder of 2D tiff files, or a text file containing a list of
-        2D tiff paths.
+        Filepath of text file listing 2D tiffs, folder of 2D tiffs,
+        or single file tiff z-stack.
 
     Returns
     -------
