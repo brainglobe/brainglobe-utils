@@ -395,18 +395,28 @@ def test_memory_error(monkeypatch):
         utils.check_mem(8, 1000)
 
 
-def test_read_with_dask_txt(array_3D_as_2d_tiffs_path, array_3d):
+def test_read_tiff_folder_with_dask(array_3D_as_2d_tiffs_path, array_3d):
     """
-    Test that a series of images can be read correctly as a dask array
+    Test that a series of 2D tiffs can be read correctly as a dask array.
     """
     stack = load.read_with_dask(array_3D_as_2d_tiffs_path)
     np.testing.assert_array_equal(stack, array_3d)
 
 
 def test_read_with_dask_glob_txt_equal(array_3D_as_2d_tiffs_path, txt_path):
+    """
+    Test that a txt file of 2D tiff paths can be read correctly as a
+    dask array.
+    """
     glob_stack = load.read_with_dask(array_3D_as_2d_tiffs_path)
     txt_stack = load.read_with_dask(txt_path)
     np.testing.assert_array_equal(glob_stack, txt_stack)
+
+
+def test_read_with_dask_raises(tmp_path):
+    with pytest.raises(ValueError) as e:
+        load.read_with_dask(tmp_path)
+    assert e.match("not contain any .tif or .tiff files")
 
 
 def test_read_z_stack_with_missing_metadata(
@@ -467,12 +477,6 @@ def test_get_size_image_with_missing_metadata(
             str(array3d_as_tiff_stack_with_missing_metadata)
         )
         mock_debug.assert_called_once()
-
-
-def test_read_with_dask_raises(tmp_path):
-    with pytest.raises(ValueError) as e:
-        load.read_with_dask(tmp_path)
-    assert e.match("not contain any .tif or .tiff files")
 
 
 @pytest.mark.parametrize(
