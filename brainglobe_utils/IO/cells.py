@@ -234,7 +234,7 @@ def get_cells_dir(
 
 def save_cells(
     cells: list[Cell],
-    xml_file_path: Path | str,
+    file_path: Path | str,
     save_csv: bool = False,
     indentation_str: str = "  ",
     artifact_keep: bool = True,
@@ -246,12 +246,12 @@ def save_cells(
     ----------
     cells : list of Cell
         Cells to save to file.
-    xml_file_path : str or Path
+    file_path : str or Path
         File path of XML or YAML file to save cells to (based on the
         extension - XML for .xml, YAML for .yml or .yaml).
     save_csv : bool, optional
         If True, will save cells to a csv file (rather than xml). This will use
-        the given xml_file_path with the .xml extension replaced with .csv.
+        the given file_path with the .xml extension replaced with .csv.
     indentation_str : str, optional
         String to use for indent in xml file.
     artifact_keep : bool, optional
@@ -260,7 +260,7 @@ def save_cells(
         are removed.
     """
     # Assume always save xml/yaml file, and maybe save other formats
-    path = Path(xml_file_path)
+    path = Path(file_path)
     if path.suffix == ".xml":
         cells_to_xml(
             cells,
