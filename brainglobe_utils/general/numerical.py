@@ -1,4 +1,5 @@
 import argparse
+from typing import Literal
 
 
 def is_even(num):
@@ -31,7 +32,10 @@ def is_even(num):
         return True
 
 
-def check_positive_float(value, none_allowed=True):
+def check_positive_float(
+    value: float | None | Literal["None", "none"],
+    none_allowed: bool = True,
+) -> float | None:
     """
     Used in argparse to enforce positive floats.
     Source: https://stackoverflow.com/questions/14117415
@@ -69,7 +73,9 @@ def check_positive_float(value, none_allowed=True):
     return value
 
 
-def check_positive_int(value, none_allowed=True):
+def check_positive_int(
+    value: int | None | Literal["None", "none"], none_allowed: bool = True
+) -> int | None:
     """
     Used in argparse to enforce positive ints.
     Source: https://stackoverflow.com/questions/14117415

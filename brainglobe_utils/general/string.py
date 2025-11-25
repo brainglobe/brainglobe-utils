@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 
 from natsort import natsorted
 
@@ -56,7 +56,9 @@ def get_text_lines(
     return lines
 
 
-def check_str(value, none_allowed=True):
+def check_str(
+    value: str | None | Literal["None", "none"], none_allowed: bool = True
+) -> str | None:
     """
     Used in argparse to enforce str input.
 
