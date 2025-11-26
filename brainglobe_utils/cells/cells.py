@@ -8,6 +8,7 @@ import os
 import re
 import threading
 from collections import defaultdict
+from collections.abc import Sequence
 from functools import total_ordering
 from typing import (
     Any,
@@ -45,6 +46,14 @@ class Cell:
         You can also pass "cell" or "no_cell", as well as None (which will
         map to Cell.UNKNOWN).
 
+    metadata : dict or None
+        A dict with arbitrary metadata associated with the cell. The metadata
+        is included when cells are saved / loaded from yaml files. If None,
+        an empty dict is saved to `metadata`.
+
+        When saving to/from yaml, all dict keys saved via `metadata` will
+        become strings.
+
     Attributes
     ----------
     x : float
@@ -58,6 +67,10 @@ class Cell:
 
     type : int
         Cell type. 1 for unknown/no cell, 2 for cell, -1 for artifact.
+
+    metadata : dict
+        A dict with arbitrary metadata associated with the cell. The metadata
+        is included when cells are saved / loaded from yaml files.
 
     transformed_x : float
         Transformed x position.
@@ -83,10 +96,15 @@ class Cell:
     # for classification compatibility
     NO_CELL = 1
 
+    metadata: dict
+
     def __init__(
         self,
-        pos: Union[str, ElementTree.Element, Dict[str, float], List[float]],
+        pos: Union[
+            str, ElementTree.Element, Dict[str, float], Sequence[float]
+        ],
         cell_type: int,
+        metadata: dict = None,
     ):
         if isinstance(pos, str):
             pos = pos_from_file_name(os.path.basename(pos))
@@ -116,6 +134,10 @@ class Cell:
             self.type = Cell.ARTIFACT
         else:
             self.type = int(cell_type)
+
+        if metadata is None:
+            metadata = {}
+        self.metadata = metadata
 
     def _sanitize_position(
         self, pos: List[float], verbose: bool = True
@@ -259,11 +281,12 @@ class Cell:
         """Return true if position and type of the cells are equal"""
         if not isinstance(other, self.__class__):
             return False
-        return (self.x, self.y, self.z, self.type) == (
+        return (self.x, self.y, self.z, self.type, self.metadata) == (
             other.x,
             other.y,
             other.z,
             other.type,
+            other.metadata,
         )
 
     def __ne__(self, other: Any) -> bool:
@@ -293,17 +316,33 @@ class Cell:
             )
 
     def __str__(self) -> str:
-        return "Cell: x: {}, y: {}, z: {}, type: {}".format(
-            int(self.x), int(self.y), int(self.z), self.type
+        return "Cell: x: {}, y: {}, z: {}, type: {}, metadata: {}".format(
+            int(self.x),
+            int(self.y),
+            int(self.z),
+            self.type,
+            self.metadata,
         )
 
     def __repr__(self) -> str:
-        return "{}, ({}, {})".format(
-            self.__class__, [self.x, self.y, self.z], self.type
+        return "{}, ({}, {}, {})".format(
+            self.__class__,
+            [self.x, self.y, self.z],
+            self.type,
+            self.metadata,
         )
 
     def to_dict(self) -> Dict[str, float]:
-        return {"x": self.x, "y": self.y, "z": self.z, "type": self.type}
+        """Returns a dict representation of the cell, including the
+        x, y, z, type, and metadata information.
+        """
+        return {
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
+            "type": self.type,
+            "metadata": self.metadata,
+        }
 
     def __hash__(self) -> int:
         return hash(str(self))
