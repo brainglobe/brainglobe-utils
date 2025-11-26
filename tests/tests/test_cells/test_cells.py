@@ -231,3 +231,15 @@ def test_cells_to_np_cell_type():
         cells.to_numpy_pos(items, cells.Cell.CELL),
         [[3, 4, 5]],
     )
+
+
+def test_file_name_from_cell():
+    cell = cells.Cell([1, 2, 3], cells.Cell.CELL)
+
+    assert cells.file_name_from_cell(cell) == "x1_y2_z3.tif"
+    assert cells.file_name_from_cell(cell, prefix="hi_") == "hi_x1_y2_z3.tif"
+    assert cells.file_name_from_cell(cell, channel=5) == "x1_y2_z3Ch5.tif"
+    assert (
+        cells.file_name_from_cell(cell, prefix="hi_", channel=0)
+        == "hi_x1_y2_z3Ch0.tif"
+    )
