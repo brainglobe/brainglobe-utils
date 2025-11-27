@@ -714,6 +714,32 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
     return image_shape
 
 
+def _verify_tiff_contains_single_3D_stack(path: Path | str) -> None:
+    """Verify that `path` contains exactly one tiff series with three axes.
+
+    Throw a value error if not. Write a line to the debugging log if the
+    series' axes have names other than x,y,z in any order.
+    """
+    with tifffile.TiffFile(path) as tiff:
+        if not len(tiff.series):
+            raise ValueError(
+                f"Attempted to load {path} but couldn't read a z-stack"
+            )
+        if len(tiff.series) != 1:
+            raise ValueError(
+                f"Attempted to load {path} but found multiple stacks"
+            )
+
+        axes = tiff.series[0].axes.lower()
+        if set(axes) != {"x", "y", "z"}:
+            # log that metadata does not specify expected axes
+            logging.debug(
+                f"Axis metadata is {axes}, "
+                "which is not the expected set of x,y,z in any order. "
+                "Assume z,y,x"
+            )
+
+
 def get_tiff_meta(
     path: str,
 ) -> Tuple[Tuple[int, int], np.dtype]:
@@ -742,24 +768,7 @@ def read_z_stack(path):
     :return: The data as a dask/numpy array.
     """
     if path.endswith(".tiff") or path.endswith(".tif"):
-        with tifffile.TiffFile(path) as tiff:
-            if not len(tiff.series):
-                raise ValueError(
-                    f"Attempted to load {path} but couldn't read a z-stack"
-                )
-            if len(tiff.series) != 1:
-                raise ValueError(
-                    f"Attempted to load {path} but found multiple stacks"
-                )
-
-            axes = tiff.series[0].axes.lower()
-            if set(axes) != {"x", "y", "z"}:
-                # log that metadata does not specify expected axes
-                logging.debug(
-                    f"Axis metadata is {axes}, "
-                    "which is not the expected set of x,y,z in any order. "
-                    "Assume z,y,x"
-                )
+        _verify_tiff_contains_single_3D_stack(path)
 
         try:
             return tifffile.memmap(path, mode="r")
@@ -773,19 +782,42 @@ def read_z_stack(path):
     return read_with_dask(path)
 
 
-def read_with_dask(path):
+def read_with_dask(path: str | Path) -> da.Array:
     """
+    Read one or more tiff files to a 3D dask array.
+
     Based on https://github.com/tlambert03/napari-ndtiffs
-    Reads a folder of tiffs lazily.
 
     Note that it will make tifffile.imread ignore OME metadata,
     because this can cause issues with correct metadata reading.
     See https://forum.image.sc/t/tifffile-opening-individual-ome-tiff-files-as-single-huge-array-even-when-isolated/77701
 
-    :param path: folder with tifs.
-    :return: dask array containing stack of tifs
+    Parameters
+    ----------
+    path : str | Path
+        Filepath of text file listing 2D tiffs, folder of 2D tiffs,
+        or single file tiff z-stack.
+
+    Returns
+    -------
+    da.Array
+        Dask array containing stack of tifs.
+
+    Raises
+    ------
+    ValueError
+        If a given directory doesn't contain any tiff files.
     """
+
     path = str(path)
+
+    if path.endswith(".tiff") or path.endswith(".tif"):
+        _verify_tiff_contains_single_3D_stack(path)
+
+        # chunk mode = 2 enforces every page (i.e. z slice) is its own chunk
+        store = tifffile.imread(path, aszarr=True, chunkmode=2)
+        return da.from_zarr(store)
+
     if path.endswith(".txt"):
         with open(path, "r") as f:
             filenames = [line.rstrip() for line in f.readlines()]
