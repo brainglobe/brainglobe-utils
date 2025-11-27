@@ -715,6 +715,11 @@ def get_size_image_from_file_paths(file_path, file_extension="tif"):
 
 
 def _verify_tiff_contains_single_3D_stack(path: Path | str) -> None:
+    """Verify that `path` contains exactly one tiff series with three axes.
+
+    Throw a value error if not. Write a line to the debugging log if the
+    series' axes have names other than x,y,z in any order.
+    """
     with tifffile.TiffFile(path) as tiff:
         if not len(tiff.series):
             raise ValueError(
