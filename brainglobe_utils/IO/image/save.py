@@ -147,7 +147,7 @@ def save_as_asr_nii(
     stack : np.ndarray
         3D image stack
     vox_sizes : list
-        list of voxel dimensions in mm. The order is 'x', 'y', 'z'
+        list of voxel dimensions in mm, in the same order as the stack axes.
     dest_path : pathlib.Path
         path to save the nifti image
     """
@@ -175,7 +175,8 @@ def _get_transf_matrix_from_res(vox_sizes: list) -> np.ndarray:
     Parameters
     ----------
     vox_sizes : list
-        list of voxel dimensions in mm. The order is 'x', 'y', 'z'
+        list of voxel dimensions in mm, in the same order as the
+        corresponding stack's axes.
 
     Returns
     -------
