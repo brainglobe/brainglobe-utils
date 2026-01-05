@@ -411,14 +411,19 @@ def test_catch_input_file_error(tmpdir):
         system.catch_input_file_error(no_exist_dir)
 
 
-def test_safe_execute_command_str(tmp_path):
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        lambda: f"{sys.executable} -c \"print('hello')\"",
+        lambda: [sys.executable, "-c", "print('hello')"],
+    ],
+)
+def test_safe_execute_command_success(tmp_path, cmd):
     log = tmp_path / "log.txt"
     err = tmp_path / "err.txt"
 
-    cmd = f'{sys.executable} -c "print(\'hello\')"'
-
     system.safe_execute_command(
-        cmd,
+        cmd(),
         log_file_path=str(log),
         error_file_path=str(err),
     )
@@ -427,17 +432,24 @@ def test_safe_execute_command_str(tmp_path):
     assert err.read_text() == ""
 
 
-def test_safe_execute_command_list(tmp_path):
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        lambda: f"{sys.executable} -c \"import sys; sys.exit(1)\"",
+        lambda: [sys.executable, "-c", "import sys; sys.exit(1)"],
+    ],
+)
+def test_safe_execute_command_failure(tmp_path, cmd):
     log = tmp_path / "log.txt"
     err = tmp_path / "err.txt"
 
-    cmd = [sys.executable, "-c", "print('hello')"]
+    with pytest.raises(system.SafeExecuteCommandError):
+        system.safe_execute_command(
+            cmd(),
+            log_file_path=str(log),
+            error_file_path=str(err),
+        )
 
-    system.safe_execute_command(
-        cmd,
-        log_file_path=str(log),
-        error_file_path=str(err),
-    )
-
-    assert log.read_text().strip() == "hello"
-    assert err.read_text() == ""
+    # log files should still be created
+    assert log.exists()
+    assert err.exists()
