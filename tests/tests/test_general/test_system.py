@@ -1,6 +1,7 @@
 import os
 import platform
 import random
+import sys
 from pathlib import Path
 from random import shuffle
 from unittest.mock import Mock, patch
@@ -408,3 +409,47 @@ def test_catch_input_file_error(tmpdir):
     no_exist_dir = os.path.join(tmpdir, "i_dont_exist")
     with pytest.raises(CommandLineInputError):
         system.catch_input_file_error(no_exist_dir)
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        f"{sys.executable} -c \"print('hello')\"",
+        [sys.executable, "-c", "print('hello')"],
+    ],
+)
+def test_safe_execute_command_success(tmp_path, cmd):
+    log = tmp_path / "log.txt"
+    err = tmp_path / "err.txt"
+
+    system.safe_execute_command(
+        cmd,
+        log_file_path=str(log),
+        error_file_path=str(err),
+    )
+
+    assert log.read_text().strip() == "hello"
+    assert err.read_text() == ""
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        f'{sys.executable} -c "import sys; sys.exit(1)"',
+        [sys.executable, "-c", "import sys; sys.exit(1)"],
+    ],
+)
+def test_safe_execute_command_failure(tmp_path, cmd):
+    log = tmp_path / "log.txt"
+    err = tmp_path / "err.txt"
+
+    with pytest.raises(system.SafeExecuteCommandError):
+        system.safe_execute_command(
+            cmd,
+            log_file_path=str(log),
+            error_file_path=str(err),
+        )
+
+    # log files should still be created
+    assert log.exists()
+    assert err.exists()
