@@ -4,6 +4,7 @@ import random
 from pathlib import Path
 from random import shuffle
 from unittest.mock import Mock, patch
+import sys
 
 import pytest
 
@@ -408,3 +409,35 @@ def test_catch_input_file_error(tmpdir):
     no_exist_dir = os.path.join(tmpdir, "i_dont_exist")
     with pytest.raises(CommandLineInputError):
         system.catch_input_file_error(no_exist_dir)
+
+
+def test_safe_execute_command_str(tmp_path):
+    log = tmp_path / "log.txt"
+    err = tmp_path / "err.txt"
+
+    cmd = f'{sys.executable} -c "print(\'hello\')"'
+
+    system.safe_execute_command(
+        cmd,
+        log_file_path=str(log),
+        error_file_path=str(err),
+    )
+
+    assert log.read_text().strip() == "hello"
+    assert err.read_text() == ""
+
+
+def test_safe_execute_command_list(tmp_path):
+    log = tmp_path / "log.txt"
+    err = tmp_path / "err.txt"
+
+    cmd = [sys.executable, "-c", "print('hello')"]
+
+    system.safe_execute_command(
+        cmd,
+        log_file_path=str(log),
+        error_file_path=str(err),
+    )
+
+    assert log.read_text().strip() == "hello"
+    assert err.read_text() == ""
