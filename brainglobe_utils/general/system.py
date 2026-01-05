@@ -422,7 +422,10 @@ def safe_execute_command(cmd, log_file_path=None, error_file_path=None):
     ):
         try:
             subprocess.check_call(
-                cmd, stdout=log_file, stderr=error_file, shell=shell,
+                cmd,
+                stdout=log_file,
+                stderr=error_file,
+                shell=shell,
             )
         except subprocess.CalledProcessError:
             hline = "-" * 25
