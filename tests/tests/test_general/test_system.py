@@ -1,10 +1,10 @@
 import os
 import platform
 import random
+import sys
 from pathlib import Path
 from random import shuffle
 from unittest.mock import Mock, patch
-import sys
 
 import pytest
 
