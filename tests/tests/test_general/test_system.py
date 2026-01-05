@@ -414,8 +414,8 @@ def test_catch_input_file_error(tmpdir):
 @pytest.mark.parametrize(
     "cmd",
     [
-        lambda: f"{sys.executable} -c \"print('hello')\"",
-        lambda: [sys.executable, "-c", "print('hello')"],
+        f"{sys.executable} -c \"print('hello')\"",
+        [sys.executable, "-c", "print('hello')"],
     ],
 )
 def test_safe_execute_command_success(tmp_path, cmd):
@@ -423,7 +423,7 @@ def test_safe_execute_command_success(tmp_path, cmd):
     err = tmp_path / "err.txt"
 
     system.safe_execute_command(
-        cmd(),
+        cmd,
         log_file_path=str(log),
         error_file_path=str(err),
     )
@@ -435,8 +435,8 @@ def test_safe_execute_command_success(tmp_path, cmd):
 @pytest.mark.parametrize(
     "cmd",
     [
-        lambda: f"{sys.executable} -c \"import sys; sys.exit(1)\"",
-        lambda: [sys.executable, "-c", "import sys; sys.exit(1)"],
+        f"{sys.executable} -c \"import sys; sys.exit(1)\"",
+        [sys.executable, "-c", "import sys; sys.exit(1)"],
     ],
 )
 def test_safe_execute_command_failure(tmp_path, cmd):
@@ -445,7 +445,7 @@ def test_safe_execute_command_failure(tmp_path, cmd):
 
     with pytest.raises(system.SafeExecuteCommandError):
         system.safe_execute_command(
-            cmd(),
+            cmd,
             log_file_path=str(log),
             error_file_path=str(err),
         )
