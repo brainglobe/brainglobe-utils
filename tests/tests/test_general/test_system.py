@@ -435,7 +435,7 @@ def test_safe_execute_command_success(tmp_path, cmd):
 @pytest.mark.parametrize(
     "cmd",
     [
-        lambda: f"{sys.executable} -c \"import sys; sys.exit(1)\"",
+        lambda: f'{sys.executable} -c "import sys; sys.exit(1)"',
         lambda: [sys.executable, "-c", "import sys; sys.exit(1)"],
     ],
 )
