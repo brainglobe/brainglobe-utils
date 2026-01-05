@@ -1,10 +1,10 @@
 import os
 import platform
 import random
+import sys
 from pathlib import Path
 from random import shuffle
 from unittest.mock import Mock, patch
-import sys
 
 import pytest
 
@@ -415,7 +415,7 @@ def test_safe_execute_command_str(tmp_path):
     log = tmp_path / "log.txt"
     err = tmp_path / "err.txt"
 
-    cmd = f'{sys.executable} -c "print(\'hello\')"'
+    cmd = f"{sys.executable} -c \"print('hello')\""
 
     system.safe_execute_command(
         cmd,
