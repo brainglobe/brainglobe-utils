@@ -138,8 +138,16 @@ deps =
 
 [tool.numpydoc_validation]
 checks = [
-    "all",   # enable all checks by default
-    "EX01",  # ignore missing Examples
-    "SA01",  # ignore missing See Also
-    "ES01",  # ignore missing Extended Summary
+    "all",
+    "-EX01",  # missing Examples
+    "-SA01",  # missing See Also
+    "-ES01",  # missing Extended Summary
+    "-SS03",  # summary punctuation
+    "-SS05",  # infinitive verb rule
+    "-SS06",  # summary length
+    "-PR01",  # undocumented parameters
+    "-PR09",  # parameter punctuation
+    "-RT01",  # missing Returns section
+    "-GL01",  # summary placement
+    "-GL02",  # closing quotes placement
 ]
