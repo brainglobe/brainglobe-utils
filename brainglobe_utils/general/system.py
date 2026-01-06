@@ -397,7 +397,7 @@ def safe_execute_command(cmd, log_file_path=None, error_file_path=None):
 
     Parameters
     ----------
-    cmd : str
+    cmd : str or list
         Command to be executed.
 
     log_file_path : str, optional
