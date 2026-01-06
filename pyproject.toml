@@ -135,3 +135,11 @@ passenv =
 deps =
     napari-dev: git+https://github.com/napari/napari
 """
+
+[tool.numpydoc_validation]
+checks = [
+    "all",   # enable all checks by default
+    "EX01",  # ignore missing Examples
+    "SA01",  # ignore missing See Also
+    "ES01",  # ignore missing Extended Summary
+]
