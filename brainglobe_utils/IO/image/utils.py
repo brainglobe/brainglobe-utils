@@ -27,6 +27,9 @@ class ImageIOLoadException(Exception):
         elif error_type == "2D tiff":
             self.message = "Single 2D .tiff file input is not supported."
 
+        elif error_type == "multichannel image":
+            self.message = "Stack contains >1 channel."
+
         elif error_type == "sequence_shape":
             self.message = (
                 "Attempted to load an image sequence where individual 2D "

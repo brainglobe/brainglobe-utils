@@ -193,8 +193,11 @@ def load_img_stack(
     logging.debug(f"Loading: {stack_path}")
     stack = tifffile.imread(stack_path)
 
-    if stack.ndim != 3:
+    if stack.ndim < 3:
         raise ImageIOLoadException(error_type="2D tiff")
+
+    if stack.ndim > 3:
+        raise ImageIOLoadException(error_type="multichannel image")
 
     # Downsampled plane by plane because the 3D downsampling in scipy etc
     # uses too much RAM
