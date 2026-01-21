@@ -25,10 +25,10 @@ def test_check_positive_float():
     with pytest.raises(ArgumentTypeError):
         assert numerical.check_positive_float(neg_val)
 
-    assert numerical.check_positive_float(None) is None
-
-    with pytest.raises(ArgumentTypeError):
-        assert numerical.check_positive_float(None, none_allowed=False)
+    for none_val in [None, "None", "none"]:
+        assert numerical.check_positive_float(none_val) is None
+        with pytest.raises(ArgumentTypeError):
+            assert numerical.check_positive_float(none_val, none_allowed=False)
 
     assert numerical.check_positive_float(0) == 0
 
@@ -42,9 +42,9 @@ def test_check_positive_int():
     with pytest.raises(ArgumentTypeError):
         assert numerical.check_positive_int(neg_val)
 
-    assert numerical.check_positive_int(None) is None
-
-    with pytest.raises(ArgumentTypeError):
-        assert numerical.check_positive_int(None, none_allowed=False)
+    for none_val in [None, "None", "none"]:
+        assert numerical.check_positive_int(none_val) is None
+        with pytest.raises(ArgumentTypeError):
+            assert numerical.check_positive_int(none_val, none_allowed=False)
 
     assert numerical.check_positive_int(0) == 0

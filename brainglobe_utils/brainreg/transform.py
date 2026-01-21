@@ -207,7 +207,7 @@ def transform_points_to_atlas_space(
     deformation_field_paths: List[os.PathLike],
     downsampled_points_path: Optional[os.PathLike] = None,
     atlas_points_path: Optional[os.PathLike] = None,
-) -> np.ndarray:
+) -> Tuple[np.ndarray, List]:
     """
     Transform points from raw data to an atlas space.
 
@@ -240,10 +240,13 @@ def transform_points_to_atlas_space(
 
     Returns
     -------
-    np.ndarray
-        An array of points transformed into the atlas space.
+    transformed_points
+        Points transformed to the atlas space.
 
+    points_out_of_bounds
+        Points that fall outside of the transformed atlas space.
     """
+
     downsampled_points = transform_points_from_raw_to_downsampled_space(
         points,
         source_image_plane,
@@ -252,11 +255,13 @@ def transform_points_to_atlas_space(
         downsampled_space,
         output_filename=downsampled_points_path,
     )
-    points = transform_points_from_downsampled_to_atlas_space(
-        downsampled_points,
-        atlas,
-        deformation_field_paths,
-        output_filename=atlas_points_path,
+    transformed_points, points_out_of_bounds = (
+        transform_points_from_downsampled_to_atlas_space(
+            downsampled_points,
+            atlas,
+            deformation_field_paths,
+            output_filename=atlas_points_path,
+        )
     )
 
-    return points
+    return transformed_points, points_out_of_bounds

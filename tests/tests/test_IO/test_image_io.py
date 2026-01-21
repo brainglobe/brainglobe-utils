@@ -200,7 +200,7 @@ def test_tiff_sequence_one_tiff(tmp_path):
         pytest.param(False, id="no parallel loading"),
     ],
 )
-def test_tiff_sequence_diff_shape(tmp_path, array_3d, load_parallel):
+def test_tiff_sequence_diff_shape(tmp_path, load_parallel):
     """
     Test that an error is thrown when trying to load a tiff sequence where
     individual 2D tiffs have different shapes
@@ -254,7 +254,7 @@ def test_nii_io(tmp_path, array_3d, use_path, nifti_suffix):
     (keeping it as a nifty object with no numpy conversion on loading).
     Tests using both str and pathlib.Path input.
     """
-    filename = "test_array.nii"
+    filename = f"test_array{nifti_suffix}"
     if use_path:
         nii_path = tmp_path / filename
     else:
@@ -395,18 +395,42 @@ def test_memory_error(monkeypatch):
         utils.check_mem(8, 1000)
 
 
-def test_read_with_dask_txt(array_3D_as_2d_tiffs_path, array_3d):
+def test_read_tiff_folder_with_dask(array_3D_as_2d_tiffs_path, array_3d):
     """
-    Test that a series of images can be read correctly as a dask array
+    Test that a series of 2D tiffs can be read correctly as a dask array.
     """
     stack = load.read_with_dask(array_3D_as_2d_tiffs_path)
     np.testing.assert_array_equal(stack, array_3d)
+    assert stack.chunksize == (1, 4, 4)
 
 
 def test_read_with_dask_glob_txt_equal(array_3D_as_2d_tiffs_path, txt_path):
+    """
+    Test that a txt file of 2D tiff paths can be read correctly as a
+    dask array.
+    """
     glob_stack = load.read_with_dask(array_3D_as_2d_tiffs_path)
     txt_stack = load.read_with_dask(txt_path)
     np.testing.assert_array_equal(glob_stack, txt_stack)
+    assert txt_stack.chunksize == (1, 4, 4)
+
+
+def test_read_3D_tiff_with_dask(tmp_path, array_3d):
+    """
+    Test that a single 3D tiff file can be read correctly as a dask array.
+    """
+    tiff_path = tmp_path / "test.tiff"
+    save.to_tiff(array_3d, tiff_path)
+
+    stack = load.read_with_dask(tiff_path)
+    np.testing.assert_array_equal(stack, array_3d)
+    assert stack.chunksize == (1, 4, 4)
+
+
+def test_read_with_dask_raises(tmp_path):
+    with pytest.raises(ValueError) as e:
+        load.read_with_dask(tmp_path)
+    assert e.match("not contain any .tif or .tiff files")
 
 
 def test_read_z_stack_with_missing_metadata(
@@ -469,12 +493,6 @@ def test_get_size_image_with_missing_metadata(
         mock_debug.assert_called_once()
 
 
-def test_read_with_dask_raises(tmp_path):
-    with pytest.raises(ValueError) as e:
-        load.read_with_dask(tmp_path)
-    assert e.match("not contain any .tif or .tiff files")
-
-
 @pytest.mark.parametrize(
     "z_size, expected_length",
     [(10000, 5), (9999, 4), (1, 1)],
@@ -486,3 +504,19 @@ def test_to_tiffs_padwidth(tmp_path, z_size, expected_length):
     image_path = list(tmp_path.glob("*.tif"))[0]
     assert str(image_path.stem).split("_")[0] == prefix
     assert len(str(image_path.stem).split("_")[1]) == expected_length
+
+
+def test_save_as_asr_nii(array_3d, tmp_path):
+    dest_path = tmp_path / "array_asr.nii.gz"
+    vox_sizes = [20, 30, 40]
+    save.save_as_asr_nii(array_3d, vox_sizes=vox_sizes, dest_path=dest_path)
+
+    reloaded = load.load_nii(dest_path, as_array=False)
+    expected_affine = np.array(
+        [[0, 0, -40, 0], [-20, 0, 0, 0], [0, -30, 0, 0], [0, 0, 0, 1]]
+    )
+
+    assert (reloaded.get_fdata() == array_3d).all()
+    assert reloaded.header.get_zooms() == tuple(vox_sizes)
+    assert (reloaded.header.get_sform() == expected_affine).all()
+    assert (reloaded.header.get_qform() == expected_affine).all()
