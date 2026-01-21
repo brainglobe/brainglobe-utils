@@ -7,7 +7,12 @@ import pytest
 import yaml
 from natsort import natsorted
 
-from brainglobe_utils.cells.cells import Cell, UntypedCell, pos_from_file_name
+from brainglobe_utils.cells.cells import (
+    Cell,
+    UntypedCell,
+    file_name_from_cell,
+    pos_from_file_name,
+)
 from brainglobe_utils.IO import cells as cell_io
 
 
@@ -307,7 +312,7 @@ def test_find_relevant_tiffs(data_path, tmp_path, cell_def_path):
     if cell_def_path.suffix == ".xml":
         cell_io.cells_to_xml([cell], cell_def_path)
     else:
-        cell_path = cell_def_path / f"x{cell.x}_y{cell.y}_z{cell.z}.tif"
+        cell_path = cell_def_path / file_name_from_cell(cell)
         cell_path.touch()
 
     selected = cell_io.find_relevant_tiffs(
