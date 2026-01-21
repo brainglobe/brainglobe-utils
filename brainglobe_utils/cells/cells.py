@@ -402,6 +402,10 @@ def pos_from_xml_marker(element: ElementTree.Element) -> List[float]:
 def file_name_from_cell(
     cell: Cell, prefix: str = "", channel: int | None = None
 ) -> str:
+    """Return filename from [x,y,z] position, and (optionally) prefix
+    and channel. For example, ([392, 522, 10], prefix="pCell", channel=0),
+    would return 'pCellz10y522x392Ch0.tif'
+    """
     name = prefix
     name += f"x{int(cell.x)}_y{int(cell.y)}_z{int(cell.z)}"
     if channel is not None:
