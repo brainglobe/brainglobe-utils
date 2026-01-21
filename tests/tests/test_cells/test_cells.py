@@ -243,6 +243,8 @@ def test_file_name_from_cell():
         cells.file_name_from_cell(cell, prefix="hi_", channel=0)
         == "hi_x1_y2_z3Ch0.tif"
     )
+
+
 def test_cells_metadata():
     a = cells.Cell((0, 1, 2), cells.Cell.UNKNOWN, metadata={"1": 2})
     b = cells.Cell((0, 1, 2), cells.Cell.UNKNOWN, metadata={"1": 3})
