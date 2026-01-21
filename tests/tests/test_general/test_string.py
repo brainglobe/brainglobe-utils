@@ -1,3 +1,5 @@
+from argparse import ArgumentTypeError
+
 import pytest
 
 from brainglobe_utils.general import string
@@ -48,3 +50,13 @@ def test_get_string_lines(jabberwocky, jabberwocky_list):
         string.get_text_lines(jabberwocky, return_lines=8)
         == jabberwocky_list[8]
     )
+
+
+def test_check_str():
+    assert "me" == string.check_str("me")
+    assert "12" == string.check_str("12")
+
+    for none_val in [None, "None", "none"]:
+        assert string.check_str(none_val) is None
+        with pytest.raises(ArgumentTypeError):
+            assert string.check_str(none_val, none_allowed=False)

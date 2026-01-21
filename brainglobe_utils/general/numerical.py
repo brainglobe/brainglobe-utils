@@ -1,4 +1,5 @@
 import argparse
+from typing import Literal
 
 
 def is_even(num):
@@ -31,14 +32,17 @@ def is_even(num):
         return True
 
 
-def check_positive_float(value, none_allowed=True):
+def check_positive_float(
+    value: float | None | Literal["None", "none"],
+    none_allowed: bool = True,
+) -> float | None:
     """
     Used in argparse to enforce positive floats.
     Source: https://stackoverflow.com/questions/14117415
 
     Parameters
     ----------
-    value : float
+    value : float or None
         Input value.
 
     none_allowed : bool, optional
@@ -46,8 +50,8 @@ def check_positive_float(value, none_allowed=True):
 
     Returns
     -------
-    float
-        Input value, if it's positive.
+    float or None
+        Input value, if it's positive, or None.
 
     Raises
     ------
@@ -55,27 +59,30 @@ def check_positive_float(value, none_allowed=True):
         If input value is invalid.
     """
     ivalue = value
-    if ivalue is not None:
-        ivalue = float(ivalue)
-        if ivalue < 0:
-            raise argparse.ArgumentTypeError(
-                "%s is an invalid positive value" % value
-            )
-    else:
+    if value in (None, "None", "none"):
         if not none_allowed:
-            raise argparse.ArgumentTypeError("%s is an invalid value." % value)
+            raise argparse.ArgumentTypeError(f"{ivalue} is an invalid value.")
+        value = None
+    else:
+        value = float(value)
+        if value < 0:
+            raise argparse.ArgumentTypeError(
+                f"{ivalue} is an invalid positive value"
+            )
 
-    return ivalue
+    return value
 
 
-def check_positive_int(value, none_allowed=True):
+def check_positive_int(
+    value: int | None | Literal["None", "none"], none_allowed: bool = True
+) -> int | None:
     """
     Used in argparse to enforce positive ints.
     Source: https://stackoverflow.com/questions/14117415
 
     Parameters
     ----------
-    value : int
+    value : int or None
         Input value.
 
     none_allowed : bool, optional
@@ -83,8 +90,8 @@ def check_positive_int(value, none_allowed=True):
 
     Returns
     -------
-    int
-        Input value, if it's positive.
+    int or None
+        Input value, if it's positive, or None.
 
     Raises
     ------
@@ -92,14 +99,15 @@ def check_positive_int(value, none_allowed=True):
         If input value is invalid.
     """
     ivalue = value
-    if ivalue is not None:
-        ivalue = int(ivalue)
-        if ivalue < 0:
-            raise argparse.ArgumentTypeError(
-                "%s is an invalid positive value" % value
-            )
-    else:
+    if value in (None, "None", "none"):
         if not none_allowed:
-            raise argparse.ArgumentTypeError("%s is an invalid value." % value)
+            raise argparse.ArgumentTypeError(f"{ivalue} is an invalid value.")
+        value = None
+    else:
+        value = int(value)
+        if value < 0:
+            raise argparse.ArgumentTypeError(
+                f"{ivalue} is an invalid positive value"
+            )
 
-    return ivalue
+    return value
