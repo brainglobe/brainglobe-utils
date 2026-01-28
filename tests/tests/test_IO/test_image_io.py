@@ -544,6 +544,6 @@ def test_load_nii_datatype(array_3d, tmp_path, array_bool, numpy_bool):
     )
     if array_bool:
         assert reloaded_load_nii.dtype == np.uint16
-        assert np.all(reloaded_load_nii == unit16_array)
+        assert np.all(reloaded_load_nii == uint16_array)
     else:
         assert reloaded_load_nii.get_data_dtype() == np.uint16
