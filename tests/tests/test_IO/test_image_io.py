@@ -520,3 +520,30 @@ def test_save_as_asr_nii(array_3d, tmp_path):
     assert reloaded.header.get_zooms() == tuple(vox_sizes)
     assert (reloaded.header.get_sform() == expected_affine).all()
     assert (reloaded.header.get_qform() == expected_affine).all()
+
+
+@pytest.mark.parametrize(
+    "array_bool, numpy_bool",
+    [
+        pytest.param(False, False, id="as_array=False, as_numpy=False"),
+        pytest.param(True, False, id="as_array=True, as_numpy=False"),
+        pytest.param(False, True, id="as_array=False, as_numpy=True"),
+        pytest.param(True, True, id="as_array=True, as_numpy=True"),
+    ],
+)
+def test_load_nii_datatype(array_3d, tmp_path, array_bool, numpy_bool):
+    """Test whether uint16 datatype is preserved."""
+    uint16_array = array_3d.astype(np.uint16)
+    image_path = tmp_path / "uint16_array.nii.gz"
+    vox_sizes = [20, 30, 40]
+    save.save_as_asr_nii(
+        uint16_array, vox_sizes=vox_sizes, dest_path=image_path
+    )
+    reloaded_load_nii = load.load_nii(
+        image_path, as_array=array_bool, as_numpy=numpy_bool
+    )
+    if array_bool:
+        assert reloaded_load_nii.dtype == np.uint16
+        assert np.all(reloaded_load_nii == uint16_array)
+    else:
+        assert reloaded_load_nii.get_data_dtype() == np.uint16
