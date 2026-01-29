@@ -198,8 +198,8 @@ def load_img_stack(
 
     if stack.ndim > 3:
         raise ImageIOLoadException(error_type="multichannel image")
-    
-    #checks for 2d multichannel tiff image 
+
+    # checks for 2d multichannel tiff image
     if not all(dim > 6 for dim in stack.shape):
         raise ImageIOLoadException(error_type="multichannel image")
 
