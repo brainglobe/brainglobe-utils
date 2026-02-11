@@ -78,8 +78,21 @@ def get_cells(
 def raise_cell_read_error(
     cells_file_path: str | Path, e: Exception | None = None
 ) -> NoReturn:
-    """Raise a NotImplementedError, with an informative message including the
-    cells file path"""
+    """
+    Raise a NotImplementedError for unsupported or invalid cell file formats.
+
+    Parameters
+    ----------
+    cells_file_path : str or pathlib.Path
+        Path to the cells file that could not be read.
+    e : Exception or None, optional
+        Original exception to chain, if available.
+
+    Raises
+    ------
+    NotImplementedError
+        If the file format is unsupported or contains errors.
+    """
     logging.error(
         "File format of: {} is not supported or contains errors. Please "
         "supply an XML or YAML file, or a directory of files with positions "
@@ -353,7 +366,7 @@ def cells_to_yml(
 
 
 def cells_xml_to_df(xml_file_path):
-    """Read cells from xml file and convert to dataframe"""
+    """Read cells from xml file and convert to dataframe."""
     cells = get_cells(xml_file_path)
     return cells_to_dataframe(cells)
 
@@ -451,7 +464,7 @@ def deal_with_artifacts(cell_dict, artifact_keep=True):
     return cell_dict
 
 
-def make_type_dict(cell_list):
+def make_type_dict(cell_list):  # noqa: D401
     """Convert a list of Cells to a dictionary with keys of cell type and
     values of the list of corresponding cells."""
     types = sorted(set([cell.type for cell in cell_list]))
@@ -505,7 +518,7 @@ def find_relevant_tiffs(tiffs: list[str], cell_def: str) -> list[str]:
     ]
 
 
-def _dict_to_yaml_string(data: dict) -> bytearray | bytes:
+def _dict_to_yaml_string(data: dict) -> bytearray | bytes:  # noqa: D401
     """
     Dump dict to yaml and return it as a buffer.
 

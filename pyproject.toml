@@ -135,3 +135,19 @@ passenv =
 deps =
     napari-dev: git+https://github.com/napari/napari
 """
+
+[tool.numpydoc_validation]
+checks = [
+    "all",
+    "-EX01",  # missing Examples
+    "-SA01",  # missing See Also
+    "-ES01",  # missing Extended Summary
+    "-SS03",  # summary punctuation
+    "-SS05",  # infinitive verb rule
+    "-SS06",  # summary length
+    "-PR01",  # undocumented parameters
+    "-PR09",  # parameter punctuation
+    "-RT01",  # missing Returns section
+    "-GL01",  # summary placement
+    "-GL02",  # closing quotes placement
+]
