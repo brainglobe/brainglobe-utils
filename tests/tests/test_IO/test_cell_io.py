@@ -262,6 +262,21 @@ def test_cells_to_yml_artifacts_keep(
     check_artifact_save(artifact_keep, written_cells, cells_with_artifacts)
 
 
+@pytest.mark.parametrize("suffix", [".xml", ".yml"])
+def test_save_artifact_only_cells(tmp_path, suffix):
+    """
+    Regression test for https://github.com/brainglobe/brainglobe-utils/issues/127.
+    Saving a list containing only artifact cells should not raise a KeyError.
+    """
+    cells = [Cell((0, 0, 0), Cell.ARTIFACT)]
+    path = tmp_path / f"cells{suffix}"
+    cell_io.save_cells(cells, path)
+    written_cells = cell_io.get_cells(path)
+    # artifact_keep=True by default: artifact converted to UNKNOWN, kept
+    assert len(written_cells) == 1
+    assert written_cells[0].type == Cell.UNKNOWN
+
+
 def assert_cells_df(cells_df, x_vals, y_vals, z_vals, type_vals):
     """
     Check that there are the correct number of cells in the Dataframe, and

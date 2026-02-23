@@ -444,7 +444,7 @@ def deal_with_artifacts(cell_dict, artifact_keep=True):
         for idx, artifact in enumerate(cell_dict[Cell.ARTIFACT]):
             cell_dict[Cell.ARTIFACT][idx].type = Cell.UNKNOWN
         # Add them to "cell_type = UNKNOWN" list
-        cell_dict[Cell.UNKNOWN].extend(cell_dict[Cell.ARTIFACT])
+        cell_dict.setdefault(Cell.UNKNOWN, []).extend(cell_dict[Cell.ARTIFACT])
     else:
         logging.debug("Removing artifacts")
     del cell_dict[Cell.ARTIFACT]  # outside if, needs to be run regardless
