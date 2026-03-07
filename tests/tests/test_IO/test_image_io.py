@@ -24,6 +24,13 @@ def array_3d(array_2d):
 
 
 @pytest.fixture()
+def array_4d(array_3d):
+    """Create a 4x4x4x4 array of 32-bit integers"""
+    hyper = np.stack((array_3d, 2 * array_3d, 3 * array_3d, 4 * array_3d))
+    return hyper
+
+
+@pytest.fixture()
 def array_3D_as_2d_tiffs_path(tmp_path, array_3d, prefix="image"):
     dest_path = tmp_path / prefix
     save.to_tiffs(array_3d, dest_path)
@@ -154,6 +161,17 @@ def test_2d_tiff(tmp_path, array_2d):
     """
     image_path = tmp_path / "image.tif"
     save.to_tiff(array_2d, image_path)
+
+    with pytest.raises(utils.ImageIOLoadException):
+        load.load_any(image_path)
+
+
+def test_multichannel_tiff(tmp_path, array_4d):
+    """
+    Test that an error is thrown when loading a multichannel 3d tiff
+    """
+    image_path = tmp_path / "image.tif"
+    save.to_tiff(array_4d, image_path)
 
     with pytest.raises(utils.ImageIOLoadException):
         load.load_any(image_path)
