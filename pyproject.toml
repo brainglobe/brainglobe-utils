@@ -62,7 +62,6 @@ dev = [
     "coverage",
     "mypy",
     "pre-commit",
-    "pyqt5",
     "pytest-cov",
     "pytest-qt",
     "pytest-mock",
