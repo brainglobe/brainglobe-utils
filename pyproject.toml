@@ -40,7 +40,6 @@ dependencies = [
 ]
 dynamic = ["version"]
 
-
 [project.scripts]
 cite-brainglobe = "brainglobe_utils.citation.cite:cli"
 
@@ -69,11 +68,9 @@ dev = [
     "ruff",
     "scikit-image",
     "setuptools_scm",
-    "tox",
     "pooch",
     "brainglobe-utils[napari]",
 ]
-
 
 [build-system]
 requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
@@ -87,7 +84,7 @@ include = ["brainglobe_utils*"]
 exclude = ["tests", "docs*"]
 
 [tool.pytest.ini_options]
-addopts = "--cov=brainglobe_utils"
+addopts = "--cov=brainglobe_utils --cov-report=xml --color=yes -vv"
 
 [tool.black]
 target-version = ['py311', 'py312', 'py313']
@@ -106,31 +103,3 @@ select = ["I", "E", "F"]
 
 [tool.mypy]
 ignore_errors = true
-
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-envlist = py{311,312,313}, napari-dev
-isolated_build = True
-
-[gh-actions]
-python =
-    3.11: py311
-    3.12: py312
-    3.13: py313
-
-[testenv]
-extras =
-    dev
-commands =
-    pytest -v --color=yes --cov=brainglobe_utils --cov-report=xml
-passenv =
-    CI
-    NUMBA_DISABLE_JIT
-    GITHUB_ACTIONS
-    DISPLAY
-    XAUTHORITY
-    PYVISTA_OFF_SCREEN
-deps =
-    napari-dev: git+https://github.com/napari/napari
-"""
