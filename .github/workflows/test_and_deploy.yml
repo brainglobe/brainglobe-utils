@@ -17,13 +17,13 @@ jobs:
     name: Check Linting
     runs-on: ubuntu-latest
     steps:
-      - uses: neuroinformatics-unit/actions/lint@v2
+      - uses: neuroinformatics-unit/actions/lint@34bedfdfd70c6010be02182c9ca37fae8a1fd99d # v3.0.0
 
   manifest:
     name: Check Manifest
     runs-on: ubuntu-latest
     steps:
-      - uses: neuroinformatics-unit/actions/check_manifest@v2
+      - uses: neuroinformatics-unit/actions/check_manifest@34bedfdfd70c6010be02182c9ca37fae8a1fd99d # v3.0.0
 
   test:
     needs: [linting, manifest]
@@ -44,7 +44,7 @@ jobs:
 
     steps:
       - name: Cache data
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: | # ensure we don't cache any interrupted atlas download and extraction, if e.g. we cancel the workflow manually
             ~/.brainglobe
@@ -53,32 +53,27 @@ jobs:
           key: brainglobe-dir-${{ runner.os }}${{ hashFiles('**/conftest.py') }}
 
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - name: Run tests
+        uses: neuroinformatics-unit/actions/test-uv@34bedfdfd70c6010be02182c9ca37fae8a1fd99d # v3.0.0
         with:
-          python-version: ${{ matrix.python-version }}
-      # these libraries enable testing on Qt on linux
-      - uses: pyvista/setup-headless-display-action@v3
-        with:
-          qt: true
-      # Run tests
-      - uses: neuroinformatics-unit/actions/test@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "${{ matrix.python-version }}"
           secret-codecov-token: ${{ secrets.CODECOV_TOKEN }}
+          install-extras: 'dev,napari'
+          use-headless: 'true'
 
-      # Run tests on napari main if this is a scheduled run
-      - name: Run tests on napari main
-        if: github.event_name == 'schedule'
-        uses: neuroinformatics-unit/actions/test@v2
+      - name: Run tests against napari main
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        uses: neuroinformatics-unit/actions/test-uv@34bedfdfd70c6010be02182c9ca37fae8a1fd99d # v3.0.0
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "${{ matrix.python-version }}"
           secret-codecov-token: ${{ secrets.CODECOV_TOKEN }}
-          tox-args: '-e napari-dev'
+          install-extras: 'dev,napari'
+          use-headless: 'true'
+          install-main-branch: 'napari/napari'
 
       - name: Notify slack on scheduled failure
         if: failure() && github.event_name == 'schedule'
-        uses: ravsamhq/notify-slack-action@v2
+        uses: ravsamhq/notify-slack-action@be814b201e233b2dc673608aa46e5447c8ab13f2 # v2.5.0
         with:
           status: ${{ job.status }} # required
           notify_when: 'failure'
@@ -95,7 +90,7 @@ jobs:
 
     steps:
       - name: Cache data
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: | # ensure we don't cache any interrupted atlas download and extraction, if e.g. we cancel the workflow manually
             ~/.brainglobe
@@ -103,24 +98,25 @@ jobs:
           # hash on conftest in case url changes
           key: brainglobe-dir-${{ runner.os }}${{ hashFiles('**/conftest.py') }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
+          enable-cache: true
           python-version: "3.13"
-      # these libraries enable testing on Qt on linux
-      - uses: pyvista/setup-headless-display-action@v3
-        with:
-          qt: true
-      # Run test suite with numba disabled
-      - uses: neuroinformatics-unit/actions/test@v2
+          cache-dependency-glob: "**/pyproject.toml"
+          activate-environment: true
+      - name: Run tests with numba disabled
+        uses: neuroinformatics-unit/actions/test-uv@34bedfdfd70c6010be02182c9ca37fae8a1fd99d # v3.0.0
         with:
           python-version: "3.13"
           secret-codecov-token: ${{ secrets.CODECOV_TOKEN }}
+          install-extras: 'dev,napari'
+          use-headless: 'true'
           codecov-flags: "numba"
 
       - name: Notify slack on scheduled failure
         if: failure() && github.event_name == 'schedule'
-        uses: ravsamhq/notify-slack-action@v2
+        uses: ravsamhq/notify-slack-action@be814b201e233b2dc673608aa46e5447c8ab13f2 # v2.5.0
         with:
           status: ${{ job.status }} # required
           notify_when: 'failure'
@@ -134,7 +130,7 @@ jobs:
     if: github.event_name == 'push' && github.ref_type == 'tag'
     runs-on: ubuntu-latest
     steps:
-    - uses: neuroinformatics-unit/actions/build_sdist_wheels@v2
+    - uses: neuroinformatics-unit/actions/build_sdist_wheels@34bedfdfd70c6010be02182c9ca37fae8a1fd99d # v3.0.0
 
   upload_all:
     name: Publish build distributions
