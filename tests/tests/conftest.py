@@ -21,7 +21,7 @@ def test_data_registry():
     """
     registry = pooch.create(
         path=Path.home() / ".brainglobe" / "test_data",
-        base_url="http://gin.swc.ucl.ac.uk/brainglobe/test-data/raw/master/",
+        base_url="http://gin.swc.ucl.ac.uk/brainglobe/test-data/raw/main/",
         registry={
             "cellfinder/cells-z-1000-1050.xml": None,
             "cellfinder/other-cells-z-1000-1050.xml": None,
