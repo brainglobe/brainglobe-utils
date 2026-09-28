@@ -174,7 +174,8 @@ def cli() -> None:
     Command-line interface for the citation tool.
     """
     parser = BrainGlobeParser(
-        description="Citation generation for BrainGlobe tools."
+        prog="cite-brainglobe",
+        description="Citation generation for BrainGlobe tools.",
     )
 
     parser.add_argument(
