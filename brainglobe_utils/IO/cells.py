@@ -352,12 +352,6 @@ def cells_to_yml(
         yml_file.write(yml_data)
 
 
-def cells_xml_to_df(xml_file_path):
-    """Read cells from xml file and convert to dataframe"""
-    cells = get_cells(xml_file_path)
-    return cells_to_dataframe(cells)
-
-
 def cells_to_dataframe(cells: list[Cell]) -> pd.DataFrame:
     """
     Takes a list of Cells and return it as a dataframe.
