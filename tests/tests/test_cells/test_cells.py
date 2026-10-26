@@ -265,3 +265,70 @@ def test_cells_metadata():
         "type": cells.Cell.UNKNOWN,
         "metadata": {"1": 2},
     }
+
+
+def test_cell_init_from_filename():
+    """
+    Test creating a Cell from a filename string.
+    """
+    cell = cells.Cell("x10_y20_z30.tif", cells.Cell.CELL)
+    assert (cell.x, cell.y, cell.z) == (10, 20, 30)
+    assert cell.type == cells.Cell.CELL
+
+
+def test_cell_init_from_dict():
+    """
+    Test creating a Cell from a dictionary.
+    """
+    cell = cells.Cell({"x": 10, "y": 20, "z": 30}, cells.Cell.CELL)
+    assert (cell.x, cell.y, cell.z) == (10, 20, 30)
+    assert cell.type == cells.Cell.CELL
+
+
+def test_cell_is_cell():
+    """
+    Test is_cell method returns True for CELL and False otherwise.
+    """
+    assert cells.Cell([1, 1, 1], cells.Cell.CELL).is_cell() is True
+    assert cells.Cell([1, 1, 1], cells.Cell.ARTIFACT).is_cell() is False
+    assert cells.Cell([1, 1, 1], cells.Cell.UNKNOWN).is_cell() is False
+
+
+def test_cell_to_xml_negative_coords():
+    """
+    Test to_xml_element clamps negative or zero coordinates to 1.
+    """
+    cell = cells.Cell([-5, 0, 10], cells.Cell.CELL)
+    xml_elem = cell.to_xml_element()
+    coords = [int(marker.text) for marker in xml_elem]
+    assert coords == [1, 1, 10]
+
+
+def test_cell_equality_and_comparison():
+    """
+    Test __eq__, __ne__, __lt__, and __hash__ on Cell.
+    """
+    c1 = cells.Cell([1, 2, 3], cells.Cell.CELL)
+    c2 = cells.Cell([1, 2, 4], cells.Cell.CELL)
+    c3 = cells.Cell([1, 3, 3], cells.Cell.CELL)
+    c4 = cells.Cell([2, 2, 3], cells.Cell.CELL)
+    c_same = cells.Cell([1, 2, 3], cells.Cell.CELL)
+
+    # __eq__ and __ne__ with non-Cell
+    assert c1 != "not_a_cell"
+    assert not (c1 == "not_a_cell")
+    assert c1 == c_same
+
+    # __lt__ ordering across axes
+    assert c1 < c2
+    assert c1 < c3
+    assert c1 < c4
+    assert not (c2 < c1)
+    assert not (c1 < c_same)
+
+    # __lt__ with non-Cell returns NotImplementedError
+    assert isinstance(c1 < "not_a_cell", NotImplementedError)
+
+    # __hash__
+    assert hash(c1) == hash(str(c1))
+    assert len({c1, c_same, c2}) == 2
