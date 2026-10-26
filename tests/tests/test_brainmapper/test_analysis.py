@@ -190,10 +190,7 @@ def test_get_region_totals(
         .sort_values("structure_name")
         .reset_index(drop=True)
     )
-    assert expected_df.equals(
-        produced_df
-    ), "Produced DataFrame no longer matches per-region "
-    "count from expected DataFrame"
+    pd.testing.assert_frame_equal(expected_df, produced_df)
 
 
 def test_summarise_points_by_region(
