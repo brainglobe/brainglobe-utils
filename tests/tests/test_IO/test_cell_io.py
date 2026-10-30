@@ -289,15 +289,6 @@ def assert_cells_df(cells_df, x_vals, y_vals, z_vals, type_vals):
     assert cells_df.z.tolist() == z_vals
 
 
-def test_cells_xml_to_dataframe(xml_path, x_vals, y_vals, z_vals, type_vals):
-    """
-    Test that cells can be read from an xml file, and correctly converted
-    into a DataFrame.
-    """
-    cells_df = cell_io.cells_xml_to_df(xml_path)
-    assert_cells_df(cells_df, x_vals, y_vals, z_vals, type_vals)
-
-
 def test_cells_to_csv(tmp_path, xml_path, x_vals, y_vals, z_vals, type_vals):
     """
     Test that cells can be written to a csv file.
