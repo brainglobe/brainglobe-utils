@@ -283,3 +283,62 @@ def test_contains_no_identical_points(pre_match):
     b = np.array([[6, 7], [7, 1], [21, 10]])
     matching = match_points(a, b, pre_match=pre_match)
     assert np.array_equal(matching, [1, 0, 2])
+
+
+@pytest.mark.parametrize("pre_match", [True, False])
+@pytest.mark.parametrize("threshold", [-1.0, 0.0])
+def test_cell_matches_negative_or_zero_threshold(pre_match, threshold):
+    """
+    Test that negative or zero threshold results in no good matches.
+    """
+    a = as_cell([10, 20])
+    b = as_cell([10, 20])
+    missing_a, good_matches, missing_b = match_cells(
+        a, b, threshold=threshold, pre_match=pre_match
+    )
+    assert missing_a == [0, 1]
+    assert good_matches == []
+    assert missing_b == [0, 1]
+
+
+@pytest.mark.parametrize("pre_match", [True, False])
+def test_cell_matches_empty_inputs(pre_match):
+    """
+    Test match_cells when one or both inputs are empty.
+    """
+    cells = as_cell([10, 20])
+
+    # Both empty
+    missing_a, good, missing_b = match_cells([], [], pre_match=pre_match)
+    assert missing_a == []
+    assert good == []
+    assert missing_b == []
+
+    # First empty
+    missing_a, good, missing_b = match_cells([], cells, pre_match=pre_match)
+    assert missing_a == []
+    assert good == []
+    assert missing_b == [0, 1]
+
+    # Second empty
+    missing_a, good, missing_b = match_cells(cells, [], pre_match=pre_match)
+    assert missing_a == [0, 1]
+    assert good == []
+    assert missing_b == []
+
+
+@pytest.mark.parametrize("threshold", [-1.0, 0.0, 5.0])
+def test_analyze_point_matches_exceed_threshold(threshold):
+    """
+    Test analyze_point_matches when matches exceed the threshold.
+    """
+    pos1 = np.array([[10, 20, 30], [40, 50, 60]])
+    pos2 = np.array([[100, 200, 300], [400, 500, 600]])
+    matches = np.array([0, 1])
+
+    missing_1, good, missing_2 = analyze_point_matches(
+        pos1, pos2, matches, threshold=threshold
+    )
+    assert np.array_equal(missing_1, [0, 1])
+    assert len(good) == 0
+    assert np.array_equal(missing_2, [0, 1])
